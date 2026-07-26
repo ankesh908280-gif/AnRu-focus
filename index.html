@@ -1,0 +1,502 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+  <title>AnRu Focus</title>
+  
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=Playfair+Display:wght@700;900&display=swap" rel="stylesheet">
+  
+  <link rel="stylesheet" href="style.css">
+  <!-- Firebase Setup -->
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+
+</head>
+<body>
+
+<div class="screen active" id="loginScreen">
+  <div class="auth-container">
+    <div class="auth-hero">
+      <div class="logo-ring"><div class="logo-inner">🚀</div></div>
+      <h1>AnRu Focus</h1>
+      <p>Crush Your Backlog. Design Your Future.</p>
+    </div>
+    <div class="auth-card glass2">
+      <div class="tab-switcher">
+        <button class="tab-btn active" id="tabLogin" onclick="switchAuthTab('login')">Login</button>
+        <button class="tab-btn" id="tabReg" onclick="switchAuthTab('reg')">Register</button>
+      </div>
+      <div class="err-box" id="authErr"></div>
+      
+      <div class="form-panel active" id="panelLogin">
+        <div class="inp-wrap"><span class="ico">📧</span><input type="email" id="liEmail" placeholder="Email address" autocomplete="email"></div>
+        <div class="inp-wrap"><span class="ico">🔒</span><input type="password" id="liPass" placeholder="Password" autocomplete="current-password"></div>
+        <button class="btn btn-grad" onclick="doLogin()">Login to Focus 🚀</button>
+        <button class="btn btn-grad" style="background: #db4437; color: white; width: 100%; padding: 12px; border: none; border-radius: 8px; font-size: 16px; margin-bottom: 10px; cursor: pointer;margin-top: 8px" onclick="continueWithGoogle()">
+  🌐 Continue with Google
+</button>
+
+        <div class="divider">or</div>
+        <button class="btn btn-glass" onclick="guestLogin()">👤 Continue as Guest</button>
+      </div>
+      
+      <div class="form-panel" id="panelReg">
+        <div class="inp-wrap"><span class="ico">👤</span><input type="text" id="reName" placeholder="Your full name"></div>
+        <div class="inp-wrap"><span class="ico">📧</span><input type="email" id="reEmail" placeholder="Email address"></div>
+        <div class="inp-wrap"><span class="ico">🎓</span><input type="text" id="reCourse" placeholder="Course / College (optional)"></div>
+        <div class="inp-wrap"><span class="ico">🔒</span><input type="password" id="rePass" placeholder="Create password (min 4 chars)"></div>
+        <button class="btn btn-grad" onclick="doRegister()">Create Account ✨</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="screen" id="appScreen">
+  
+  <div class="top-nav">
+    <div class="nav-brand">🚀 AnRu Focus</div>
+    <div class="nav-right">
+      <div class="nav-avatar" id="navAv" onclick="switchPage('profile')">?</div>
+      <button class="btn-logout" onclick="doLogout()">Logout</button>
+    </div>
+  </div>
+
+  <div class="main-content">
+    
+    <div class="page active" id="page-dash">
+      <div class="welcome-banner">
+        <h2 id="wMsg">Hey Champion! 👋</h2>
+        <p id="wSub">Ready to crush today?</p>
+        <div class="date-chip">📅 <span id="todayDate">—</span></div>
+      </div>
+      
+      <div id="activeBuffUI" class="glass" style="display:none; padding:12px 16px; margin-bottom:18px; border:1px solid var(--p4); background: linear-gradient(135deg, rgba(236,72,153,0.15), transparent); border-radius:12px; align-items:center; justify-content:space-between;">
+        <div style="display:flex; align-items:center; gap:10px;">
+          <span style="font-size:24px; animation:pulseNeon 2s infinite;">⚡</span>
+          <div>
+            <div style="font-size:12px; font-weight:800; color:var(--p4); text-transform:uppercase;">XP Multiplier Active</div>
+            <div style="font-size:11px; color:var(--textSub);">+20 Extra XP per Task!</div>
+          </div>
+        </div>
+        <div id="buffTimerUI" style="font-size:15px; font-family:'Playfair Display',serif; font-weight:900; color:var(--p4);">02:00:00</div>
+      </div>
+
+      <div class="glass" style="padding:14px; margin-bottom:18px; font-style:italic; text-align:center; font-size:13px; color:var(--textSub); border-left:4px solid var(--p1);">
+        🔥 <span id="dashQuote">लोड हो रहा है धाकड़ मोटिवेशन...</span>
+      </div>
+
+      <div class="glass" style="padding:16px; margin-bottom:18px; border:1px solid rgba(248,113,113,0.3);">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+          <div style="font-weight:700; font-size:14px;">🔥 Daily Lecture Target</div>
+          <div style="font-size:12px; font-weight:800; color:var(--danger)" id="targetTextUI">0/3 Done</div>
+        </div>
+        <div style="height:6px; background:rgba(255,255,255,0.1); border-radius:3px; overflow:hidden;">
+          <div id="targetBarUI" style="height:100%; width:0%; background:linear-gradient(90deg, #f87171, #fbbf24); transition:width 0.5s;"></div>
+        </div>
+      </div>
+
+      <div class="glass" id="aiSuggesterUI" style="padding:14px; margin-bottom:18px; border: 1px solid var(--p3); background: linear-gradient(135deg, rgba(168,85,247,0.15), transparent); border-radius:14px; display:flex; align-items:center; gap:12px;">
+        <div style="font-size:28px; animation: orbFloat 3s infinite;">🤖</div>
+        <div style="flex:1;">
+          <div style="font-size:11px; font-weight:800; color:var(--p3); text-transform:uppercase; margin-bottom:2px;">Smart AI Suggester</div>
+          <div style="font-size:12px; color:var(--textSub); line-height:1.3;">Bhai, aaj live classes kam hain. Chal ek Backlog nipta lein?</div>
+        </div>
+        <button class="btn-sm" style="background:var(--p3); color:#fff; padding:8px 12px; font-size:11px;" onclick="openBacklogVaultModal()">Let's Go</button>
+      </div>
+
+      <div class="vault-banner" onclick="openBacklogVaultModal()">
+        <div style="display:flex; align-items:center; gap:10px;">
+          <span style="font-size:24px">🗂️</span>
+          <div>
+            <div style="font-weight:700; font-size:14px;">Backlog Crusher Vault</div>
+            <div style="font-size:11px; color:var(--textMuted);" id="backlogBannerDesc">0 backlogs pending</div>
+          </div>
+        </div>
+        <span style="font-size:18px; color:var(--danger)">➔</span>
+      </div>
+
+      <div class="stats-grid">
+        <div class="stat-card sc1"><div class="si">📚</div><div class="sn" id="dTotal">0</div><div class="sl">Total Tasks</div></div>
+        <div class="stat-card sc2"><div class="si">🔥</div><div class="sn" id="dPending">0</div><div class="sl">Pending</div></div>
+        <div class="stat-card sc3"><div class="si">🎯</div><div class="sn" id="dXP">0</div><div class="sl">Total XP Level</div></div>
+        <div class="stat-card sc4"><div class="si">⚡</div><div class="sn" id="dStreak">0</div><div class="sl" id="streakLabel">Day Streak</div></div>
+      </div>
+      
+      <div class="prog-card glass">
+        <div class="ring-wrap">
+          <svg width="90" height="90" viewBox="0 0 90 90">
+            <circle class="ring-track" cx="45" cy="45" r="38"/>
+            <circle class="ring-prog" id="pRing" cx="45" cy="45" r="38" fill="none" stroke-width="10" stroke-linecap="round" stroke-dasharray="239" stroke-dashoffset="239" stroke="url(#rg)" transform="rotate(-90 45 45)"/>
+            <defs>
+              <linearGradient id="rg" x1="0%" y1="0%" x2="100%" y2="0%"><stop offset="0%" stop-color="var(--p1)"/><stop offset="100%" stop-color="var(--p3)"/></linearGradient>
+            </defs>
+          </svg>
+          <div class="ring-text"><div class="ring-pct" id="pPct">0%</div><div class="ring-done" id="pDone">done</div></div>
+        </div>
+        <div class="prog-info">
+          <h4 id="ceoRankLabel">Rank: Rookie 🌟</h4>
+          <p id="pDesc">Add tasks to start tracking your mission!</p>
+          <div class="prog-bar"><div class="prog-bar-fill" id="pBar" style="width:0%"></div></div>
+        </div>
+      </div>
+      
+      <div class="sec-head">
+        <div class="sec-title">Recent Tasks</div><button class="see-all" onclick="switchPage('tasks')">See All →</button>
+      </div>
+      <div id="recentList"></div>
+      
+      <div class="sec-head" style="margin-top:20px">
+        <div class="sec-title">Quick Study</div><button class="see-all" onclick="switchPage('timer')">Open Timer →</button>
+      </div>
+      <div class="glass" style="padding:16px;display:flex;align-items:center;gap:14px;border-radius:16px;cursor:pointer" onclick="switchPage('timer')">
+        <div style="font-size:38px">⏱️</div>
+        <div>
+          <div style="font-weight:700;font-size:15px">Study Timer</div>
+          <div style="font-size:12px;color:var(--textMuted)">Background Safe & Anti-Distraction</div>
+        </div>
+        <div style="margin-left:auto;color:var(--textMuted);font-size:20px">›</div>
+      </div>
+
+      <div class="sec-head" style="margin-top:24px;">
+        <div class="sec-title" style="color:var(--warn);">🕵️ Secret Missions</div>
+      </div>
+      <div class="glass" id="secretMissionCard" style="padding:16px; margin-bottom:10px; border: 1px solid rgba(251,191,36,0.3); background: linear-gradient(135deg, rgba(251,191,36,0.05), rgba(0,0,0,0.2)); border-radius: 16px;">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+          <div style="font-weight:700; font-size:13px; color:var(--textSub)">Complete to earn rewards!</div>
+          <div style="display:flex; gap:6px; align-items:center;">
+            <button class="btn-icon" style="width:28px; height:28px; font-size:12px; background:var(--glass2); border:1px solid var(--glassBorder); color:#fff;" onclick="changeSecretMission()" title="Change Mission">🔁</button>
+            <div style="font-size:11px; background:var(--warn); color:#000; padding:3px 10px; border-radius:12px; font-weight:800; box-shadow: 0 0 10px rgba(251,191,36,0.3);">+50 XP</div>
+          </div>
+        </div>
+        <div id="smText" style="font-size:15px; color:#fff; margin-bottom:16px; font-weight:600; line-height:1.4;">Loading mission...</div>
+        <button id="smBtn" class="btn" style="width:100%; background:var(--grad); color:#fff; border-radius:12px; font-size:13px;" onclick="claimSecretMission()">Verify & Claim Reward 🎁</button>
+      </div>
+    </div>
+
+    <div class="page" id="page-tasks">
+      <div class="add-card glass">
+        <h3>➕ Add New Task</h3>
+        <div class="inp-wrap"><span class="ico">📚</span><input type="text" id="tName" placeholder="Task name (e.g., Physics Chapter 5)"></div>
+        <div class="row2">
+          <div class="inp-wrap" style="margin-bottom:0"><input type="date" id="tDate"></div>
+          <div class="inp-wrap" style="margin-bottom:0"><select id="tSubj"><option value="">Subject</option></select></div>
+        </div>
+        <div style="margin-top:10px"></div>
+        <div class="pri-group" id="priGroup">
+          <button class="pri-btn" id="pb-low" onclick="selPri('low')">🟢 Low</button>
+          <button class="pri-btn" id="pb-med" onclick="selPri('med')">🟡 Medium</button>
+          <button class="pri-btn" id="pb-high" onclick="selPri('high')">🔴 High</button>
+        </div>
+        
+        <div style="margin-bottom:12px; font-size:13px; display:flex; align-items:center; gap:8px;">
+          <input type="checkbox" id="tIsTwoStep" style="width:16px; height:16px; margin:0;" checked>
+          <label for="tIsTwoStep" style="color:var(--textSub); font-weight:600; cursor:pointer;">Use Lecture + Notes Split Mode (11th Master) 🎥✍️</label>
+        </div>
+
+        <div class="inp-wrap area"><span class="ico">✍️</span><textarea id="tNote" rows="2" placeholder="Notes or reminders..."></textarea></div>
+        <button class="btn btn-grad" onclick="addTask()">Add to Mission List 🔥</button>
+      </div>
+      
+      <div class="chip-scroll">
+        <button class="fchip active" onclick="setFilter('all',this)">All</button>
+        <button class="fchip" onclick="setFilter('pending',this)">⏳ Pending</button>
+        <button class="fchip" onclick="setFilter('done',this)">✅ Done</button>
+        <button class="fchip" onclick="setFilter('high',this)">🔴 High</button>
+      </div>
+      <div id="taskList"></div>
+    </div>
+
+    <div class="page timer-page" id="page-timer">
+      <div class="timer-mode-toggle" style="margin-top:4px">
+        <button class="tmode-btn active" id="tm-focus" onclick="setTimerMode('focus',this)">🎯 Focus</button>
+        <button class="tmode-btn" id="tm-short" onclick="setTimerMode('short',this)">☕ Short</button>
+        <button class="tmode-btn" id="tm-long" onclick="setTimerMode('long',this)">🌙 Long</button>
+        <button class="tmode-btn" id="tm-stopwatch" onclick="setTimerMode('stopwatch',this)">⏱️ Count-Up</button>
+      </div>
+      
+      <div class="timer-display">
+        <svg width="220" height="220" viewBox="0 0 220 220">
+          <circle cx="110" cy="110" r="100" fill="none" stroke="rgba(255,255,255,0.06)" stroke-width="12"/>
+          <circle id="timerCircle" cx="110" cy="110" r="100" fill="none" stroke-width="12" stroke-linecap="round" stroke-dasharray="628" stroke-dashoffset="0" stroke="url(#tg)" transform="rotate(-90 110 110)"/>
+          <defs>
+            <linearGradient id="tg" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stop-color="var(--p1)"/><stop offset="50%" stop-color="var(--p2)"/><stop offset="100%" stop-color="var(--p4)"/>
+            </linearGradient>
+          </defs>
+        </svg>
+        <div class="timer-content">
+          <div class="timer-time" id="timerDisplay">25:00</div>
+          <div class="timer-label" id="timerLabel">Focus Session</div>
+          <div class="timer-session" id="timerSess">Session #1</div>
+        </div>
+      </div>
+      
+      <button class="btn-sm" id="zenBtn" style="margin-bottom:15px; display:none; background:rgba(255,255,255,0.1); border:1px solid rgba(255,255,255,0.2)" onclick="openZenMode()">🧘‍♂️ Enter Zen Mode</button>
+
+      <div class="timer-controls">
+        <button class="tbtn tbtn-sec" onclick="resetTimer()" title="Reset">🔄</button>
+        <button class="tbtn tbtn-main" id="timerPlayBtn" onclick="toggleTimer()">▶️</button>
+        <button class="tbtn tbtn-sec" onclick="skipTimer()" title="Skip / Log">⏭️</button>
+      </div>
+      
+      <div class="timer-presets" id="timerPresetsBox">
+        <button class="preset-btn active" onclick="setPreset(25,this)">25m</button>
+        <button class="preset-btn" onclick="setPreset(45,this)">45m</button>
+        <button class="preset-btn" onclick="setPreset(60,this)">60m</button>
+        <button class="preset-btn" onclick="setPreset(90,this)">90m</button>
+        <button class="preset-btn" onclick="customTimer(this)">✏️</button>
+      </div>
+      
+      <div class="sec-head" style="width:100%">
+        <div class="sec-title">Today's Sessions</div><span id="totalStudyTime" style="font-size:13px;color:var(--textMuted)">0h 0m total</span>
+      </div>
+      <div id="sessionLog" style="width:100%"></div>
+    </div>
+
+    <div class="page" id="page-subjects">
+      
+      <div class="sec-head" style="margin-top:8px;"><div class="sec-title">📅 Live vs Backlogs</div></div>
+      <div class="row2" style="margin-bottom:20px;">
+         <div class="glass" style="padding:14px; border-left: 4px solid var(--success); background: linear-gradient(135deg, rgba(74,222,128,0.1), transparent);">
+            <div style="font-size:11px; color:var(--textMuted); font-weight:600; text-transform:uppercase;">Live Classes</div>
+            <div style="font-size:24px; font-family:'Playfair Display', serif; font-weight:900; color:var(--success);" id="liveCountUI">0</div>
+         </div>
+         <div class="glass" style="padding:14px; border-left: 4px solid var(--danger); background: linear-gradient(135deg, rgba(248,113,113,0.1), transparent);">
+            <div style="font-size:11px; color:var(--textMuted); font-weight:600; text-transform:uppercase;">Pending Backlogs</div>
+            <div style="font-size:24px; font-family:'Playfair Display', serif; font-weight:900; color:var(--danger);" id="backlogCountUI">0</div>
+         </div>
+      </div>
+
+      <div class="sec-head"><div class="sec-title">🗺️ Syllabus Skill Tree</div></div>
+      <div class="glass" style="padding:16px; margin-bottom:20px; position:relative; max-height:200px; overflow-y:auto;">
+        <div id="skillTreeContainer" style="display:flex; flex-direction:column; gap:12px;">
+           <div style="font-size:13px; color:var(--textSub); text-align:center; padding:10px;">Add subjects to grow your skill tree! 🌱</div>
+        </div>
+      </div>
+
+      <div class="add-card glass" style="margin-bottom:16px">
+        <h3>📁 Add Subject / Chapter</h3>
+        <div class="emoji-row" id="emojiRow"></div>
+        <div style="display:flex;gap:8px; align-items:center;">
+          <div class="inp-wrap" style="flex:1; margin-bottom:0;"><input type="text" id="sName" placeholder="Chapter name (e.g., Kinematics)"></div>
+          <button class="btn btn-sm" onclick="addSubject()" style="height:100%;">Add</button>
+        </div>
+      </div>
+      
+      <div class="sec-head"><div class="sec-title">Formula Vaults</div></div>
+      <div class="subj-grid" id="subjGrid"></div>
+    </div>
+
+    <div class="page" id="page-profile">
+      
+      <div class="sec-head" style="margin-bottom:0px; display:flex; justify-content:space-between; align-items:center;">
+        <div class="sec-title">Holographic ID</div>
+        <select class="chart-select" id="chartFilter" onchange="renderWeeklyStudyChart()">
+          <option value="7">Last 7 Days</option>
+          <option value="30">Last 30 Days</option>
+          <option value="365">12 Months</option>
+        </select>
+      </div>
+      
+      <div class="holo-scene" onclick="this.querySelector('.holo-card').classList.toggle('is-flipped')">
+        <div class="holo-card">
+          <div class="holo-face holo-front">
+            <input type="file" id="pfpInput" accept="image/*" style="display:none" onchange="handlePfpUpload(event)">
+            <div class="pa-ring" onclick="event.stopPropagation(); document.getElementById('pfpInput').click()">
+              <div class="pa-inner" id="profAv">?</div>
+              <div class="pa-edit-badge">📷</div>
+            </div>
+            <div class="profile-name" id="profName">Champion</div>
+            <div class="profile-email" id="profEmail">—</div>
+            <div class="profile-badge" id="profBadge">Rank: Rookie 🌟</div>
+            <div style="font-size:10px; opacity:0.5; margin-top:20px; text-transform:uppercase; letter-spacing:1px;">Tap to view analytics ↺</div>
+          </div>
+          <div class="holo-face holo-back">
+            <div class="ps-grid">
+              <div class="ps-box"><div class="ps-num" id="ps1">0</div><div class="ps-lbl">Tasks</div></div>
+              <div class="ps-box"><div class="ps-num" id="ps2">0</div><div class="ps-lbl">Completed</div></div>
+              <div class="ps-box"><div class="ps-num" id="ps3">0</div><div class="ps-lbl">Subjects</div></div>
+            </div>
+            <div class="chart-container" id="weeklyStudyChart" style="height:120px; background:transparent; border:none; padding:0; margin:0;">
+            </div>
+            
+            <div style="font-size:11px; font-weight:700; margin-top:10px; color:var(--textSub);">Subject Focus Breakdown</div>
+            <div id="subjectTimeGrid" style="display:flex; gap:2px; width:100%; height:8px; border-radius:4px; overflow:hidden; margin-top:4px; background:rgba(255,255,255,0.1);"></div>
+            <div id="subjectTimeLabels" style="display:flex; flex-wrap:wrap; gap:6px; justify-content:center; margin-top:6px;"></div>
+
+            <div style="font-size:10px; opacity:0.5; text-align:center; margin-top:10px; text-transform:uppercase; letter-spacing:1px;">Tap to flip back ↺</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="sec-head" style="margin-top:10px;"><div class="sec-title">🛒 XP Theme Shop</div></div>
+      <div class="glass settings-card" style="margin-bottom:20px; padding:10px;">
+        
+        <div class="shop-item" style="border-color: var(--p3); background: rgba(168, 85, 247, 0.1);">
+          <div class="shop-info">
+            <div class="shop-icon">🎁</div>
+            <div><div class="shop-title" style="color: var(--p3);">Mystery Box</div><div class="shop-desc">Random Reward (Boost, Freeze, etc)</div></div>
+          </div>
+          <button class="btn-sm" onclick="buyMysteryBox()" style="background: var(--p3); color: #fff;">150 XP</button>
+        </div>
+
+        <div class="shop-item">
+          <div class="shop-info">
+            <div class="shop-icon">🌌</div>
+            <div><div class="shop-title">AnRu Dark</div><div class="shop-desc">Original Premium Theme.</div></div>
+          </div>
+          <button class="btn-sm" id="btnThemeDefault" style="background:rgba(255,255,255,0.1); border:1px solid rgba(255,255,255,0.2);" onclick="buyShopItem('default', 0)">Use</button>
+        </div>
+
+        <div class="shop-item">
+          <div class="shop-info">
+            <div class="shop-icon">❄️</div>
+            <div><div class="shop-title">Streak Freeze</div><div class="shop-desc">Saves streak if missed tomorrow.</div></div>
+          </div>
+          <button class="btn-sm" style="background:rgba(255,255,255,0.1); border:1px solid rgba(255,255,255,0.2);" onclick="buyShopItem('freeze', 200)">200 XP</button>
+        </div>
+
+        <div class="shop-item">
+          <div class="shop-info">
+            <div class="shop-icon">🟢</div>
+            <div><div class="shop-title">Matrix Hacker</div><div class="shop-desc">Neon green cyber theme.</div></div>
+          </div>
+          <button class="btn-sm" id="btnThemeMatrix" onclick="buyShopItem('matrix', 500)">500 XP</button>
+        </div>
+
+        <div class="shop-item">
+          <div class="shop-info">
+            <div class="shop-icon">🔴</div>
+            <div><div class="shop-title">Cyberpunk Red</div><div class="shop-desc">Aggressive red & blue theme.</div></div>
+          </div>
+          <button class="btn-sm" id="btnThemeCyber" onclick="buyShopItem('cyber', 1000)">1000 XP</button>
+        </div>
+        
+        <div class="shop-item">
+          <div class="shop-info">
+            <div class="shop-icon">🌊</div>
+            <div><div class="shop-title">Ocean Blue</div><div class="shop-desc">Calm deep sea vibe.</div></div>
+          </div>
+          <button class="btn-sm" id="btnThemeOcean" onclick="buyShopItem('ocean', 300)">300 XP</button>
+        </div>
+
+      </div>
+
+      <div class="sec-head"><div class="sec-title">Settings & Cloud Controls</div></div>
+      <div class="glass settings-card">
+        
+        <div class="sitem" onclick="openReportModal()">
+          <div class="sitem-l"><div class="sitem-ico">📊</div><div><div class="sitem-txt">Weekly Academic Report</div><div class="sitem-sub">Generate performance document</div></div></div>
+          <div class="sitem-r">›</div>
+        </div>
+
+        <div class="sitem" onclick="openModal('editName')">
+          <div class="sitem-l"><div class="sitem-ico">✏️</div><div><div class="sitem-txt">Edit Name</div><div class="sitem-sub">Change your display name</div></div></div>
+          <div class="sitem-r">›</div>
+        </div>
+        <div class="sitem" onclick="openModal('editPass')">
+          <div class="sitem-l"><div class="sitem-ico">🔒</div><div><div class="sitem-txt">Change Password</div><div class="sitem-sub">Update security authorization</div></div></div>
+          <div class="sitem-r">›</div>
+        </div>
+        <div class="sitem" onclick="openModal('editCourse')">
+          <div class="sitem-l"><div class="sitem-ico">🎓</div><div><div class="sitem-txt">Edit Course/College</div><div class="sitem-sub" id="courseDisplay">—</div></div></div>
+          <div class="sitem-r">›</div>
+        </div>
+        
+        <div class="sitem" onclick="toggleEyeStrain()">
+          <div class="sitem-l"><div class="sitem-ico">👁️</div><div><div class="sitem-txt">Eye-Strain Break</div><div class="sitem-sub">Auto-remind after 45 mins of class</div></div></div>
+          <div class="toggle-sw" id="eyeStrainSw"></div>
+        </div>
+
+        <div class="sitem" onclick="exportBackupData()">
+          <div class="sitem-l"><div class="sitem-ico">📥</div><div><div class="sitem-txt">Export Backup JSON</div><div class="sitem-sub">Download data file safely</div></div></div>
+          <div class="sitem-r">›</div>
+        </div>
+        <div class="sitem" onclick="document.getElementById('importBackupInput').click()">
+          <div class="sitem-l"><div class="sitem-ico">📤</div><div><div class="sitem-txt">Import Backup File</div><div class="sitem-sub">Restore tasks configuration</div></div></div>
+          <input type="file" id="importBackupInput" accept=".json" style="display:none" onchange="importBackupData(event)">
+          <div class="sitem-r">›</div>
+        </div>
+        <div class="sitem" onclick="toggleNotif()">
+          <div class="sitem-l"><div class="sitem-ico">🔔</div><div><div class="sitem-txt">Notifications</div><div class="sitem-sub">Study reminders engine</div></div></div>
+          <div class="toggle-sw" id="notifSw"></div>
+        </div>
+        <div class="sitem" onclick="toggleSfx()">
+          <div class="sitem-l"><div class="sitem-ico">🔊</div><div><div class="sitem-txt">Sound Effects</div><div class="sitem-sub">Chimes, alarms & click sounds</div></div></div>
+          <div class="toggle-sw" id="sfxSw"></div>
+        </div>
+        <div class="sitem" onclick="openModal('clearData')">
+          <div class="sitem-l"><div class="sitem-ico">🗑️</div><div><div class="sitem-txt">Clear All Data</div><div class="sitem-sub">Reset internal files limits</div></div></div>
+          <div class="sitem-r" style="color:var(--danger)">›</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="bottom-nav">
+    <button class="bnav-item active" id="bn-dash" onclick="switchPage('dash',this)"><span class="bni">🏠</span>Dashboard</button>
+    <button class="bnav-item" id="bn-tasks" onclick="switchPage('tasks',this)"><span class="bni">📋</span>Tasks<span class="bnav-badge" id="pendingBadge" style="display:none">0</span></button>
+    <button class="bnav-item" id="bn-timer" onclick="switchPage('timer',this)"><span class="bni">⏱️</span>Timer</button>
+    <button class="bnav-item" id="bn-subjects" onclick="switchPage('subjects',this)"><span class="bni">📁</span>Subjects</button>
+    <button class="bnav-item" id="bn-profile" onclick="switchPage('profile',this)"><span class="bni">👤</span>Profile</button>
+  </div>
+</div>
+
+<div id="floatingNoteBtn" onclick="openTimestampModal()" style="position:fixed; bottom:85px; right:20px; width:50px; height:50px; background:var(--grad); border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:20px; color:#fff; box-shadow:0 5px 15px rgba(0,0,0,0.4); cursor:pointer; z-index:400; transition:transform 0.2s;">
+  📝
+</div>
+
+<div class="modal-overlay" id="modalOverlay">
+  <div class="modal-box glass2">
+    <button class="modal-close" onclick="closeModal()">✕</button>
+    <div id="modalContent"></div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="timestampModal">
+  <div class="modal-box glass2" style="max-width:320px;">
+    <button class="modal-close" onclick="document.getElementById('timestampModal').classList.remove('open')">✕</button>
+    <div class="modal-title" style="font-size:18px;">⏱️ Quick Timestamp Note</div>
+    <p style="font-size:12px; color:var(--textMuted); margin-bottom:12px;">Class ke beech me important point save karo!</p>
+    <div class="inp-wrap area"><textarea id="tsNoteInput" rows="3" placeholder="Ex: 45:20 - Important derivation..."></textarea></div>
+    <div class="inp-wrap"><select id="tsTaskSelect"><option value="">Select Active Task to attach...</option></select></div>
+    <button class="btn btn-grad" onclick="saveTimestampNote()">Save Note 📌</button>
+  </div>
+</div>
+
+<div class="modal-overlay" id="reportModal">
+  <div class="modal-box glass2" style="max-width:400px; padding:16px;">
+    <button class="modal-close" onclick="document.getElementById('reportModal').classList.remove('open')">✕</button>
+    <div class="modal-title" style="font-size:18px; margin-bottom:10px;">📊 Weekly Report</div>
+    
+    <div id="reportContent" style="background:#fff; color:#111; padding:20px; border-radius:12px; margin-bottom:16px; box-shadow:0 10px 25px rgba(0,0,0,0.3);">
+      <div style="text-align:center; font-family:'Playfair Display', serif; font-weight:900; font-size:22px; margin-bottom:10px; color:#222;">AnRu Focus</div>
+      <div style="text-align:center; font-size:12px; color:#666; margin-bottom:20px; border-bottom:1px solid #eee; padding-bottom:10px;">Weekly Academic Performance</div>
+      
+      <div style="font-size:14px; font-weight:600; margin-bottom:8px;" id="reportDateRange">Date: -- to --</div>
+      <div style="font-size:13px; margin-bottom:6px;">🧑‍🎓 Student: <span id="reportStudentName" style="font-weight:700;">--</span></div>
+      <div style="font-size:13px; margin-bottom:6px;">⏱️ Total Focus: <span id="reportTotalTime" style="font-weight:700;">0h 0m</span></div>
+      <div style="font-size:13px; margin-bottom:6px;">✅ Tasks Done: <span id="reportTasksDone" style="font-weight:700;">0</span></div>
+      <div style="font-size:13px; margin-bottom:20px;">🗂️ Backlogs Cleared: <span id="reportBacklogsCleared" style="font-weight:700;">0</span></div>
+      
+      <div style="text-align:center; font-size:11px; color:#888; font-style:italic; border-top:1px solid #eee; padding-top:10px;">"Consistency is the ultimate superpower."</div>
+    </div>
+
+    <button class="btn btn-grad" onclick="printReport()">Download / Print Report 🖨️</button>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<div class="zen-overlay" id="zenOverlay" ondblclick="exitZenMode()">
+  <div class="zen-time" id="zenDisplay">25:00</div>
+  <div class="zen-quote" id="zenQuote">गहरी एकाग्रता ही 21वीं सदी की महाशक्ति है।</div>
+  <div class="zen-exit">Double tap anywhere to exit</div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+<script src="app.js"></script>
+
+</body>
+</html>
