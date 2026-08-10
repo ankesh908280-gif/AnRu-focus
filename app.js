@@ -8,36 +8,21 @@ const firebaseConfig = {
   appId: "1:503432672889:web:193c620deec4b8906646a8"
 };
 
-// 2. Initialize Firebase
+// 2. Initialize Firebase & Firestore
 firebase.initializeApp(firebaseConfig);
 const auth = firebase.auth();
+const db = firebase.firestore(); // ☁️ CLOUD DATABASE ENGINE
 const googleProvider = new firebase.auth.GoogleAuthProvider();
-
-// 3. Google Login Function
-function continueWithGoogle() {
-  auth.signInWithPopup(googleProvider)
-    .then((result) => {
-      const user = result.user;
-      
-      // Yeh aapke login screen ko chupayega aur app chalu karega
-      document.getElementById('loginScreen').classList.remove('active');
-      
-      // Agar aapke purane code me login ke baad ka koi function hai (jaise loginWith), 
-      // toh use yahan call kar sakte hain. Abhi ke liye success message dikhayega:
-      alert("Hello " + user.displayName + " 🚀, Login Successful!");
-    })
-    .catch((error) => {
-      document.getElementById('authErr').innerText = "Error: " + error.message;
-    });
-}
 
 /* ████████████████████████████████████████████████████████████
                   1. APP STATE & CONFIGURATION 
 ████████████████████████████████████████████████████████████ 
 */
 const S={
-  users:[], session:null, tasks:[], subjects:[], filter:'all', pri:'med', emoji:'📚', notif:false, sfx:true, xp:0, 
-  theme: 'default', unlocks: { matrix:false, cyber:false, ocean:false }, freezeDate: null, lastDrainDate: null,
+  session:null, tasks:[], subjects:[], filter:'all', pri:'med', emoji:'📚', notif:false, sfx:true, xp:0, 
+  theme: 'default', 
+  unlocks: { matrix:false, cyber:false, ocean:false, sunset:false, gold:false, badge_ninja:false, badge_scholar:false, badge_legend:false }, 
+  freezeDate: null, lastDrainDate: null, lastMissionDate: null,
   eyeStrain: false, activeBuff: null, 
   timer:{running:false, interval:null, total:25*60, left:25*60, elapsed:0, mode:'focus', session:1, logs:[], targetTime:0, startTime:0}
 };
@@ -90,46 +75,100 @@ function playSfx(name){
     else if(name==='unlock'){ sfxTone(523.25,0,0.1,'sine',0.16); sfxTone(659.25,0.08,0.1,'sine',0.16); sfxTone(783.99,0.16,0.1,'sine',0.16); sfxTone(1046.5,0.24,0.22,'sine',0.2); }
   }catch(e){}
 }
-function toggleSfx(){ S.sfx = !S.sfx; updateSfxToggle(); saveData(); if(S.sfx) playSfx('click'); showToast(S.sfx?'🔊 Sound Effects On!':'🔇 Sound Effects Off'); }
+function toggleSfx(){ S.sfx = !S.sfx; updateSfxToggle(); localStorage.setItem('mceo_sfx', JSON.stringify(S.sfx)); if(S.sfx) playSfx('click'); showToast(S.sfx?'🔊 Sound Effects On!':'🔇 Sound Effects Off'); }
 function updateSfxToggle(){ const sw=document.getElementById('sfxSw'); if(sw) sw.classList.toggle('on', S.sfx); }
+function toggleNotif(){ S.notif=!S.notif; if(S.notif&&'Notification' in window&&Notification.permission!=='granted'){Notification.requestPermission().then(p=>{if(p!=='granted'){S.notif=false; updateNotifToggle();}});} updateNotifToggle(); localStorage.setItem('mceo_notif', JSON.stringify(S.notif)); showToast(S.notif?'🔔 Notifications Active!':'🔕 Notifications Sleeping'); }
+function updateNotifToggle(){const sw=document.getElementById('notifSw'); if(sw)sw.classList.toggle('on',S.notif);}
 
 /* ████████████████████████████████████████████████████████████
-                  3. DATA LOAD, SAVE & BOOT 
+                  3. CLOUD SYNC & DATA MANAGEMENT ☁️
 ████████████████████████████████████████████████████████████ 
 */
-window.onload=()=>{
-  S.users=JSON.parse(localStorage.getItem('mceo_users') || '[]');
-  S.session=JSON.parse(localStorage.getItem('mceo_sess') || 'null');
-  if(S.session){ loadData(); bootApp(); }
+window.onload = async () => {
+  S.session = JSON.parse(localStorage.getItem('mceo_sess') || 'null');
   updateTodayDate(); loadQuotesEngine();
+  
+  if(S.session) {
+     if(!S.session.isGuest) {
+        try {
+            // ☁️ Fetch fresh data from Google Cloud
+            const doc = await db.collection('users').doc(S.session.email).get();
+            if(doc.exists) loadDataFromObj(doc.data());
+            else loadDataLocal(); 
+        } catch(e) { console.error(e); loadDataLocal(); }
+     } else {
+        loadDataLocal(); // Guest mode (Local only)
+     }
+     bootApp();
+  }
 };
-
-function updateTodayDate(){const d=new Date(); const el=document.getElementById('todayDate'); if(el) el.textContent=d.toLocaleDateString('en-IN',{weekday:'long',year:'numeric',month:'short',day:'numeric'});}
-function loadQuotesEngine(){const el=document.getElementById('dashQuote'); if(el) el.textContent=pickQuote();}
 
 function key(s){const id=S.session?.isGuest?'guest':(S.session?.email||'guest'); return `mceo_${id}_${s}`;}
 
-function loadData(){
+// Load from Cloud Data Object
+function loadDataFromObj(data) {
+    S.tasks = data.tasks || [];
+    S.subjects = data.subjects || [{name:'Physics',emoji:'🔬',flashcards:[]},{name:'Maths',emoji:'🧮',flashcards:[]},{name:'Computer Science',emoji:'💻',flashcards:[]}];
+    S.timer.logs = data.logs || [];
+    S.xp = data.xp || 0;
+    S.theme = data.theme || 'default';
+    S.unlocks = { matrix:false, cyber:false, ocean:false, sunset:false, gold:false, badge_ninja:false, badge_scholar:false, badge_legend:false, ...(data.unlocks || {}) };
+    S.freezeDate = data.freezeDate || null;
+    S.lastDrainDate = data.lastDrainDate || null;
+    S.lastMissionDate = data.lastMissionDate || null;
+    S.eyeStrain = data.eyeStrain || false;
+    S.activeBuff = data.activeBuff || null;
+    
+    // device specific settings (Not synced to cloud)
+    S.notif=JSON.parse(localStorage.getItem('mceo_notif')||'false'); 
+    S.sfx=JSON.parse(localStorage.getItem('mceo_sfx')||'true');
+}
+
+// Fallback to local storage (Offline or Guest)
+function loadDataLocal(){
   S.tasks=JSON.parse(localStorage.getItem(key('tasks'))||'[]');
   S.subjects=JSON.parse(localStorage.getItem(key('subj'))||JSON.stringify([{name:'Physics',emoji:'🔬'},{name:'Maths',emoji:'🧮'},{name:'Computer Science',emoji:'💻'}]));
   S.subjects.forEach(s => { if(!s.flashcards) s.flashcards = []; });
   S.timer.logs=JSON.parse(localStorage.getItem(key('logs'))||'[]');
-  S.notif=JSON.parse(localStorage.getItem(key('notif'))||'false');
-  S.sfx=JSON.parse(localStorage.getItem(key('sfx'))||'true');
   S.eyeStrain=JSON.parse(localStorage.getItem(key('eyeStrain'))||'false'); 
   S.activeBuff=JSON.parse(localStorage.getItem(key('buff'))||'null'); 
   S.xp=parseInt(localStorage.getItem(key('xp'))||'0');
   S.theme=localStorage.getItem(key('theme'))||'default';
-  S.unlocks=JSON.parse(localStorage.getItem(key('unlocks'))||JSON.stringify({matrix:false, cyber:false, ocean:false}));
+  let savedUnlocks = JSON.parse(localStorage.getItem(key('unlocks'))||'{}');
+  S.unlocks = { matrix:false, cyber:false, ocean:false, sunset:false, gold:false, badge_ninja:false, badge_scholar:false, badge_legend:false, ...savedUnlocks };
   S.freezeDate=localStorage.getItem(key('freeze'))||null;
   S.lastDrainDate=localStorage.getItem(key('drain'))||null;
+  S.lastMissionDate=localStorage.getItem(key('lastMissionDate'))||null;
+  S.notif=JSON.parse(localStorage.getItem('mceo_notif')||'false'); 
+  S.sfx=JSON.parse(localStorage.getItem('mceo_sfx')||'true');
 }
+
+async function saveToCloud() {
+  if(!S.session || S.session.isGuest) return; 
+  try {
+    // ☁️ Push Data to Google Cloud Firestore
+    await db.collection('users').doc(S.session.email).set({
+      profile: S.session,
+      tasks: S.tasks,
+      subjects: S.subjects,
+      logs: S.timer.logs,
+      xp: S.xp,
+      theme: S.theme,
+      unlocks: S.unlocks,
+      freezeDate: S.freezeDate,
+      lastDrainDate: S.lastDrainDate,
+      lastMissionDate: S.lastMissionDate,
+      eyeStrain: S.eyeStrain,
+      activeBuff: S.activeBuff
+    });
+  } catch(e) { console.error("Cloud Save Failed", e); }
+}
+
 function saveData(){
+  // Local Save (Backup / Offline Support)
   localStorage.setItem(key('tasks'),JSON.stringify(S.tasks));
   localStorage.setItem(key('subj'),JSON.stringify(S.subjects));
   localStorage.setItem(key('logs'),JSON.stringify(S.timer.logs));
-  localStorage.setItem(key('notif'),JSON.stringify(S.notif));
-  localStorage.setItem(key('sfx'),JSON.stringify(S.sfx));
   localStorage.setItem(key('eyeStrain'),JSON.stringify(S.eyeStrain)); 
   if(S.activeBuff) localStorage.setItem(key('buff'),JSON.stringify(S.activeBuff)); else localStorage.removeItem(key('buff')); 
   localStorage.setItem(key('xp'),S.xp.toString());
@@ -137,6 +176,10 @@ function saveData(){
   localStorage.setItem(key('unlocks'),JSON.stringify(S.unlocks));
   if(S.freezeDate) localStorage.setItem(key('freeze'), S.freezeDate);
   if(S.lastDrainDate) localStorage.setItem(key('drain'), S.lastDrainDate);
+  if(S.lastMissionDate) localStorage.setItem(key('lastMissionDate'), S.lastMissionDate);
+  
+  // Trigger Cloud Sync automatically ☁️
+  saveToCloud();
 }
 
 function bootApp(){
@@ -150,7 +193,7 @@ function bootApp(){
 }
 
 /* ████████████████████████████████████████████████████████████
-                  4. AUTHENTICATION 
+                  4. CLOUD AUTHENTICATION 
 ████████████████████████████████████████████████████████████ 
 */
 function switchAuthTab(t){
@@ -160,25 +203,103 @@ function switchAuthTab(t){
 }
 function showAuthErr(m){const e=document.getElementById('authErr'); e.textContent=m; e.style.display='block';}
 
-function doRegister(){
-  const name=document.getElementById('reName').value.trim(); const email=document.getElementById('reEmail').value.trim();
+async function doRegister(){
+  const name=document.getElementById('reName').value.trim(); const email=document.getElementById('reEmail').value.trim().toLowerCase();
   const course=document.getElementById('reCourse').value.trim(); const pass=document.getElementById('rePass').value;
+  
   if(!name){ playSfx('error'); return showAuthErr('Naam daal bhai! 😅'); }
   if(!email||!email.includes('@')){ playSfx('error'); return showAuthErr('Valid email daal!'); }
   if(pass.length<4){ playSfx('error'); return showAuthErr('Password kam se kam 4 characters!'); }
-  if(S.users.find(u=>u.email===email)){ playSfx('error'); return showAuthErr('Email already registered hai!'); }
-  const u={name,email,course,pass,createdAt:Date.now(),pfp:null};
-  S.users.push(u); localStorage.setItem('mceo_users',JSON.stringify(S.users));
-  loginWith(u); playSfx('success'); showToast('🎉 Account ban gaya! Welcome!','success');
+  
+  document.getElementById('authErr').style.display='none'; showToast("Creating Cloud Account... ☁️");
+  
+  try {
+      const doc = await db.collection('users').doc(email).get();
+      if(doc.exists) { playSfx('error'); return showAuthErr('Email already registered!'); }
+      
+      await syncAndLogin(email, name, course, null, pass);
+      playSfx('success'); showToast('🎉 Cloud Account Created!','success');
+  } catch (error) { playSfx('error'); showAuthErr("Network Error. Check connection."); }
 }
-function doLogin(){
-  const email=document.getElementById('liEmail').value.trim(); const pass=document.getElementById('liPass').value;
-  const u=S.users.find(u=>u.email===email&&u.pass===pass);
-  if(!u){ playSfx('error'); return showAuthErr('Email ya password galat hai! 🤔'); }
-  loginWith(u); playSfx('success'); showToast('🚀 Welcome back!','success');
+
+async function doLogin(){
+  const email=document.getElementById('liEmail').value.trim().toLowerCase(); const pass=document.getElementById('liPass').value;
+  if(!email || !pass){ playSfx('error'); return showAuthErr('Details daal bhai! 😅'); }
+
+  document.getElementById('authErr').style.display='none'; showToast("Fetching Cloud Data... ☁️");
+
+  try {
+      const doc = await db.collection('users').doc(email).get();
+      if(!doc.exists){ playSfx('error'); return showAuthErr('Account not found! 🤔'); }
+      
+      const data = doc.data();
+      if(data.profile && data.profile.pass !== pass) { playSfx('error'); return showAuthErr('Wrong password! ❌'); }
+      
+      S.session = data.profile;
+      localStorage.setItem('mceo_sess', JSON.stringify(S.session));
+      loadDataFromObj(data);
+      bootApp();
+      playSfx('success'); showToast('🚀 Cloud Sync Successful!','success');
+  } catch (error) { playSfx('error'); showAuthErr("Network Error. Check connection."); }
 }
-function guestLogin(){loginWith({name:'Guest',email:'guest@mceo.app',course:'',isGuest:true,pfp:null}); playSfx('success'); showToast('👤 Guest mode mein ho!','success');}
-function loginWith(u){S.session=u; localStorage.setItem('mceo_sess',JSON.stringify(u)); loadData(); bootApp();}
+
+async function continueWithGoogle() {
+  try {
+    const result = await auth.signInWithPopup(googleProvider);
+    const user = result.user;
+    document.getElementById('loginScreen').classList.remove('active');
+    showToast("Syncing cloud data... ☁️");
+    await syncAndLogin(user.email.toLowerCase(), user.displayName, null, user.photoURL, "google_oauth");
+  } catch(error) { showAuthErr("Error: " + error.message); }
+}
+
+// ☁️ Master Sync Function
+async function syncAndLogin(email, name, course, pfp, pass) {
+  const userRef = db.collection('users').doc(email);
+  const doc = await userRef.get();
+  
+  if(doc.exists) {
+    const data = doc.data(); S.session = data.profile;
+    if(pfp && !S.session.pfp) S.session.pfp = pfp; // Update pfp if new
+    loadDataFromObj(data);
+  } else {
+    // Create completely new clean account
+    S.session = { name, email, course: course||'', pass, pfp, isGuest:false };
+    S.tasks=[]; S.subjects=[{name:'Physics',emoji:'🔬',flashcards:[]},{name:'Maths',emoji:'🧮',flashcards:[]},{name:'Computer Science',emoji:'💻',flashcards:[]}];
+    S.timer.logs=[]; S.xp=0; S.theme='default'; S.activeBuff=null; S.freezeDate=null; S.lastDrainDate=null; S.lastMissionDate=null; S.eyeStrain=false;
+    S.unlocks={matrix:false, cyber:false, ocean:false, sunset:false, gold:false, badge_ninja:false, badge_scholar:false, badge_legend:false};
+  }
+  localStorage.setItem('mceo_sess', JSON.stringify(S.session));
+  await saveToCloud(); bootApp();
+}
+
+async function doForgotPassword() {
+  const email = prompt("Enter your registered email address:\n(अपना रजिस्टर्ड ईमेल दर्ज करें)");
+  if (!email) return;
+  const lowerEmail = email.trim().toLowerCase();
+  
+  showToast("Searching Cloud... ☁️");
+  const userRef = db.collection('users').doc(lowerEmail);
+  const doc = await userRef.get();
+  
+  if (!doc.exists) { playSfx('error'); return showAuthErr('यह ईमेल रजिस्टर्ड नहीं है! 🤔'); }
+  if (doc.data().profile.pass === "google_oauth") { playSfx('error'); return alert('You logged in with Google! Password reset is not needed.'); }
+  
+  const newPass = prompt("Set a new password (min 4 characters):\n(नया पासवर्ड सेट करें)");
+  if (!newPass || newPass.length < 4) { playSfx('error'); alert('Password must be at least 4 characters long!'); return; }
+  
+  const data = doc.data(); data.profile.pass = newPass;
+  await userRef.set(data);
+  playSfx('success'); showToast('🎉 Cloud Password successfully reset! Please login.', 'success'); document.getElementById('authErr').style.display = 'none';
+}
+
+function guestLogin(){
+   S.session = {name:'Guest',email:'guest@mceo.app',course:'',isGuest:true,pfp:null};
+   localStorage.setItem('mceo_sess',JSON.stringify(S.session));
+   loadDataLocal(); bootApp();
+   playSfx('success'); showToast('👤 Guest mode mein ho! Data Cloud me save nahi hoga.','success');
+}
+
 function doLogout(){
   if(!confirm('Logout karna chahte ho?'))return;
   saveData(); S.session=null; localStorage.removeItem('mceo_sess'); stopTimer(); playSfx('click');
@@ -207,17 +328,44 @@ function applyTheme(th) { S.theme = th; saveData(); document.body.className = th
 
 function buyShopItem(item, cost) {
   if(item === 'default') { applyTheme('default'); playSfx('click'); showToast('🌌 Restored AnRu Dark Theme!', 'success'); updateShopUI(); return; }
+  
+  if(item === 'potion') {
+    if(S.xp < cost){ playSfx('error'); return showToast(`Not enough XP! Need ${cost}`, 'error'); }
+    S.xp -= cost; 
+    S.activeBuff = { type: 'xp_boost', endTime: Date.now() + (1 * 60 * 60 * 1000) };
+    saveData(); renderDashboard(); updateShopUI(); playSfx('unlock'); checkBuffState(); showToast('🧪 2x XP Potion Active for 1 Hour!', 'success');
+    return;
+  }
+  
+  if(item === 'timetravel') {
+     if(S.xp < cost){ playSfx('error'); return showToast(`Not enough XP! Need ${cost}`, 'error'); }
+     S.xp -= cost; 
+     let yest = new Date(); yest.setDate(yest.getDate() - 1);
+     S.tasks.push({ id:Date.now(), name: "⏳ Time Travel Recovery", date: yest.toISOString().split('T')[0], subj: "", priority: "med", isDone: true, isBacklog: false });
+     saveData(); renderDashboard(); updateShopUI(); playSfx('unlock'); showToast('⏳ Timeline Restored! Streak Saved.', 'success');
+     return;
+  }
+  
   if(item === 'freeze') {
     if(S.xp < cost){ playSfx('error'); return showToast(`Not enough XP! Need ${cost}`, 'error'); }
     S.xp -= cost; let tomorrow = new Date(); tomorrow.setDate(tomorrow.getDate() + 1); S.freezeDate = tomorrow.toISOString().split('T')[0];
     saveData(); renderDashboard(); updateShopUI(); playSfx('unlock'); showToast('❄️ Streak Freeze active for tomorrow!', 'success');
+    return;
   } 
-  else {
-    if(S.unlocks[item]) { applyTheme(item); playSfx('click'); showToast(`Applied ${item} theme!`, 'success'); updateShopUI(); return; }
-    if(S.xp < cost){ playSfx('error'); return showToast(`Not enough XP! Need ${cost}`, 'error'); }
-    S.xp -= cost; S.unlocks[item] = true; applyTheme(item);
-    saveData(); renderDashboard(); updateShopUI(); playSfx('unlock'); showToast(`🎉 Unlocked & Applied theme!`, 'success');
+
+  if(S.unlocks[item]) { 
+     if(item.startsWith('theme_') || ['sunset','gold','matrix','cyber','ocean'].includes(item)) {
+         applyTheme(item); playSfx('click'); showToast(`Applied theme!`, 'success'); 
+     } else if (item.startsWith('badge_')) {
+         playSfx('click'); showToast(`Badge is already equipped!`, 'success'); 
+     }
+     updateShopUI(); updateNavUser(); return; 
   }
+  
+  if(S.xp < cost){ playSfx('error'); return showToast(`Not enough XP! Need ${cost}`, 'error'); }
+  S.xp -= cost; S.unlocks[item] = true; 
+  if(['sunset','gold','matrix','cyber','ocean'].includes(item)) applyTheme(item);
+  saveData(); renderDashboard(); updateShopUI(); updateNavUser(); playSfx('unlock'); showToast(`🎉 Unlocked successfully!`, 'success');
 }
 
 function buyMysteryBox() {
@@ -263,6 +411,12 @@ function updateShopUI() {
   const mBtn = document.getElementById('btnThemeMatrix'); if(mBtn) mBtn.textContent = S.unlocks.matrix ? (S.theme==='matrix'?'Applied':'Use') : '500 XP';
   const cBtn = document.getElementById('btnThemeCyber'); if(cBtn) cBtn.textContent = S.unlocks.cyber ? (S.theme==='cyber'?'Applied':'Use') : '1000 XP';
   const oBtn = document.getElementById('btnThemeOcean'); if(oBtn) oBtn.textContent = S.unlocks.ocean ? (S.theme==='ocean'?'Applied':'Use') : '300 XP';
+  const sBtn = document.getElementById('btnThemeSunset'); if(sBtn) sBtn.textContent = S.unlocks.sunset ? (S.theme==='sunset'?'Applied':'Use') : '400 XP';
+  const gBtn = document.getElementById('btnThemeGold'); if(gBtn) gBtn.textContent = S.unlocks.gold ? (S.theme==='gold'?'Applied':'Use') : '800 XP';
+  
+  const bNinja = document.getElementById('btnBadgeNinja'); if(bNinja) bNinja.textContent = S.unlocks.badge_ninja ? 'Unlocked' : '300 XP';
+  const bScholar = document.getElementById('btnBadgeScholar'); if(bScholar) bScholar.textContent = S.unlocks.badge_scholar ? 'Unlocked' : '500 XP';
+  const bLegend = document.getElementById('btnBadgeLegend'); if(bLegend) bLegend.textContent = S.unlocks.badge_legend ? 'Unlocked' : '1000 XP';
 }
 
 function getRank(xp) {
@@ -302,20 +456,36 @@ function loadSecretMission() {
   if (activeIdx === null) { activeIdx = Math.floor(Math.random() * SECRET_MISSIONS.length); localStorage.setItem(key('sm_active_idx'), activeIdx); }
   const currentMission = SECRET_MISSIONS[parseInt(activeIdx)];
   const smText = document.getElementById('smText'); const smBtn = document.getElementById('smBtn');
-  if (smText && smBtn && currentMission) { smText.textContent = currentMission.text; smBtn.textContent = "Verify & Claim Reward 🎁"; smBtn.style.background = "var(--grad)"; smBtn.disabled = false; }
+  
+  if (smText && smBtn && currentMission) { 
+      smText.textContent = currentMission.text; 
+      const todayStr = new Date().toISOString().split('T')[0];
+      if (S.lastMissionDate === todayStr) {
+          smBtn.textContent = "Claimed! Come back tomorrow 🌙"; smBtn.style.background = "var(--glass)"; smBtn.disabled = true;
+      } else {
+          smBtn.textContent = "Verify & Claim Reward 🎁"; smBtn.style.background = "var(--grad)"; smBtn.disabled = false; 
+      }
+  }
 }
+
 function claimSecretMission() {
+  const todayStr = new Date().toISOString().split('T')[0];
+  if (S.lastMissionDate === todayStr) return; 
+
   const activeIdx = localStorage.getItem(key('sm_active_idx')); if (activeIdx === null) return;
   const currentMission = SECRET_MISSIONS[parseInt(activeIdx)];
+  
   if (currentMission && currentMission.check()) {
-    S.xp += 50; saveData(); renderDashboard();
+    S.xp += 50; S.lastMissionDate = todayStr; saveData(); renderDashboard();
     if (typeof confetti === 'function') confetti({ particleCount: 120, spread: 80, origin: { y: 0.6 }, zIndex: 9999 });
     playSfx('success'); showToast('🏆 Mission Verified! +50 XP Awarded!', 'success');
-    let nextIdx; do { nextIdx = Math.floor(Math.random() * SECRET_MISSIONS.length); } while (nextIdx === parseInt(activeIdx) && SECRET_MISSIONS.length > 1);
-    localStorage.setItem(key('sm_active_idx'), nextIdx); loadSecretMission(); 
+    loadSecretMission(); 
   } else { playSfx('error'); showToast('⚠️ Abhi poora nahi hua hai bhai! Pehle target complete karo. ⏳', 'error'); }
 }
+
 function changeSecretMission() {
+  const todayStr = new Date().toISOString().split('T')[0];
+  if (S.lastMissionDate === todayStr) { showToast('Already claimed today!', 'error'); return; }
   const activeIdx = localStorage.getItem(key('sm_active_idx')); let nextIdx;
   do { nextIdx = Math.floor(Math.random() * SECRET_MISSIONS.length); } while (nextIdx === parseInt(activeIdx) && SECRET_MISSIONS.length > 1);
   localStorage.setItem(key('sm_active_idx'), nextIdx); loadSecretMission(); playSfx('click'); showToast('🔁 Mission changed successfully!');
@@ -341,7 +511,13 @@ function updateNavUser(){
   if(u.pfp){ nAv.textContent=''; pAv.textContent=''; nAv.style.backgroundImage=`url(${u.pfp})`; pAv.style.backgroundImage=`url(${u.pfp})`; } 
   else { nAv.textContent=init; pAv.textContent=init; nAv.style.backgroundImage=''; pAv.style.backgroundImage=''; }
   document.getElementById('profName').textContent=u.name; document.getElementById('profEmail').textContent=u.email;
-  const rLabel = getRank(S.xp); document.getElementById('profBadge').textContent=`Rank: ${rLabel}`;
+  
+  let rLabel = getRank(S.xp);
+  if (S.unlocks?.badge_legend) rLabel = "👑 Legend Focus CEO";
+  else if (S.unlocks?.badge_scholar) rLabel = "🎓 Elite Scholar";
+  else if (S.unlocks?.badge_ninja) rLabel = "🥷 Silent Ninja";
+  
+  document.getElementById('profBadge').textContent=`Rank: ${rLabel}`;
   const labelEl = document.getElementById('ceoRankLabel'); if(labelEl) labelEl.textContent = `${rLabel}`;
   document.getElementById('wMsg').textContent=`Hey, ${u.name.split(' ')[0]}! 👋`;
   const cd=document.getElementById('courseDisplay'); if(cd)cd.textContent=u.course||'Not set';
@@ -357,8 +533,7 @@ function handlePfpUpload(e) {
       if(w>h){ if(w>max){ h*=max/w; w=max;} } else { if(h>max){ w*=max/h; h=max;} }
       canvas.width=w; canvas.height=h; const ctx=canvas.getContext('2d'); ctx.drawImage(img,0,0,w,h);
       const compressedUrl = canvas.toDataURL('image/jpeg',0.85); S.session.pfp = compressedUrl;
-      if(!S.session.isGuest){ const u = S.users.find(x=>x.email===S.session.email); if(u){ u.pfp=compressedUrl; localStorage.setItem('mceo_users',JSON.stringify(S.users));} }
-      localStorage.setItem('mceo_sess',JSON.stringify(S.session)); updateNavUser(); showToast('📸 Profile image updated!','success');
+      saveData(); updateNavUser(); showToast('📸 Profile image synced to Cloud!','success');
     }; img.src=ev.target.result;
   }; reader.readAsDataURL(file);
 }
@@ -382,7 +557,7 @@ function addTask(){
   
   S.xp += 15; saveData(); playSfx('coin');
   ['tName','tNote'].forEach(id=>document.getElementById(id).value=''); document.getElementById('tDate').value=''; document.getElementById('tSubj').value='';
-  selPri('med'); renderAll(); showToast('🔥 Task added (+15 XP)!','success');
+  selPri('med'); renderAll(); showToast('🔥 Task Synced to Cloud (+15 XP)!','success');
 }
 
 function scheduleRevision(task) {
@@ -401,11 +576,10 @@ function toggleTask(id){
     if(t.isTwoStep && (!t.watched || !t.notesMade)) { playSfx('error'); showToast('⚠️ Please use Watched & Notes buttons to complete!','error'); return; }
     t.isDone=!t.isDone;
     if(t.isDone){ 
-      let extraXP = getExtraBuffXP();
-      S.xp += (40 + extraXP); playSfx('task_complete'); 
+      let extraXP = getExtraBuffXP(); S.xp += (40 + extraXP); playSfx('task_complete'); 
       showToast(`✅ Mission complete (+${40 + extraXP} XP)!${extraXP>0?' ⚡ Buffed!':''}`,'success'); 
       if(t.subtasks){ t.subtasks.forEach(st=>st.done=true); } 
-      if(t.isTwoStep) scheduleRevision(t); 
+      if(t.isTwoStep && !t.repScheduled) { setTimeout(() => { if(confirm("🏆 Task completed! Do you want to schedule automatic 7 & 30 Days Revisions for this topic?")) { scheduleRevision(t); } }, 500); }
     } else { S.xp = Math.max(0, S.xp - 40); playSfx('click'); }
     saveData(); renderAll();
   }
@@ -417,11 +591,9 @@ function toggleSplitStep(id, step) {
   else if (step === 'notes') { t.notesMade = !t.notesMade; if(t.notesMade){ S.xp += 20; playSfx('xp_gain'); } else { S.xp = Math.max(0, S.xp - 20); playSfx('click'); } }
   
   if(t.watched && t.notesMade) { 
-      t.isDone = true; 
-      let extraXP = getExtraBuffXP();
-      S.xp += (20 + extraXP); playSfx('task_complete'); 
+      t.isDone = true; let extraXP = getExtraBuffXP(); S.xp += (20 + extraXP); playSfx('task_complete'); 
       showToast(`🏆 Mastered: Lecture + Notes (+${20+extraXP} Bonus XP)!${extraXP>0?' ⚡ Buffed!':''}`, 'success'); 
-      scheduleRevision(t); 
+      if(!t.repScheduled) { setTimeout(() => { if(confirm("🏆 Mastered! Do you want to schedule automatic 7 & 30 Days Revisions for this topic?")) { scheduleRevision(t); } }, 500); }
   } else { t.isDone = false; }
   saveData(); renderAll();
 }
@@ -429,7 +601,7 @@ function toggleSplitStep(id, step) {
 function toggleBacklogVault(id) {
   const t = S.tasks.find(x=>x.id===id); if(!t) return;
   t.isBacklog = !t.isBacklog; saveData(); renderAll();
-  if(t.isBacklog){ playSfx('backlog'); showToast('🗂️ Sent to Backlog Vault!'); } else { playSfx('click'); }
+  if(t.isBacklog){ playSfx('click'); showToast('🗂️ Sent to Backlog Vault!'); } else { playSfx('success'); showToast('↩️ Restored back to Live Tasks!'); }
   closeModal();
 }
 
@@ -502,6 +674,8 @@ function taskCard(t,mini=false){
     splitUiHtml = `<div class="split-btn-group"><button class="split-btn ${watchedActive}" onclick="event.stopPropagation(); toggleSplitStep(${t.id}, 'watched')">🎥 Watched ${t.watched?'✓':''}</button><button class="split-btn ${notesActive}" onclick="event.stopPropagation(); toggleSplitStep(${t.id}, 'notes')">✍️ Notes ${t.notesMade?'✓':''}</button></div>${t.watched && !t.notesMade ? `<div style="font-size:11px; color:var(--warn); font-weight:700; margin-top:6px;">Lecture Done, Notes Pending! ⏳</div>` : ''}`;
   }
 
+  let restoreBtn = mini ? `<button class="btn-sm" style="margin-top:10px; width:100%; background: rgba(74,222,128,0.2); color:var(--success); border:1px solid var(--success);" onclick="toggleBacklogVault(${t.id})">↩️ Move back to Live</button>` : '';
+
   return `<div class="task-item p-${t.priority} ${t.isDone?'done':''} ${pendingClass}">
     <button class="check-circle ${t.isDone?'checked':''}" onclick="toggleTask(${t.id})">${t.isDone?'✓':''}</button>
     <div class="task-body">
@@ -510,6 +684,7 @@ function taskCard(t,mini=false){
       ${t.note&&!mini?`<div class="task-note">💬 ${t.note}</div>`:''}
       ${splitUiHtml}
       ${subHtml}
+      ${restoreBtn}
     </div>
     ${!mini?`<div class="task-actions"><button class="btn btn-icon" style="color:var(--p1);background:none;border:none" onclick="openEditTask(${t.id})">✏️</button><button class="btn btn-icon" style="color:var(--danger);background:none;border:none" onclick="deleteTask(${t.id})">🗑️</button></div>`:''}
   </div>`;
@@ -692,8 +867,12 @@ function deleteFlashcard(subName, id) { const subj = S.subjects.find(s=>s.name==
 */
 function renderSubjects(){
   const todayStr = new Date().toISOString().split('T')[0];
-  const liveCountUI = document.getElementById('liveCountUI'); const backlogCountUI = document.getElementById('backlogCountUI');
-  if(liveCountUI) liveCountUI.textContent = S.tasks.filter(t => !t.isBacklog && !t.isDone && t.date <= todayStr).length;
+  const liveCountUI = document.getElementById('liveCountUI'); 
+  const revisionCountUI = document.getElementById('revisionCountUI'); 
+  const backlogCountUI = document.getElementById('backlogCountUI');
+  
+  if(liveCountUI) liveCountUI.textContent = S.tasks.filter(t => !t.isBacklog && !t.isRevision && !t.isDone && t.date <= todayStr).length;
+  if(revisionCountUI) revisionCountUI.textContent = S.tasks.filter(t => !t.isDone && t.isRevision && t.date <= todayStr).length;
   if(backlogCountUI) backlogCountUI.textContent = S.tasks.filter(t => t.isBacklog && !t.isDone).length;
 
   const stCont = document.getElementById('skillTreeContainer');
@@ -720,6 +899,15 @@ function renderSubjects(){
                   13. CHARTS & DASHBOARD RENDERING 
 ████████████████████████████████████████████████████████████ 
 */
+window.showChartTooltip = function(e, text) {
+    const tt = document.getElementById('chartTooltip');
+    if(!tt) return;
+    tt.textContent = text; tt.style.display = 'block';
+    const rect = e.currentTarget.getBoundingClientRect(); const containerRect = document.getElementById('weeklyStudyChart').getBoundingClientRect();
+    tt.style.left = (rect.left - containerRect.left + (rect.width/2)) + 'px'; tt.style.top = '-10px';
+}
+window.hideChartTooltip = function() { const tt = document.getElementById('chartTooltip'); if(tt) tt.style.display = 'none'; }
+
 function renderWeeklyStudyChart(){
   const container=document.getElementById('weeklyStudyChart'); if(!container) return;
   const filterType = document.getElementById('chartFilter').value; let trackingPoints = []; let maxMin = 30; 
@@ -737,14 +925,24 @@ function renderWeeklyStudyChart(){
     }
     trackingPoints.forEach(pt => { pt.minutes = S.timer.logs.filter(l=>l.dateStr.startsWith(pt.id)).reduce((acc,curr)=>acc+curr.duration, 0); if(pt.minutes > maxMin) maxMin = pt.minutes; });
   }
+  
   container.innerHTML = trackingPoints.map(pt=>{
-    const barPct = Math.round((pt.minutes / maxMin)*100); return `<div class="chart-bar-wrapper" onclick="event.stopPropagation(); showToast('${pt.minutes} mins studied in ${pt.desc}', 'success')"><div class="chart-val" style="display:${filterType==='30'?'none':'block'}">${pt.minutes > 0 ? (pt.minutes > 999 ? '1k+' : pt.minutes) : ''}</div><div class="chart-bar" style="height: ${barPct}%;"></div><div class="chart-label">${pt.label}</div></div>`;
+    const barPct = Math.round((pt.minutes / maxMin)*100); 
+    return `<div class="chart-bar-wrapper" onmouseover="showChartTooltip(event, '${pt.minutes} mins studied in ${pt.desc}')" onmouseout="hideChartTooltip()" onclick="event.stopPropagation(); showToast('${pt.minutes} mins studied in ${pt.desc}', 'success')"><div class="chart-val" style="display:${filterType==='30'?'none':'block'}">${pt.minutes > 0 ? (pt.minutes > 999 ? '1k+' : pt.minutes) : ''}</div><div class="chart-bar" style="height: ${barPct}%;"></div><div class="chart-label">${pt.label}</div></div>`;
   }).join('');
 }
 
 function renderDashboard(){
   const todayStr = new Date().toISOString().split('T')[0];
-  const target = 3; const todayCompleted = S.tasks.filter(t => t.date === todayStr && t.isDone && !t.isBacklog).length;
+  const revAlert = document.getElementById('revisionAlertUI');
+  const revCount = S.tasks.filter(t => !t.isDone && t.isRevision && t.date <= todayStr).length;
+  if(revAlert) {
+      if(revCount > 0) { revAlert.style.display = 'flex'; document.getElementById('revAlertText').textContent = `You have ${revCount} task(s) pending for revision!`; } 
+      else { revAlert.style.display = 'none'; }
+  }
+
+  const target = 2; 
+  const todayCompleted = S.tasks.filter(t => t.date === todayStr && t.isDone && !t.isBacklog).length;
   const targetText = document.getElementById('targetTextUI'); const targetBar = document.getElementById('targetBarUI');
   if(targetText) targetText.textContent = `${todayCompleted}/${target} Done`; if(targetBar) targetBar.style.width = `${Math.min(100, (todayCompleted/target)*100)}%`;
 
@@ -835,13 +1033,12 @@ function printReport() { window.print(); playSfx('success'); showToast('📄 PDF
 function toggleEyeStrain() { S.eyeStrain = !S.eyeStrain; updateEyeStrainToggle(); saveData(); showToast(S.eyeStrain ? '👁️ Eye-Strain Break ON (45m)' : '👁️ Eye-Strain Break OFF'); }
 function updateEyeStrainToggle() { const sw=document.getElementById('eyeStrainSw'); if(sw) sw.classList.toggle('on', S.eyeStrain); }
 
-// --- NEW COPY/PASTE BACKUP SYSTEM (CRASH-FREE) ---
 function exportBackupData() {
   const packagedData = { tasks: S.tasks, subjects: S.subjects, logs: S.timer.logs, xp: S.xp, notif: S.notif, unlocks: S.unlocks, theme: S.theme, freezeDate: S.freezeDate, drainDate: S.lastDrainDate, eyeStrain: S.eyeStrain, activeBuff: S.activeBuff };
   const backupStr = btoa(unescape(encodeURIComponent(JSON.stringify(packagedData))));
   const mc = document.getElementById('modalContent');
   mc.innerHTML = `<div class="modal-title">💾 Save Backup Code</div>
-    <p style="font-size:12px; color:var(--textMuted); margin-bottom:12px;">Acode app file download ko block karta hai. Apna data save rakhne ke liye is code ko COPY karke Notes/WhatsApp par rakh lo!</p>
+    <p style="font-size:12px; color:var(--textMuted); margin-bottom:12px;">Apna data save rakhne ke liye is code ko COPY karke Notes/WhatsApp par rakh lo!</p>
     <div class="inp-wrap area"><textarea id="bCodeArea" rows="5" readonly style="font-size:11px; color:var(--warn); font-family:monospace; word-break:break-all;">${backupStr}</textarea></div>
     <button class="btn btn-grad" onclick="navigator.clipboard.writeText(document.getElementById('bCodeArea').value); showToast('✅ Code Copied!'); closeModal(); playSfx('success');">Copy Code 📋</button>`;
   document.getElementById('modalOverlay').classList.add('open');
@@ -854,16 +1051,15 @@ function processRestoreCode() {
         const restoredJson = JSON.parse(decodeURIComponent(escape(atob(code))));
         if(restoredJson.tasks) S.tasks = restoredJson.tasks; if(restoredJson.subjects) S.subjects = restoredJson.subjects;
         if(restoredJson.logs) S.timer.logs = restoredJson.logs; if(restoredJson.xp) S.xp = restoredJson.xp;
-        if(restoredJson.unlocks) S.unlocks = restoredJson.unlocks; if(restoredJson.theme) S.theme = restoredJson.theme;
+        if(restoredJson.unlocks) S.unlocks = { ...S.unlocks, ...restoredJson.unlocks }; if(restoredJson.theme) S.theme = restoredJson.theme;
         if(restoredJson.freezeDate) S.freezeDate = restoredJson.freezeDate; if(restoredJson.drainDate) S.lastDrainDate = restoredJson.drainDate;
         if(restoredJson.eyeStrain !== undefined) S.eyeStrain = restoredJson.eyeStrain;
         if(restoredJson.activeBuff !== undefined) S.activeBuff = restoredJson.activeBuff;
-        saveData(); applyTheme(S.theme); renderAll(); updateNavUser(); playSfx('success'); showToast('📤 Data restored!','success');
+        saveData(); applyTheme(S.theme); renderAll(); updateNavUser(); updateShopUI(); playSfx('success'); showToast('📤 Data restored!','success');
         closeModal();
     } catch(err) { playSfx('error'); showToast('❌ Invalid Backup Code!','error'); }
 }
 
-// HTML badle bina Import button ka fix
 document.addEventListener("DOMContentLoaded", () => {
   setTimeout(() => {
      const importDiv = document.querySelector('div[onclick="document.getElementById(\'importBackupInput\').click()"]');
@@ -880,9 +1076,6 @@ document.addEventListener("DOMContentLoaded", () => {
   }, 500);
 });
 
-function toggleNotif(){ S.notif=!S.notif; if(S.notif&&'Notification' in window&&Notification.permission!=='granted'){Notification.requestPermission().then(p=>{if(p!=='granted'){S.notif=false; updateNotifToggle();}});} updateNotifToggle(); saveData(); showToast(S.notif?'🔔 Notifications Active!':'🔕 Notifications Sleeping'); }
-function updateNotifToggle(){const sw=document.getElementById('notifSw'); if(sw)sw.classList.toggle('on',S.notif);}
-
 function openModal(type){
   const ov=document.getElementById('modalOverlay'); const mc=document.getElementById('modalContent');
   if(type==='editName'){ mc.innerHTML=`<div class="modal-title">✏️ Edit Name</div><div class="inp-wrap"><span class="ico">👤</span><input type="text" id="mInp" placeholder="Your name" value="${S.session?.name||''}"></div><button class="btn btn-grad" onclick="saveModal('name')">Save</button>`; }
@@ -893,11 +1086,11 @@ function openModal(type){
 }
 function closeModal(){document.getElementById('modalOverlay').classList.remove('open');}
 function saveModal(type){
-  if(type==='name'){ const val=document.getElementById('mInp').value.trim(); if(!val){ playSfx('error'); return showToast('Validation Error!','error'); } S.session.name=val; if(!S.session.isGuest){const u=S.users.find(u=>u.email===S.session.email); if(u){u.name=val; localStorage.setItem('mceo_users',JSON.stringify(S.users));}} localStorage.setItem('mceo_sess',JSON.stringify(S.session)); updateNavUser(); closeModal(); playSfx('success'); showToast('✅ Name updated!','success'); }
-  else if(type==='pass'){ const oldP=document.getElementById('mOld').value; const newP=document.getElementById('mNew').value; const u=S.users.find(u=>u.email===S.session.email); if(!u||u.pass!==oldP){ playSfx('error'); return showToast('Old key invalid!','error'); } if(newP.length<4){ playSfx('error'); return showToast('Min 4 chars!','error'); } u.pass=newP; localStorage.setItem('mceo_users',JSON.stringify(S.users)); closeModal(); playSfx('success'); showToast('🔒 Password locked!','success'); }
-  else if(type==='course'){ const val=document.getElementById('mInp').value.trim(); S.session.course=val; if(!S.session.isGuest){const u=S.users.find(u=>u.email===S.session.email); if(u){u.course=val; localStorage.setItem('mceo_users',JSON.stringify(S.users));}} localStorage.setItem('mceo_sess',JSON.stringify(S.session)); updateNavUser(); closeModal(); playSfx('success'); showToast('🎓 Course metrics saved!','success'); }
+  if(type==='name'){ const val=document.getElementById('mInp').value.trim(); if(!val){ playSfx('error'); return showToast('Validation Error!','error'); } S.session.name=val; localStorage.setItem('mceo_sess',JSON.stringify(S.session)); saveData(); updateNavUser(); closeModal(); playSfx('success'); showToast('✅ Name updated!','success'); }
+  else if(type==='pass'){ const oldP=document.getElementById('mOld').value; const newP=document.getElementById('mNew').value; if(S.session.pass!==oldP){ playSfx('error'); return showToast('Old key invalid!','error'); } if(newP.length<4){ playSfx('error'); return showToast('Min 4 chars!','error'); } S.session.pass=newP; localStorage.setItem('mceo_sess',JSON.stringify(S.session)); saveData(); closeModal(); playSfx('success'); showToast('🔒 Password locked!','success'); }
+  else if(type==='course'){ const val=document.getElementById('mInp').value.trim(); S.session.course=val; localStorage.setItem('mceo_sess',JSON.stringify(S.session)); saveData(); updateNavUser(); closeModal(); playSfx('success'); showToast('🎓 Course metrics saved!','success'); }
 }
-function confirmClearData(){ S.tasks=[]; S.subjects=[{name:'Physics',emoji:'🔬'},{name:'Maths',emoji:'🧮'},{name:'Computer Science',emoji:'💻'}]; S.subjects.forEach(s => s.flashcards = []); S.timer.logs=[]; S.xp=0; S.theme='default'; S.unlocks={matrix:false, cyber:false, ocean:false}; S.freezeDate=null; S.lastDrainDate=null; S.eyeStrain=false; S.activeBuff=null; applyTheme('default'); saveData(); closeModal(); renderAll(); updateShopUI(); playSfx('delete'); showToast('🗑️ Architecture wiped clean!'); }
+function confirmClearData(){ S.tasks=[]; S.subjects=[{name:'Physics',emoji:'🔬'},{name:'Maths',emoji:'🧮'},{name:'Computer Science',emoji:'💻'}]; S.subjects.forEach(s => s.flashcards = []); S.timer.logs=[]; S.xp=0; S.theme='default'; S.unlocks={matrix:false, cyber:false, ocean:false, sunset:false, gold:false, badge_ninja:false, badge_scholar:false, badge_legend:false}; S.freezeDate=null; S.lastDrainDate=null; S.lastMissionDate=null; S.eyeStrain=false; S.activeBuff=null; applyTheme('default'); saveData(); closeModal(); renderAll(); updateShopUI(); playSfx('delete'); showToast('🗑️ Architecture wiped clean!'); }
 
 /* Global Events */
 document.addEventListener('click', function(e){ const el = e.target.closest('.btn, .btn-sm, .btn-glass, .btn-icon, .tbtn, .bnav-item, .fchip, .pri-btn, .tmode-btn, .preset-btn, .tab-btn, .emj, .see-all, .sitem, .toggle-sw, .modal-close, .del-subj-btn'); if(el) playSfx('click'); }, true);

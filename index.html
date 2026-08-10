@@ -6,12 +6,12 @@
   <title>AnRu Focus</title>
   
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=Playfair+Display:wght@700;900&display=swap" rel="stylesheet">
-  
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <link rel="stylesheet" href="style.css">
-  <!-- Firebase Setup -->
-<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
 
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
 </head>
 <body>
 
@@ -32,10 +32,15 @@
       <div class="form-panel active" id="panelLogin">
         <div class="inp-wrap"><span class="ico">📧</span><input type="email" id="liEmail" placeholder="Email address" autocomplete="email"></div>
         <div class="inp-wrap"><span class="ico">🔒</span><input type="password" id="liPass" placeholder="Password" autocomplete="current-password"></div>
+        
+        <div style="text-align: right; margin-top: -6px; margin-bottom: 12px;">
+          <a href="#" onclick="doForgotPassword(); return false;" style="color: var(--p1, #a855f7); font-size: 13px; text-decoration: none; font-weight: 600;">Forgot Password?</a>
+        </div>
+
         <button class="btn btn-grad" onclick="doLogin()">Login to Focus 🚀</button>
         <button class="btn btn-grad" style="background: #db4437; color: white; width: 100%; padding: 12px; border: none; border-radius: 8px; font-size: 16px; margin-bottom: 10px; cursor: pointer;margin-top: 8px" onclick="continueWithGoogle()">
-  🌐 Continue with Google
-</button>
+          🌐 Continue with Google
+        </button>
 
         <div class="divider">or</div>
         <button class="btn btn-glass" onclick="guestLogin()">👤 Continue as Guest</button>
@@ -53,7 +58,6 @@
 </div>
 
 <div class="screen" id="appScreen">
-  
   <div class="top-nav">
     <div class="nav-brand">🚀 AnRu Focus</div>
     <div class="nav-right">
@@ -64,6 +68,7 @@
 
   <div class="main-content">
     
+    <!-- DASHBOARD TAB -->
     <div class="page active" id="page-dash">
       <div class="welcome-banner">
         <h2 id="wMsg">Hey Champion! 👋</h2>
@@ -71,6 +76,15 @@
         <div class="date-chip">📅 <span id="todayDate">—</span></div>
       </div>
       
+      <div id="revisionAlertUI" class="glass" style="display:none; padding:12px 16px; margin-bottom:18px; border:1px solid var(--p4); background: linear-gradient(135deg, rgba(236,72,153,0.15), transparent); border-radius:12px; align-items:center; gap:12px; cursor:pointer;" onclick="switchPage('tasks')">
+        <div style="font-size:24px; animation:pulseNeon 2s infinite;">⏰</div>
+        <div style="flex:1;">
+          <div style="font-size:12px; font-weight:800; color:var(--p4); text-transform:uppercase;">Revision Due Today!</div>
+          <div style="font-size:11px; color:var(--textSub);" id="revAlertText">You have tasks pending for revision.</div>
+        </div>
+        <div style="color:var(--p4); font-size:20px;">›</div>
+      </div>
+
       <div id="activeBuffUI" class="glass" style="display:none; padding:12px 16px; margin-bottom:18px; border:1px solid var(--p4); background: linear-gradient(135deg, rgba(236,72,153,0.15), transparent); border-radius:12px; align-items:center; justify-content:space-between;">
         <div style="display:flex; align-items:center; gap:10px;">
           <span style="font-size:24px; animation:pulseNeon 2s infinite;">⚡</span>
@@ -89,7 +103,7 @@
       <div class="glass" style="padding:16px; margin-bottom:18px; border:1px solid rgba(248,113,113,0.3);">
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
           <div style="font-weight:700; font-size:14px;">🔥 Daily Lecture Target</div>
-          <div style="font-size:12px; font-weight:800; color:var(--danger)" id="targetTextUI">0/3 Done</div>
+          <div style="font-size:12px; font-weight:800; color:var(--danger)" id="targetTextUI">0/2 Done</div>
         </div>
         <div style="height:6px; background:rgba(255,255,255,0.1); border-radius:3px; overflow:hidden;">
           <div id="targetBarUI" style="height:100%; width:0%; background:linear-gradient(90deg, #f87171, #fbbf24); transition:width 0.5s;"></div>
@@ -123,14 +137,46 @@
         <div class="stat-card sc4"><div class="si">⚡</div><div class="sn" id="dStreak">0</div><div class="sl" id="streakLabel">Day Streak</div></div>
       </div>
       
+      <!-- QUICK STUDY SECTION -->
+      <div class="quick-study-pro-section">
+          <div class="qs-pro-header">
+              <h3 class="qs-pro-title">Quick Study <span class="bolt-anim">⚡</span></h3>
+              <span class="qs-pro-badge">PRO</span>
+          </div>
+          <div class="qs-pro-cards">
+              <div class="qs-card-3d glass-panel" onclick="playQsClick('grammar.html')" onpointerdown="playQsHover()" onmouseenter="playQsHover()">
+                  <div class="qs-card-content">
+                      <div class="qs-icon-wrapper gradient-purple-glow"><i class="fa-solid fa-book-open-reader qs-floating-icon"></i><div class="qs-icon-ring"></div></div>
+                      <div class="qs-text-content"><h4 class="qs-card-title">Grammar Vault</h4><p class="qs-card-desc">Master Tense, Voice & Syntax</p></div>
+                      <div class="qs-arrow-btn"><i class="fa-solid fa-arrow-right-long"></i></div>
+                  </div>
+                  <div class="qs-shimmer"></div>
+              </div>
+              <div class="qs-card-3d glass-panel" onclick="playQsClick('vocab.html')" onpointerdown="playQsHover()" onmouseenter="playQsHover()">
+                  <div class="qs-card-content">
+                      <div class="qs-icon-wrapper gradient-blue-glow"><i class="fa-solid fa-user-ninja qs-floating-icon"></i><div class="qs-icon-ring"></div></div>
+                      <div class="qs-text-content"><h4 class="qs-card-title">Word Ninja Pro</h4><p class="qs-card-desc">Unlimited Vocab Builder</p></div>
+                      <div class="qs-arrow-btn"><i class="fa-solid fa-arrow-right-long"></i></div>
+                  </div>
+                  <div class="qs-shimmer"></div>
+              </div>
+              <div class="qs-card-3d glass-panel" onclick="playQsClick('quiz.html')" onpointerdown="playQsHover()" onmouseenter="playQsHover()">
+                  <div class="qs-card-content">
+                      <div class="qs-icon-wrapper gradient-orange-glow"><i class="fa-solid fa-shield-halved qs-floating-icon"></i><div class="qs-icon-ring"></div></div>
+                      <div class="qs-text-content"><h4 class="qs-card-title">Combat Quiz Mode</h4><p class="qs-card-desc">Test your 11th concepts in Arena</p></div>
+                      <div class="qs-arrow-btn"><i class="fa-solid fa-arrow-right-long"></i></div>
+                  </div>
+                  <div class="qs-shimmer"></div>
+              </div>
+          </div>
+      </div>
+
       <div class="prog-card glass">
         <div class="ring-wrap">
           <svg width="90" height="90" viewBox="0 0 90 90">
             <circle class="ring-track" cx="45" cy="45" r="38"/>
             <circle class="ring-prog" id="pRing" cx="45" cy="45" r="38" fill="none" stroke-width="10" stroke-linecap="round" stroke-dasharray="239" stroke-dashoffset="239" stroke="url(#rg)" transform="rotate(-90 45 45)"/>
-            <defs>
-              <linearGradient id="rg" x1="0%" y1="0%" x2="100%" y2="0%"><stop offset="0%" stop-color="var(--p1)"/><stop offset="100%" stop-color="var(--p3)"/></linearGradient>
-            </defs>
+            <defs><linearGradient id="rg" x1="0%" y1="0%" x2="100%" y2="0%"><stop offset="0%" stop-color="var(--p1)"/><stop offset="100%" stop-color="var(--p3)"/></linearGradient></defs>
           </svg>
           <div class="ring-text"><div class="ring-pct" id="pPct">0%</div><div class="ring-done" id="pDone">done</div></div>
         </div>
@@ -145,18 +191,6 @@
         <div class="sec-title">Recent Tasks</div><button class="see-all" onclick="switchPage('tasks')">See All →</button>
       </div>
       <div id="recentList"></div>
-      
-      <div class="sec-head" style="margin-top:20px">
-        <div class="sec-title">Quick Study</div><button class="see-all" onclick="switchPage('timer')">Open Timer →</button>
-      </div>
-      <div class="glass" style="padding:16px;display:flex;align-items:center;gap:14px;border-radius:16px;cursor:pointer" onclick="switchPage('timer')">
-        <div style="font-size:38px">⏱️</div>
-        <div>
-          <div style="font-weight:700;font-size:15px">Study Timer</div>
-          <div style="font-size:12px;color:var(--textMuted)">Background Safe & Anti-Distraction</div>
-        </div>
-        <div style="margin-left:auto;color:var(--textMuted);font-size:20px">›</div>
-      </div>
 
       <div class="sec-head" style="margin-top:24px;">
         <div class="sec-title" style="color:var(--warn);">🕵️ Secret Missions</div>
@@ -174,6 +208,7 @@
       </div>
     </div>
 
+    <!-- TASKS TAB -->
     <div class="page" id="page-tasks">
       <div class="add-card glass">
         <h3>➕ Add New Task</h3>
@@ -207,6 +242,7 @@
       <div id="taskList"></div>
     </div>
 
+    <!-- TIMER TAB -->
     <div class="page timer-page" id="page-timer">
       <div class="timer-mode-toggle" style="margin-top:4px">
         <button class="tmode-btn active" id="tm-focus" onclick="setTimerMode('focus',this)">🎯 Focus</button>
@@ -254,25 +290,27 @@
       <div id="sessionLog" style="width:100%"></div>
     </div>
 
+    <!-- SUBJECTS TAB -->
     <div class="page" id="page-subjects">
-      
-      <div class="sec-head" style="margin-top:8px;"><div class="sec-title">📅 Live vs Backlogs</div></div>
-      <div class="row2" style="margin-bottom:20px;">
-         <div class="glass" style="padding:14px; border-left: 4px solid var(--success); background: linear-gradient(135deg, rgba(74,222,128,0.1), transparent);">
-            <div style="font-size:11px; color:var(--textMuted); font-weight:600; text-transform:uppercase;">Live Classes</div>
-            <div style="font-size:24px; font-family:'Playfair Display', serif; font-weight:900; color:var(--success);" id="liveCountUI">0</div>
+      <div class="sec-head" style="margin-top:8px;"><div class="sec-title">📅 Academic Overview</div></div>
+      <div style="display:grid; grid-template-columns: repeat(3, 1fr); gap:10px; margin-bottom:20px;">
+         <div class="glass" style="padding:12px 10px; border-left: 3px solid var(--success); background: linear-gradient(135deg, rgba(74,222,128,0.1), transparent);">
+            <div style="font-size:10px; color:var(--textMuted); font-weight:600; text-transform:uppercase;">Live</div>
+            <div style="font-size:22px; font-family:'Playfair Display', serif; font-weight:900; color:var(--success);" id="liveCountUI">0</div>
          </div>
-         <div class="glass" style="padding:14px; border-left: 4px solid var(--danger); background: linear-gradient(135deg, rgba(248,113,113,0.1), transparent);">
-            <div style="font-size:11px; color:var(--textMuted); font-weight:600; text-transform:uppercase;">Pending Backlogs</div>
-            <div style="font-size:24px; font-family:'Playfair Display', serif; font-weight:900; color:var(--danger);" id="backlogCountUI">0</div>
+         <div class="glass" style="padding:12px 10px; border-left: 3px solid var(--p4); background: linear-gradient(135deg, rgba(236,72,153,0.1), transparent);">
+            <div style="font-size:10px; color:var(--textMuted); font-weight:600; text-transform:uppercase;">Revision</div>
+            <div style="font-size:22px; font-family:'Playfair Display', serif; font-weight:900; color:var(--p4);" id="revisionCountUI">0</div>
+         </div>
+         <div class="glass" style="padding:12px 10px; border-left: 3px solid var(--danger); background: linear-gradient(135deg, rgba(248,113,113,0.1), transparent);">
+            <div style="font-size:10px; color:var(--textMuted); font-weight:600; text-transform:uppercase;">Backlog</div>
+            <div style="font-size:22px; font-family:'Playfair Display', serif; font-weight:900; color:var(--danger);" id="backlogCountUI">0</div>
          </div>
       </div>
 
       <div class="sec-head"><div class="sec-title">🗺️ Syllabus Skill Tree</div></div>
       <div class="glass" style="padding:16px; margin-bottom:20px; position:relative; max-height:200px; overflow-y:auto;">
-        <div id="skillTreeContainer" style="display:flex; flex-direction:column; gap:12px;">
-           <div style="font-size:13px; color:var(--textSub); text-align:center; padding:10px;">Add subjects to grow your skill tree! 🌱</div>
-        </div>
+        <div id="skillTreeContainer" style="display:flex; flex-direction:column; gap:12px;"></div>
       </div>
 
       <div class="add-card glass" style="margin-bottom:16px">
@@ -283,11 +321,11 @@
           <button class="btn btn-sm" onclick="addSubject()" style="height:100%;">Add</button>
         </div>
       </div>
-      
       <div class="sec-head"><div class="sec-title">Formula Vaults</div></div>
       <div class="subj-grid" id="subjGrid"></div>
     </div>
 
+    <!-- PROFILE & SHOP TAB (PHASE 2 UPGRADE) -->
     <div class="page" id="page-profile">
       
       <div class="sec-head" style="margin-bottom:0px; display:flex; justify-content:space-between; align-items:center;">
@@ -304,8 +342,7 @@
           <div class="holo-face holo-front">
             <input type="file" id="pfpInput" accept="image/*" style="display:none" onchange="handlePfpUpload(event)">
             <div class="pa-ring" onclick="event.stopPropagation(); document.getElementById('pfpInput').click()">
-              <div class="pa-inner" id="profAv">?</div>
-              <div class="pa-edit-badge">📷</div>
+              <div class="pa-inner" id="profAv">?</div><div class="pa-edit-badge">📷</div>
             </div>
             <div class="profile-name" id="profName">Champion</div>
             <div class="profile-email" id="profEmail">—</div>
@@ -318,79 +355,106 @@
               <div class="ps-box"><div class="ps-num" id="ps2">0</div><div class="ps-lbl">Completed</div></div>
               <div class="ps-box"><div class="ps-num" id="ps3">0</div><div class="ps-lbl">Subjects</div></div>
             </div>
-            <div class="chart-container" id="weeklyStudyChart" style="height:120px; background:transparent; border:none; padding:0; margin:0;">
-            </div>
+            
+            <div class="chart-container" id="weeklyStudyChart" style="height:120px; background:transparent; border:none; padding:0; margin:0; position:relative;"></div>
+            <div id="chartTooltip" class="glass" style="display:none; position:absolute; z-index:1000; padding:8px 12px; font-size:11px; color:#fff; border-radius:8px; pointer-events:none; box-shadow:0 10px 20px rgba(0,0,0,0.5);"></div>
             
             <div style="font-size:11px; font-weight:700; margin-top:10px; color:var(--textSub);">Subject Focus Breakdown</div>
             <div id="subjectTimeGrid" style="display:flex; gap:2px; width:100%; height:8px; border-radius:4px; overflow:hidden; margin-top:4px; background:rgba(255,255,255,0.1);"></div>
             <div id="subjectTimeLabels" style="display:flex; flex-wrap:wrap; gap:6px; justify-content:center; margin-top:6px;"></div>
-
             <div style="font-size:10px; opacity:0.5; text-align:center; margin-top:10px; text-transform:uppercase; letter-spacing:1px;">Tap to flip back ↺</div>
           </div>
         </div>
       </div>
 
-      <div class="sec-head" style="margin-top:10px;"><div class="sec-title">🛒 XP Theme Shop</div></div>
+      <!-- ==============================================
+           🚀 PHASE 2: NEW EXPANDED XP SHOP SECTION
+           ============================================== -->
+      <div class="sec-head" style="margin-top:10px;"><div class="sec-title">🛒 XP Theme & Perks Shop</div></div>
       <div class="glass settings-card" style="margin-bottom:20px; padding:10px;">
         
+        <!-- Category: Power-Ups -->
+        <div style="font-size:11px; font-weight:800; color:var(--textSub); margin:8px 0 8px 10px; text-transform:uppercase; letter-spacing:1px;">🚀 Power-Ups</div>
+        
         <div class="shop-item" style="border-color: var(--p3); background: rgba(168, 85, 247, 0.1);">
-          <div class="shop-info">
-            <div class="shop-icon">🎁</div>
-            <div><div class="shop-title" style="color: var(--p3);">Mystery Box</div><div class="shop-desc">Random Reward (Boost, Freeze, etc)</div></div>
-          </div>
+          <div class="shop-info"><div class="shop-icon">🎁</div><div><div class="shop-title" style="color: var(--p3);">Mystery Box</div><div class="shop-desc">Random Reward (Boost, Freeze, etc)</div></div></div>
           <button class="btn-sm" onclick="buyMysteryBox()" style="background: var(--p3); color: #fff;">150 XP</button>
         </div>
-
+        
         <div class="shop-item">
-          <div class="shop-info">
-            <div class="shop-icon">🌌</div>
-            <div><div class="shop-title">AnRu Dark</div><div class="shop-desc">Original Premium Theme.</div></div>
-          </div>
-          <button class="btn-sm" id="btnThemeDefault" style="background:rgba(255,255,255,0.1); border:1px solid rgba(255,255,255,0.2);" onclick="buyShopItem('default', 0)">Use</button>
+          <div class="shop-info"><div class="shop-icon">🧪</div><div><div class="shop-title">2x XP Potion</div><div class="shop-desc">Double XP for the next 1 Hour.</div></div></div>
+          <button class="btn-sm" style="background:rgba(255,255,255,0.1); border:1px solid rgba(255,255,255,0.2);" onclick="buyShopItem('potion', 250)">250 XP</button>
         </div>
 
         <div class="shop-item">
-          <div class="shop-info">
-            <div class="shop-icon">❄️</div>
-            <div><div class="shop-title">Streak Freeze</div><div class="shop-desc">Saves streak if missed tomorrow.</div></div>
-          </div>
+          <div class="shop-info"><div class="shop-icon">❄️</div><div><div class="shop-title">Streak Freeze</div><div class="shop-desc">Saves streak if missed tomorrow.</div></div></div>
           <button class="btn-sm" style="background:rgba(255,255,255,0.1); border:1px solid rgba(255,255,255,0.2);" onclick="buyShopItem('freeze', 200)">200 XP</button>
         </div>
 
         <div class="shop-item">
-          <div class="shop-info">
-            <div class="shop-icon">🟢</div>
-            <div><div class="shop-title">Matrix Hacker</div><div class="shop-desc">Neon green cyber theme.</div></div>
-          </div>
+          <div class="shop-info"><div class="shop-icon">⏳</div><div><div class="shop-title">Time Traveler</div><div class="shop-desc">Restore a recently broken streak.</div></div></div>
+          <button class="btn-sm" style="background:rgba(255,255,255,0.1); border:1px solid rgba(255,255,255,0.2);" onclick="buyShopItem('timetravel', 1500)">1500 XP</button>
+        </div>
+
+        <!-- Category: Exclusive Titles/Badges -->
+        <div style="font-size:11px; font-weight:800; color:var(--textSub); margin:20px 0 8px 10px; text-transform:uppercase; letter-spacing:1px;">🏅 Exclusive Titles</div>
+        
+        <div class="shop-item">
+          <div class="shop-info"><div class="shop-icon">🥷</div><div><div class="shop-title">Ninja Badge</div><div class="shop-desc">Show off your silent focus.</div></div></div>
+          <button class="btn-sm" id="btnBadgeNinja" style="background:rgba(255,255,255,0.1); border:1px solid rgba(255,255,255,0.2);" onclick="buyShopItem('badge_ninja', 300)">300 XP</button>
+        </div>
+
+        <div class="shop-item">
+          <div class="shop-info"><div class="shop-icon">🎓</div><div><div class="shop-title">Scholar Badge</div><div class="shop-desc">For the dedicated learner.</div></div></div>
+          <button class="btn-sm" id="btnBadgeScholar" style="background:rgba(255,255,255,0.1); border:1px solid rgba(255,255,255,0.2);" onclick="buyShopItem('badge_scholar', 500)">500 XP</button>
+        </div>
+
+        <div class="shop-item">
+          <div class="shop-info"><div class="shop-icon">👑</div><div><div class="shop-title">Legend Badge</div><div class="shop-desc">Ultimate flex for top scorers.</div></div></div>
+          <button class="btn-sm" id="btnBadgeLegend" style="background:rgba(255,255,255,0.1); border:1px solid rgba(255,255,255,0.2);" onclick="buyShopItem('badge_legend', 1000)">1000 XP</button>
+        </div>
+
+        <!-- Category: Premium Themes -->
+        <div style="font-size:11px; font-weight:800; color:var(--textSub); margin:20px 0 8px 10px; text-transform:uppercase; letter-spacing:1px;">🎨 Premium Themes</div>
+        
+        <div class="shop-item">
+          <div class="shop-info"><div class="shop-icon">🌌</div><div><div class="shop-title">AnRu Dark</div><div class="shop-desc">Original Premium Theme.</div></div></div>
+          <button class="btn-sm" id="btnThemeDefault" style="background:rgba(255,255,255,0.1); border:1px solid rgba(255,255,255,0.2);" onclick="buyShopItem('default', 0)">Use</button>
+        </div>
+
+        <div class="shop-item">
+          <div class="shop-info"><div class="shop-icon">🌅</div><div><div class="shop-title">Sunset Glow</div><div class="shop-desc">Warm orange & pink aesthetics.</div></div></div>
+          <button class="btn-sm" id="btnThemeSunset" onclick="buyShopItem('sunset', 400)">400 XP</button>
+        </div>
+
+        <div class="shop-item">
+          <div class="shop-info"><div class="shop-icon">🟢</div><div><div class="shop-title">Matrix Hacker</div><div class="shop-desc">Neon green cyber theme.</div></div></div>
           <button class="btn-sm" id="btnThemeMatrix" onclick="buyShopItem('matrix', 500)">500 XP</button>
         </div>
 
         <div class="shop-item">
-          <div class="shop-info">
-            <div class="shop-icon">🔴</div>
-            <div><div class="shop-title">Cyberpunk Red</div><div class="shop-desc">Aggressive red & blue theme.</div></div>
-          </div>
+          <div class="shop-info"><div class="shop-icon">✨</div><div><div class="shop-title">Royal Gold</div><div class="shop-desc">Luxurious gold & black vibe.</div></div></div>
+          <button class="btn-sm" id="btnThemeGold" onclick="buyShopItem('gold', 800)">800 XP</button>
+        </div>
+
+        <div class="shop-item">
+          <div class="shop-info"><div class="shop-icon">🔴</div><div><div class="shop-title">Cyberpunk Red</div><div class="shop-desc">Aggressive red & blue theme.</div></div></div>
           <button class="btn-sm" id="btnThemeCyber" onclick="buyShopItem('cyber', 1000)">1000 XP</button>
         </div>
         
         <div class="shop-item">
-          <div class="shop-info">
-            <div class="shop-icon">🌊</div>
-            <div><div class="shop-title">Ocean Blue</div><div class="shop-desc">Calm deep sea vibe.</div></div>
-          </div>
+          <div class="shop-info"><div class="shop-icon">🌊</div><div><div class="shop-title">Ocean Blue</div><div class="shop-desc">Calm deep sea vibe.</div></div></div>
           <button class="btn-sm" id="btnThemeOcean" onclick="buyShopItem('ocean', 300)">300 XP</button>
         </div>
-
       </div>
+      <!-- ============================================== -->
 
       <div class="sec-head"><div class="sec-title">Settings & Cloud Controls</div></div>
       <div class="glass settings-card">
-        
         <div class="sitem" onclick="openReportModal()">
           <div class="sitem-l"><div class="sitem-ico">📊</div><div><div class="sitem-txt">Weekly Academic Report</div><div class="sitem-sub">Generate performance document</div></div></div>
           <div class="sitem-r">›</div>
         </div>
-
         <div class="sitem" onclick="openModal('editName')">
           <div class="sitem-l"><div class="sitem-ico">✏️</div><div><div class="sitem-txt">Edit Name</div><div class="sitem-sub">Change your display name</div></div></div>
           <div class="sitem-r">›</div>
@@ -403,12 +467,10 @@
           <div class="sitem-l"><div class="sitem-ico">🎓</div><div><div class="sitem-txt">Edit Course/College</div><div class="sitem-sub" id="courseDisplay">—</div></div></div>
           <div class="sitem-r">›</div>
         </div>
-        
         <div class="sitem" onclick="toggleEyeStrain()">
           <div class="sitem-l"><div class="sitem-ico">👁️</div><div><div class="sitem-txt">Eye-Strain Break</div><div class="sitem-sub">Auto-remind after 45 mins of class</div></div></div>
           <div class="toggle-sw" id="eyeStrainSw"></div>
         </div>
-
         <div class="sitem" onclick="exportBackupData()">
           <div class="sitem-l"><div class="sitem-ico">📥</div><div><div class="sitem-txt">Export Backup JSON</div><div class="sitem-sub">Download data file safely</div></div></div>
           <div class="sitem-r">›</div>
@@ -443,9 +505,7 @@
   </div>
 </div>
 
-<div id="floatingNoteBtn" onclick="openTimestampModal()" style="position:fixed; bottom:85px; right:20px; width:50px; height:50px; background:var(--grad); border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:20px; color:#fff; box-shadow:0 5px 15px rgba(0,0,0,0.4); cursor:pointer; z-index:400; transition:transform 0.2s;">
-  📝
-</div>
+<div id="floatingNoteBtn" onclick="openTimestampModal()" style="position:fixed; bottom:85px; right:20px; width:50px; height:50px; background:var(--grad); border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:20px; color:#fff; box-shadow:0 5px 15px rgba(0,0,0,0.4); cursor:pointer; z-index:400; transition:transform 0.2s;">📝</div>
 
 <div class="modal-overlay" id="modalOverlay">
   <div class="modal-box glass2">
@@ -469,20 +529,16 @@
   <div class="modal-box glass2" style="max-width:400px; padding:16px;">
     <button class="modal-close" onclick="document.getElementById('reportModal').classList.remove('open')">✕</button>
     <div class="modal-title" style="font-size:18px; margin-bottom:10px;">📊 Weekly Report</div>
-    
     <div id="reportContent" style="background:#fff; color:#111; padding:20px; border-radius:12px; margin-bottom:16px; box-shadow:0 10px 25px rgba(0,0,0,0.3);">
       <div style="text-align:center; font-family:'Playfair Display', serif; font-weight:900; font-size:22px; margin-bottom:10px; color:#222;">AnRu Focus</div>
       <div style="text-align:center; font-size:12px; color:#666; margin-bottom:20px; border-bottom:1px solid #eee; padding-bottom:10px;">Weekly Academic Performance</div>
-      
       <div style="font-size:14px; font-weight:600; margin-bottom:8px;" id="reportDateRange">Date: -- to --</div>
       <div style="font-size:13px; margin-bottom:6px;">🧑‍🎓 Student: <span id="reportStudentName" style="font-weight:700;">--</span></div>
       <div style="font-size:13px; margin-bottom:6px;">⏱️ Total Focus: <span id="reportTotalTime" style="font-weight:700;">0h 0m</span></div>
       <div style="font-size:13px; margin-bottom:6px;">✅ Tasks Done: <span id="reportTasksDone" style="font-weight:700;">0</span></div>
       <div style="font-size:13px; margin-bottom:20px;">🗂️ Backlogs Cleared: <span id="reportBacklogsCleared" style="font-weight:700;">0</span></div>
-      
       <div style="text-align:center; font-size:11px; color:#888; font-style:italic; border-top:1px solid #eee; padding-top:10px;">"Consistency is the ultimate superpower."</div>
     </div>
-
     <button class="btn btn-grad" onclick="printReport()">Download / Print Report 🖨️</button>
   </div>
 </div>
@@ -497,6 +553,31 @@
 
 <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
 <script src="app.js"></script>
+
+<!-- 🚀 Quick Study Advanced Sound Script -->
+<script>
+    const qsClickSound = new Audio('https://assets.mixkit.co/sfx/preview/mixkit-sci-fi-click-900.mp3');
+    const qsHoverSound = new Audio('https://assets.mixkit.co/sfx/preview/mixkit-fast-small-sweep-transition-166.mp3');
+    
+    qsClickSound.load();
+    qsHoverSound.load();
+
+    function playQsHover() {
+        qsHoverSound.volume = 0.2;
+        qsHoverSound.currentTime = 0;
+        let playPromise = qsHoverSound.play();
+        if (playPromise !== undefined) { playPromise.catch(e => { }); }
+    }
+    
+    function playQsClick(url) {
+        qsClickSound.volume = 1.0;
+        qsClickSound.currentTime = 0;
+        let playPromise = qsClickSound.play();
+        if (playPromise !== undefined) { playPromise.catch(e => { console.log("Sound blocked by browser"); }); }
+        if (navigator.vibrate) { navigator.vibrate(40); }
+        setTimeout(() => { window.location.href = url; }, 300); 
+    }
+</script>
 
 </body>
 </html>
