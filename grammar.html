@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>AnRu Focus - Grammar Vault</title>
+    
+    <!-- Premium Font: Poppins -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- CSS File Link -->
+    <link rel="stylesheet" href="grammar.css">
+</head>
+<body>
+
+    <!-- 🌟 Confetti Canvas (Celebration Effect) 🌟 -->
+    <canvas id="confetti-canvas" class="hidden"></canvas>
+
+    <!-- 🌟 Header: Matching AnRu Focus Theme -->
+    <header class="anru-header">
+        <button class="back-btn" onclick="window.location.href='index.html'" id="header-back-btn">
+            <i class="fa-solid fa-arrow-left"></i>
+        </button>
+        <div class="header-title-container">
+            <h1 class="header-title" id="header-title"><i class="fa-solid fa-rocket"></i> Grammar Vault</h1>
+        </div>
+        <div class="header-stats">
+            <div class="streak-badge"><i class="fa-solid fa-fire"></i> <span id="streak-count">0</span></div>
+        </div>
+    </header>
+
+    <!-- 🌟 Main Container -->
+    <main class="app-container">
+        
+        <!-- ========================================== -->
+        <!-- VIEW 1: CHAPTER SELECTION (होम स्क्रीन) -->
+        <!-- ========================================== -->
+        <section id="chapter-view" class="view-section active-view fade-in">
+            
+            <div class="welcome-banner glass-panel">
+                <h2>Master English 🎯</h2>
+                <p>Unlock UP Board Grammar Secrets!</p>
+            </div>
+
+            <!-- Dynamic Chapters Container (JS will inject chapters here) -->
+            <div id="dynamic-chapters-container" class="timeline-container">
+                <div class="loader"><i class="fa-solid fa-circle-notch fa-spin"></i> Loading Modules...</div>
+            </div>
+
+        </section>
+
+        <!-- ========================================== -->
+        <!-- VIEW 2: RULE CARDS (सीखने वाला सेक्शन) -->
+        <!-- ========================================== -->
+        <section id="rule-view" class="view-section hidden">
+            
+            <!-- Progress Bar -->
+            <div class="progress-container">
+                <span id="current-step-text">Rule 1 of x</span>
+                <div class="progress-track">
+                    <div class="progress-fill gradient-purple" id="rule-progress"></div>
+                </div>
+            </div>
+            
+            <!-- Interactive Flashcard -->
+            <div class="flashcard-wrapper">
+                <div class="flashcard glass-panel" id="current-rule-card">
+                    <!-- JS will inject rule content here -->
+                </div>
+            </div>
+
+            <!-- Navigation Controls -->
+            <div class="bottom-controls">
+                <button id="prev-rule-btn" class="nav-btn btn-secondary" onclick="prevRule()"><i class="fa-solid fa-angle-left"></i> Prev</button>
+                <button id="next-rule-btn" class="nav-btn btn-primary gradient-purple" onclick="nextRule()">Next <i class="fa-solid fa-angle-right"></i></button>
+            </div>
+        </section>
+
+        <!-- ========================================== -->
+        <!-- VIEW 3: SENTENCE BUILDER (प्रैक्टिस गेम) -->
+        <!-- ========================================== -->
+        <section id="practice-view" class="view-section hidden">
+            <div class="practice-header">
+                <h2>Sentence Builder 🛠️</h2>
+                <p>Tap the words in the correct order!</p>
+            </div>
+
+            <!-- Target Hindi Sentence -->
+            <div class="target-sentence-box glass-panel">
+                <p class="hindi-text" id="target-hindi">Loading...</p>
+            </div>
+
+            <!-- Answer Drop Zone -->
+            <div class="answer-zone" id="answer-zone">
+                <!-- User selected words will appear here -->
+            </div>
+
+            <!-- Word Chips Bank -->
+            <div class="word-bank" id="word-bank">
+                <!-- Draggable/Clickable words will be injected here by JS -->
+            </div>
+
+            <!-- Action Buttons for Practice -->
+            <div class="practice-actions">
+                <div class="secondary-actions">
+                    <button id="show-answer-btn" class="nav-btn btn-secondary" onclick="showAnswer()">
+                        <i class="fa-solid fa-eye"></i> Show Answer
+                    </button>
+                    <button id="clear-btn" class="nav-btn btn-secondary" onclick="clearSentence()">
+                        <i class="fa-solid fa-eraser"></i> Clear
+                    </button>
+                </div>
+                
+                <button id="check-answer-btn" class="submit-btn gradient-purple" onclick="checkAnswer()">
+                    Check Answer <i class="fa-solid fa-check-double"></i>
+                </button>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- ========================================== -->
+    <!-- SUCCESS MODAL (Chapter Complete Popup) -->
+    <!-- ========================================== -->
+    <div id="success-modal" class="modal-overlay hidden">
+        <div class="modal-box glass-panel bounce-in">
+            <div class="modal-icon"><i class="fa-solid fa-trophy"></i></div>
+            <h2 class="modal-title">Chapter Completed!</h2>
+            <p class="modal-text">Awesome job! You have successfully mastered this topic.</p>
+            <div class="modal-stats">
+                <div class="stat-box">
+                    <span class="stat-val" id="modal-streak">🔥 0</span>
+                    <span class="stat-label">Total Streak</span>
+                </div>
+            </div>
+            <button class="submit-btn gradient-blue" onclick="closeSuccessModal()">Continue Journey <i class="fa-solid fa-arrow-right"></i></button>
+        </div>
+    </div>
+
+    <!-- Audio Effects -->
+    <audio id="sound-correct" src="https://assets.mixkit.co/sfx/preview/mixkit-correct-answer-tone-2870.mp3" preload="auto"></audio>
+    <audio id="sound-wrong" src="https://assets.mixkit.co/sfx/preview/mixkit-wrong-answer-fail-notification-946.mp3" preload="auto"></audio>
+    <audio id="sound-complete" src="https://assets.mixkit.co/sfx/preview/mixkit-winning-chimes-2015.mp3" preload="auto"></audio>
+
+    <!-- JS File Link -->
+    <script src="grammar.js"></script>
+</body>
+</html>

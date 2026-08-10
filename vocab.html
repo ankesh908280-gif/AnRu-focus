@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>AnRu Focus - Word Ninja Pro</title>
+    
+    <!-- Premium Font & Icons -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- CSS File Link -->
+    <link rel="stylesheet" href="vocab.css">
+</head>
+<body>
+
+    <!-- Celebration Canvas -->
+    <canvas id="confetti-canvas" class="hidden"></canvas>
+
+    <!-- 🌟 Header -->
+    <header class="anru-header">
+        <button class="back-btn" onclick="handleBackButton()" id="header-back-btn">
+            <i class="fa-solid fa-arrow-left"></i>
+        </button>
+        <div class="header-title-container">
+            <h1 class="header-title"><i class="fa-solid fa-user-ninja"></i> Word Ninja</h1>
+        </div>
+        <div class="header-stats">
+            <div class="score-badge"><i class="fa-solid fa-coins"></i> <span id="total-coins">0</span></div>
+        </div>
+    </header>
+
+    <main class="app-container">
+        
+        <!-- ========================================== -->
+        <!-- VIEW 1: VOCAB DASHBOARD (होम स्क्रीन) -->
+        <!-- ========================================== -->
+        <section id="dashboard-view" class="view-section active-view fade-in">
+            
+            <div class="welcome-banner glass-panel">
+                <h2>Build Your Vocab! 📚</h2>
+                <p>Play, Learn, and track your mistakes.</p>
+            </div>
+
+            <!-- Stats Grid -->
+            <div class="stats-grid">
+                <div class="stat-card glass-panel correct-stat">
+                    <i class="fa-solid fa-check-circle"></i>
+                    <h3 id="stat-mastered">0</h3>
+                    <p>Mastered</p>
+                </div>
+                <div class="stat-card glass-panel wrong-stat">
+                    <i class="fa-solid fa-brain"></i>
+                    <h3 id="stat-mistakes">0</h3>
+                    <p>Needs Work</p>
+                </div>
+            </div>
+
+            <!-- Game Modes -->
+            <div class="mode-container mt-20">
+                <button class="mode-card premium-card gradient-purple" onclick="startEndlessMode()">
+                    <div class="mode-icon"><i class="fa-solid fa-infinity"></i></div>
+                    <div class="mode-info">
+                        <h4>Endless Mode</h4>
+                        <p>Learn new random words</p>
+                    </div>
+                </button>
+
+                <button class="mode-card premium-card gradient-blue" onclick="startRevisionMode()">
+                    <div class="mode-icon"><i class="fa-solid fa-rotate-left"></i></div>
+                    <div class="mode-info">
+                        <h4>Revise Mistakes</h4>
+                        <p>Practice words you got wrong</p>
+                    </div>
+                </button>
+
+                <button class="mode-card premium-card gradient-gray" onclick="openHistoryView()">
+                    <div class="mode-icon"><i class="fa-solid fa-clock-rotate-left"></i></div>
+                    <div class="mode-info">
+                        <h4>Word History</h4>
+                        <p>View all played words</p>
+                    </div>
+                </button>
+            </div>
+        </section>
+
+        <!-- ========================================== -->
+        <!-- VIEW 2: GAMEPLAY SCREEN -->
+        <!-- ========================================== -->
+        <section id="game-view" class="view-section hidden">
+            
+            <div class="game-header">
+                <h2 id="game-mode-title">Endless Mode</h2>
+                <p id="word-counter">Find the correct spelling!</p>
+            </div>
+
+            <!-- Target Hindi Word -->
+            <div class="target-word-box glass-panel">
+                <div class="hint-label">Hindi Meaning:</div>
+                <p class="hindi-text" id="target-hindi">Loading...</p>
+            </div>
+
+            <!-- Answer Drop Zone -->
+            <div class="answer-zone" id="answer-zone">
+                <!-- Selected letters appear here -->
+            </div>
+
+            <!-- Letter Bank -->
+            <div class="letter-bank" id="letter-bank">
+                <!-- Scrambled letters appear here -->
+            </div>
+
+            <!-- Actions (Added Show Answer) -->
+            <div class="game-actions">
+                <div class="secondary-actions">
+                    <button id="show-answer-btn" class="nav-btn btn-secondary" onclick="showAnswer()">
+                        <i class="fa-solid fa-eye"></i> Show Answer
+                    </button>
+                    <button id="clear-btn" class="nav-btn btn-secondary" onclick="clearLetters()">
+                        <i class="fa-solid fa-eraser"></i> Clear
+                    </button>
+                </div>
+                
+                <button id="check-btn" class="submit-btn gradient-purple" onclick="checkSpelling()">
+                    Check Spelling <i class="fa-solid fa-check-double"></i>
+                </button>
+            </div>
+        </section>
+
+        <!-- ========================================== -->
+        <!-- VIEW 3: WORD HISTORY & TRACKING -->
+        <!-- ========================================== -->
+        <section id="history-view" class="view-section hidden">
+            <div class="history-header">
+                <h2>Your Word History 📜</h2>
+                <p>Track your vocabulary journey.</p>
+            </div>
+
+            <div class="history-tabs">
+                <button class="tab-btn active" onclick="switchTab('wrong')">Needs Work ❌</button>
+                <button class="tab-btn" onclick="switchTab('correct')">Mastered ✅</button>
+            </div>
+
+            <!-- List of Wrong Words -->
+            <div id="wrong-words-list" class="words-list active-list">
+                <!-- JS will populate this -->
+            </div>
+
+            <!-- List of Correct Words -->
+            <div id="correct-words-list" class="words-list hidden">
+                <!-- JS will populate this -->
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Audio Effects -->
+    <audio id="sound-correct" src="https://assets.mixkit.co/sfx/preview/mixkit-correct-answer-tone-2870.mp3" preload="auto"></audio>
+    <audio id="sound-wrong" src="https://assets.mixkit.co/sfx/preview/mixkit-wrong-answer-fail-notification-946.mp3" preload="auto"></audio>
+    <audio id="sound-tap" src="https://assets.mixkit.co/sfx/preview/mixkit-modern-technology-select-3124.mp3" preload="auto"></audio>
+
+    <script src="vocab.js"></script>
+</body>
+</html>

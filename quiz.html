@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Combat Quiz - AnRu Focus</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=Playfair+Display:wght@700;900&display=swap" rel="stylesheet">
+    
+    <!-- MathJax for rendering formulas -->
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    
+    <!-- BUG FIX: Confetti Library added for Victory/Streak Animations 🎉 -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    
+    <!-- APP NATIVE FEEL FIX (Prevents Text Selection) -->
+    <style>
+        body, .quiz-container, .btn, .q-card, .shop-item, .vault-card {
+            -webkit-touch-callout: none; /* iOS Safari */
+            -webkit-user-select: none; /* Safari */
+            -khtml-user-select: none; /* Konqueror HTML */
+            -moz-user-select: none; /* Old Firefox */
+            -ms-user-select: none; /* Internet Explorer/Edge */
+            user-select: none; /* Standard syntax */
+        }
+    </style>
+
+    <link rel="stylesheet" href="quiz.css">
+</head>
+<body class="theme-default" id="arenaBody">
+    <!-- Background Effects -->
+    <div class="bg-orbs"></div>
+
+    <div class="quiz-container" id="quizApp">
+        <!-- HEADER -->
+        <div class="q-header">
+            <button class="btn-icon hover-glow" onclick="exitQuiz()" title="Back to Main App">←</button>
+            <div class="q-title anim-pulse">Combat Arena ⚔️</div>
+            <div class="q-xp hover-glow" id="combatXpDisplay">0 CXP</div>
+        </div>
+
+        <!-- ==========================================
+             1. SETUP & SHOP SCREEN (Pre-Match)
+        =========================================== -->
+        <div class="q-screen active" id="screenSetup">
+            
+            <!-- Config Card -->
+            <div class="glass q-card setup-card anim-slide-up">
+                <h2 class="card-heading">Configure Mission</h2>
+                
+                <div class="inp-wrap">
+                    <span class="ico">📁</span>
+                    <select id="selSubject" onchange="loadChapters()">
+                        <option value="">Select Subject...</option>
+                    </select>
+                </div>
+
+                <div class="inp-wrap">
+                    <span class="ico">🔖</span>
+                    <select id="selChapter" disabled>
+                        <option value="">Select Chapter...</option>
+                    </select>
+                </div>
+
+              <div class="inp-wrap">
+    <span class="ico">🔢</span>
+    <select id="selCount">
+        <option value="5">5 Questions (Sprint)</option>
+        <option value="10">10 Questions (Challenge)</option>
+        <option value="15">15 Questions (Endurance)</option>
+        <option value="20">20 Questions (Mastery)</option>
+        <option value="30">30 Questions (Pro)</option>
+        <option value="50">50 Questions (Legend)</option>
+        <option value="60">60 Questions (Full Chapter)</option>
+        <option value="999">All Questions (सब ले आ)</option>
+    </select>
+</div>
+
+
+                <!-- Mode Selector -->
+                <div class="mode-selector">
+                    <button class="mode-btn active hover-glow" id="modeZen" onclick="selectMode('zen')">
+                        <span class="m-icon">🧘‍♂️</span>
+                        <span class="m-title">Zen Mode</span>
+                        <span class="m-desc">No Time Limit</span>
+                    </button>
+                    <button class="mode-btn hover-glow" id="modeAttack" onclick="selectMode('attack')">
+                        <span class="m-icon">⏱️</span>
+                        <span class="m-title">Time Attack</span>
+                        <span class="m-desc">60s / Question</span>
+                    </button>
+                </div>
+
+                <button class="btn btn-grad start-btn hover-glow anim-pulse" onclick="startMatch()">Start Combat 🔥</button>
+            </div>
+
+            <!-- MEGA ARENA SHOP -->
+            <div class="glass q-card shop-card anim-slide-up" style="animation-delay: 0.1s;">
+                <h2 class="card-heading" style="color: var(--warn); margin-bottom: 12px; font-size: 18px;">🛒 Black Market (CXP Shop)</h2>
+                <p style="font-size: 11px; color: var(--textMuted); margin-bottom: 15px; text-align: center;">Equip powerful perks & cosmetics!</p>
+                
+                <div class="shop-list scroll-hide">
+                    <!-- Power-ups -->
+                    <div class="shop-item hover-scale">
+                        <div class="s-info"><span class="s-ico">🌓</span><div><div class="s-name">50/50 Strike</div><div class="s-desc" id="inv5050">Owned: 0</div></div></div>
+                        <button class="btn-buy" onclick="buyPowerUp('5050', 50)">50 CXP</button>
+                    </div>
+                    <div class="shop-item hover-scale">
+                        <div class="s-info"><span class="s-ico">❄️</span><div><div class="s-name">Time Freeze (15s)</div><div class="s-desc" id="invFreeze">Owned: 0</div></div></div>
+                        <button class="btn-buy" onclick="buyPowerUp('freeze', 30)">30 CXP</button>
+                    </div>
+                    <div class="shop-item hover-scale">
+                        <div class="s-info"><span class="s-ico">⏭️</span><div><div class="s-name">Skip Pass</div><div class="s-desc" id="invSkip">Owned: 0</div></div></div>
+                        <button class="btn-buy" onclick="buyPowerUp('skip', 100)">100 CXP</button>
+                    </div>
+                    <div class="shop-item hover-scale">
+                        <div class="s-info"><span class="s-ico">👁️</span><div><div class="s-name">Hint Revealer</div><div class="s-desc" id="invHint">Owned: 0</div></div></div>
+                        <button class="btn-buy" onclick="buyPowerUp('hint', 40)">40 CXP</button>
+                    </div>
+                    <div class="shop-item hover-scale">
+                        <div class="s-info"><span class="s-ico">💖</span><div><div class="s-name">Second Chance</div><div class="s-desc" id="invRevive">Owned: 0</div></div></div>
+                        <button class="btn-buy" onclick="buyPowerUp('revive', 80)">80 CXP</button>
+                    </div>
+                    <div class="shop-item hover-scale" style="border-color: rgba(74,222,128,0.4);">
+                        <div class="s-info"><span class="s-ico">🧪</span><div><div class="s-name" style="color:var(--success)">2x XP Potion</div><div class="s-desc" id="invDoubleXp">Passive (Owned: 0)</div></div></div>
+                        <button class="btn-buy" onclick="buyPowerUp('doubleXp', 150)">150 CXP</button>
+                    </div>
+                    <div class="shop-item hover-scale" style="border-color: rgba(102,126,234,0.4);">
+                        <div class="s-info"><span class="s-ico">🛡️</span><div><div class="s-name" style="color:var(--p1)">Auto-Time Shield</div><div class="s-desc" id="invShield">Passive (Owned: 0)</div></div></div>
+                        <button class="btn-buy" onclick="buyPowerUp('shield', 60)">60 CXP</button>
+                    </div>
+                    <div class="shop-item hover-scale" style="background: linear-gradient(45deg, rgba(236,72,153,0.2), rgba(168,85,247,0.2));">
+                        <div class="s-info"><span class="s-ico">🎁</span><div><div class="s-name">Mystery Lootbox</div><div class="s-desc">Get Random Perks</div></div></div>
+                        <button class="btn-buy" onclick="buyLootbox(120)">120 CXP</button>
+                    </div>
+
+                    <!-- Themes -->
+                    <div class="shop-item hover-scale">
+                        <div class="s-info"><span class="s-ico">🌌</span><div><div class="s-name" style="color: #fff;">Theme: Default</div><div class="s-desc">Original Style</div></div></div>
+                        <button class="btn-buy" id="btnThemeDefault" onclick="equipArenaTheme('default', 0)">Equip</button>
+                    </div>
+                    <div class="shop-item hover-scale">
+                        <div class="s-info"><span class="s-ico">🟢</span><div><div class="s-name">Theme: Matrix</div><div class="s-desc" id="invThemeMatrix">Cosmetic</div></div></div>
+                        <button class="btn-buy" id="btnThemeMatrix" onclick="equipArenaTheme('matrix', 300)">300 CXP</button>
+                    </div>
+                    <div class="shop-item hover-scale">
+                        <div class="s-info"><span class="s-ico">👑</span><div><div class="s-name" style="color: gold;">Theme: Golden VIP</div><div class="s-desc" id="invThemeGold">Cosmetic</div></div></div>
+                        <button class="btn-buy" id="btnThemeGold" onclick="equipArenaTheme('gold', 500)">500 CXP</button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Error Vault Access -->
+            <div class="glass q-card vault-card hover-glow anim-slide-up" style="animation-delay: 0.2s;" onclick="openErrorVault()">
+                <div class="vault-info">
+                    <span class="v-ico">📓</span>
+                    <div>
+                        <div class="v-title">Error Vault <span id="vaultBadge" style="background:var(--danger); color:#fff; font-size:10px; padding:2px 6px; border-radius:10px; margin-left:5px;">0</span></div>
+                        <div class="v-desc">Revise past mistakes</div>
+                    </div>
+                </div>
+                <span class="v-arrow">›</span>
+            </div>
+
+            <!-- BOSS FIGHT: PHASE 4 -->
+            <div class="glass q-card vault-card hover-glow anim-slide-up" style="animation-delay: 0.3s; border-left-color: var(--p3); background: linear-gradient(90deg, rgba(168,85,247,0.15), transparent);" onclick="startBossFight()">
+                <div class="vault-info">
+                    <span class="v-ico">🐉</span>
+                    <div>
+                        <div class="v-title" style="color: var(--p3);">Grand Boss Fight</div>
+                        <div class="v-desc">Mixed Subjects. The Ultimate Test!</div>
+                    </div>
+                </div>
+                <span class="v-arrow">›</span>
+            </div>
+        </div>
+
+        <!-- ==========================================
+             2. COMBAT ARENA (Test Screen)
+        =========================================== -->
+        <div class="q-screen" id="screenCombat">
+             
+             <div class="c-header">
+                 <div class="c-qnum">Question <span id="currentQNum">1</span> / <span id="totalQNum">5</span></div>
+                 <div id="streakDisplayUI" class="streak-box">🔥 3 COMBO</div>
+                 <div id="combatTimerUI" class="c-timer">⏱️ <span id="qTimerText">60</span>s</div>
+             </div>
+
+             <div id="passiveStatusUI" style="display:flex; gap:10px; margin-bottom: 8px; justify-content: flex-end; font-size: 11px; font-weight: 700;">
+                 <span id="activeDxp" style="display:none; background:rgba(74,222,128,0.2); color:var(--success); padding:2px 8px; border-radius:10px;">🧪 2x XP Active</span>
+                 <span id="activeShield" style="display:none; background:rgba(102,126,234,0.2); color:var(--p1); padding:2px 8px; border-radius:10px;">🛡️ Shield Ready</span>
+             </div>
+
+             <div class="prog-wrap">
+                 <div id="combatProgressBar" class="prog-fill"></div>
+             </div>
+
+             <div class="powerup-tray scroll-hide" id="powerUpTray">
+                 <button class="pu-btn hover-scale" id="btnUse5050" onclick="usePowerUp('5050')">🌓 50/50 (<span id="tray5050">0</span>)</button>
+                 <button class="pu-btn hover-scale" id="btnUseFreeze" onclick="usePowerUp('freeze')">❄️ Freeze (<span id="trayFreeze">0</span>)</button>
+                 <button class="pu-btn hover-scale" id="btnUseSkip" onclick="usePowerUp('skip')">⏭️ Skip (<span id="traySkip">0</span>)</button>
+                 <button class="pu-btn hover-scale" id="btnUseHint" onclick="usePowerUp('hint')">👁️ Hint (<span id="trayHint">0</span>)</button>
+                 <button class="pu-btn hover-scale" id="btnUseRevive" onclick="usePowerUp('revive')">💖 Revive (<span id="trayRevive">0</span>)</button>
+             </div>
+
+             <div class="glass q-card question-box anim-zoom" id="questionText">Loading Question...</div>
+             <div id="optionsContainer" class="options-grid"></div>
+             
+             <div id="explanationBox" class="glass explanation-box">
+                 <strong style="color:#fff;">💡 Concept:</strong> <span id="explanationText"></span>
+             </div>
+
+             <button id="btnNext" class="btn btn-grad next-btn hover-glow" onclick="nextQuestion()">Next Question ➔</button>
+        </div>
+
+        <!-- ==========================================
+             3. RESULT SCREEN (Post-Match)
+        =========================================== -->
+        <div class="q-screen" id="screenResult">
+            <div class="glass q-card result-card anim-zoom">
+                <div class="res-emoji anim-bounce" id="resultEmoji">🏆</div>
+                <h2 class="res-title" id="resultTitle">Mission Passed!</h2>
+                <div class="res-acc">Accuracy: <span id="resultAccuracy">100%</span></div>
+
+                <div class="res-stats-grid">
+                    <div class="r-stat-box s-correct hover-scale"><div class="r-val" id="resCorrect">0</div><div class="r-lbl">Correct</div></div>
+                    <div class="r-stat-box s-wrong hover-scale"><div class="r-val" id="resWrong">0</div><div class="r-lbl">Incorrect</div></div>
+                    <div class="r-stat-box s-time hover-scale"><div class="r-val" id="resAvgTime">0s</div><div class="r-lbl">Avg Time per Question</div></div>
+                </div>
+
+                <div class="xp-earned-box hover-glow">+ <span id="resXpEarned">0</span> Combat XP Earned! ⚡</div>
+
+                <div class="res-actions">
+                    <button class="btn btn-glass hover-scale" onclick="switchQScreen('setup')">Arena Home 🏠</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==========================================
+             4. ERROR VAULT SCREEN
+        =========================================== -->
+        <div class="q-screen" id="screenVault">
+            <div class="glass q-card anim-slide-up">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
+                    <h2 class="card-heading" style="color:var(--danger); margin-bottom:0;">📓 Error Vault</h2>
+                    <button class="btn-icon hover-scale" onclick="switchQScreen('setup')" style="width:30px;height:30px;font-size:14px;">✕</button>
+                </div>
+                
+                <p style="font-size:12px; color:var(--textMuted); margin-bottom:15px; text-align:center;">Here are the questions you got wrong. Revise them to become unstoppable!</p>
+                
+                <div id="vaultListContainer" class="scroll-hide" style="max-height:300px; overflow-y:auto; display:flex; flex-direction:column; gap:10px; margin-bottom:20px;"></div>
+
+                <div style="display:flex; gap:10px;">
+                    <button class="btn btn-glass hover-scale" style="flex:1; border-color:var(--danger); color:var(--danger)" onclick="clearVault()">Clear All 🗑️</button>
+                    <button class="btn btn-grad hover-glow" style="flex:2;" onclick="startVaultTest()">Revise All 🔥</button>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <script src="quiz.js"></script>
+</body>
+</html>
