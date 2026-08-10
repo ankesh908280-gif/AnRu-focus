@@ -9,6 +9,7 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <link rel="stylesheet" href="style.css">
 
+<link rel="manifest" href="manifest.json">
 
 </head>
 <body>
@@ -579,6 +580,12 @@
         if (navigator.vibrate) { navigator.vibrate(40); }
         setTimeout(() => { window.location.href = url; }, 300); 
     }
+</script>
+<script>
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('sw.js')
+      .then(() => console.log('Service Worker Registered'));
+  }
 </script>
 
 </body>
