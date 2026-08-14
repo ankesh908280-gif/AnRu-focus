@@ -33,7 +33,38 @@ const QUOTES=[
   "अभी बाकी है असली इम्तिहान, शांत रहकर मेहनत करो और उड़ा दो आसमान! 🔥",
   "जो मुस्कुरा रहा है उसे दर्द ने पाला होगा, जो चल रहा है उसके पाँव में छाला होगा! 👑",
   "AnRu Focus माइंडसेट: बहानों को पीछे छोड़ो, आज के काम पर ध्यान जोड़ो! 🚀",
-  "भविष्य का अंदाज़ा लगाने का सबसे बेस्ट तरीका है कि उसे आज की मेहनत से लिख डालो! ✨"
+  "भविष्य का अंदाज़ा लगाने का सबसे बेस्ट तरीका है कि उसे आज की मेहनत से लिख डालो! ✨",
+  "सपने बड़े हैं तो संघर्ष भी बड़ा होगा, बिना तपे तो सोना भी नहीं निखरेगा! 🌟",
+  "वक़्त से लड़कर जो नसीब बदल दे, इंसान वही जो अपनी तकदीर बदल दे! ⏳",
+  "आज किताबों के सामने झुक जाओ, कल दुनिया तुम्हारे सामने झुकेगी! 📚",
+  "जिद्दी बनो, जो लिखा नहीं मुकद्दर में उसे भी हासिल करना सीखो! 💪",
+  "मुश्किलें केवल बेहतरीन लोगों के हिस्से में आती हैं, क्योंकि वे ही इसे बेहतरीन तरीके से अंजाम दे सकते हैं! 🏆",
+  "थक कर ना बैठ ऐ मंज़िल के मुसाफ़िर, मंज़िल भी मिलेगी और मिलने का मज़ा भी आएगा! 🚀",
+  "अगर सूरज की तरह जलना है, तो रोज़ उगना पड़ेगा! ☀️",
+  "नींद से इतना भी प्यार न करो कि मंज़िल भी ख्वाब बन जाए! 👁️",
+  "मेहनत इतनी खामोशी से करो, कि सफलता शोर मचा दे! 🤫",
+  "हौसलों के तरकश में कोशिश का वो तीर ज़िंदा रखो, हार जाओ चाहे ज़िंदगी में सब कुछ, मगर फिर से जीतने की उम्मीद ज़िंदा रखो! 🏹",
+  "रास्ते कभी खत्म नहीं होते, बस लोग हिम्मत हार जाते हैं! 🚶‍♂️",
+  "जीतने का असली मज़ा तो तब है, जब सब आपके हारने का इंतज़ार कर रहे हों! 😎",
+  "जिनमें अकेले चलने के हौसले होते हैं, एक दिन उन्हीं के पीछे काफिले होते हैं! 🚶‍♂️👑",
+  "जो पढ़ाई आज तुम्हें दर्द लग रही है, कल वही तुम्हारी सबसे बड़ी ताकत बनेगी! 💡",
+  "भीड़ हमेशा उस रास्ते पर चलती है जो आसान लगता है, पर अपना रास्ता खुद चुनो क्योंकि तुम्हें तुमसे बेहतर कोई नहीं जानता! 🛤️",
+  "जिसने भी खुद को खर्च किया है, दुनिया ने उसी को Google पर सर्च किया है! 🌍",
+  "कामयाबी के दरवाजे उन्हीं के लिए खुलते हैं, जो उन्हें खटखटाने की ताकत रखते हैं! 🚪",
+  "जब टूटने लगे हौसले तो बस ये याद रखना, बिना मेहनत के हासिल तख्तो-ताज नहीं होते! 👑",
+  "इंतज़ार करने वालों को सिर्फ उतना मिलता है, जितना कोशिश करने वाले छोड़ देते हैं! 🏃‍♂️",
+  "आज का दर्द कल की जीत है, फोकस बनाए रखो! 🎯",
+  "सफलता एक दिन में नहीं मिलती, लेकिन ठान लो तो एक दिन ज़रूर मिलती है! ⏳",
+  "अपने लक्ष्य पर नज़र रखो और तब तक मत रुको जब तक उसे हासिल न कर लो! 🦅",
+  "परिंदों को मंज़िल मिलेगी यकीनन, ये फैले हुए उनके पंख बोलते हैं! 🦅",
+  "बहाने बनाना छोड़ो, क्योंकि तुम्हारी सफलता सिर्फ तुम्हारी ज़िम्मेदारी है! 🔥",
+  "जो अपने कदमों की काबिलियत पर विश्वास रखते हैं, वही अक्सर मंज़िल पर पहुँचते हैं! 👣",
+  "अगर तुम उस वक़्त मुस्कुरा सकते हो जब तुम पूरी तरह टूट चुके हो, तो यकीनन दुनिया में तुम्हें कोई नहीं हरा सकता! 🛡️",
+  "सफलता की राहों पर जब-जब काँटे चुभेंगे, समझ लेना तुम्हारी रफ़्तार बढ़ने वाली है! ⚡",
+  "मैदान में हारा हुआ इंसान फिर से जीत सकता है, लेकिन मन से हारा हुआ इंसान कभी नहीं जीत सकता! 🧠",
+  "अपने सपनों को ज़िंदा रखो, अगर तुम्हारे सपनों की चिंगारी बुझ गई है तो समझो तुमने जीते जी आत्महत्या कर ली है! 🔥",
+  "AnRu Focus का एक ही उसूल है: आज का काम आज ही खत्म! 🚀"
+
 ];
 let usedQuoteIdx = [];
 function pickQuote(){
@@ -89,19 +120,26 @@ window.onload = async () => {
   updateTodayDate(); loadQuotesEngine();
   
   if(S.session) {
+     // 🚀 1. सबसे पहले Local Data लोड करो और ऐप खोल दो (बिना इंटरनेट का इंतज़ार किए!)
+     loadDataLocal();
+     bootApp();
+     
      if(!S.session.isGuest) {
         try {
-            // ☁️ Fetch fresh data from Google Cloud
+            // ☁️ 2. बैकग्राउंड में चुपचाप Cloud से सिंक करो
             const doc = await db.collection('users').doc(S.session.email).get();
-            if(doc.exists) loadDataFromObj(doc.data());
-            else loadDataLocal(); 
-        } catch(e) { console.error(e); loadDataLocal(); }
-     } else {
-        loadDataLocal(); // Guest mode (Local only)
+            if(doc.exists) {
+                loadDataFromObj(doc.data());
+                renderAll(); // नया डेटा आते ही स्क्रीन अपडेट कर दो
+                updateShopUI();
+            }
+        } catch(e) { 
+            console.log("Network delay: Using local offline data."); 
+        }
      }
-     bootApp();
   }
 };
+
 
 function key(s){const id=S.session?.isGuest?'guest':(S.session?.email||'guest'); return `mceo_${id}_${s}`;}
 
@@ -273,24 +311,66 @@ async function syncAndLogin(email, name, course, pfp, pass) {
   await saveToCloud(); bootApp();
 }
 
-async function doForgotPassword() {
-  const email = prompt("Enter your registered email address:\n(अपना रजिस्टर्ड ईमेल दर्ज करें)");
-  if (!email) return;
-  const lowerEmail = email.trim().toLowerCase();
+/* --- 🔑 SMART FORGOT PASSWORD SYSTEM --- */
+
+let verifiedFpEmail = ""; // ईमेल को सेव रखने के लिए
+
+// 1. मोडल को ओपन करने का फंक्शन
+function doForgotPassword() {
+  document.getElementById('fpEmail').value = '';
+  document.getElementById('fpNewPass').value = '';
+  document.getElementById('fpStep1').style.display = 'block';
+  document.getElementById('fpStep2').style.display = 'none';
+  document.getElementById('fpSubText').textContent = 'Enter your registered email address to verify your account.';
+  document.getElementById('forgotPassModal').classList.add('open');
+}
+
+// 2. स्टेप 1: Cloud में ईमेल चेक करना
+async function fpVerifyEmail() {
+  const email = document.getElementById('fpEmail').value.trim();
+  if (!email) { playSfx('error'); return showToast('Bhai pehle email daal! 😅', 'error'); }
+  const lowerEmail = email.toLowerCase();
   
   showToast("Searching Cloud... ☁️");
   const userRef = db.collection('users').doc(lowerEmail);
   const doc = await userRef.get();
   
-  if (!doc.exists) { playSfx('error'); return showAuthErr('यह ईमेल रजिस्टर्ड नहीं है! 🤔'); }
-  if (doc.data().profile.pass === "google_oauth") { playSfx('error'); return alert('You logged in with Google! Password reset is not needed.'); }
+  if (!doc.exists) { 
+      playSfx('error'); 
+      return showToast('यह ईमेल रजिस्टर्ड नहीं है! 🤔', 'error'); 
+  }
+  if (doc.data().profile.pass === "google_oauth") { 
+      playSfx('error'); 
+      return showToast('Google login वाले अकाउंट का पासवर्ड चेंज नहीं होता!', 'error'); 
+  }
   
-  const newPass = prompt("Set a new password (min 4 characters):\n(नया पासवर्ड सेट करें)");
-  if (!newPass || newPass.length < 4) { playSfx('error'); alert('Password must be at least 4 characters long!'); return; }
+  // अगर ईमेल सही है, तो स्टेप 2 दिखाओ
+  verifiedFpEmail = lowerEmail;
+  playSfx('success');
+  document.getElementById('fpStep1').style.display = 'none';
+  document.getElementById('fpStep2').style.display = 'block';
+  document.getElementById('fpSubText').textContent = 'Email verified! Create a strong new password.';
+}
+
+// 3. स्टेप 2: नया पासवर्ड सेव करना
+async function fpSaveNewPassword() {
+  const newPass = document.getElementById('fpNewPass').value;
+  if (!newPass || newPass.length < 4) { 
+      playSfx('error'); 
+      return showToast('Password कम से कम 4 characters का होना चाहिए!', 'error'); 
+  }
   
-  const data = doc.data(); data.profile.pass = newPass;
+  showToast("Updating Password... ☁️");
+  const userRef = db.collection('users').doc(verifiedFpEmail);
+  const doc = await userRef.get();
+  
+  const data = doc.data(); 
+  data.profile.pass = newPass;
   await userRef.set(data);
-  playSfx('success'); showToast('🎉 Cloud Password successfully reset! Please login.', 'success'); document.getElementById('authErr').style.display = 'none';
+  
+  playSfx('success'); 
+  showToast('🎉 Password successfully reset! Please login.', 'success'); 
+  document.getElementById('forgotPassModal').classList.remove('open');
 }
 
 function guestLogin(){
@@ -642,15 +722,30 @@ function saveEditTask(id){
 function toggleSubtaskInline(taskId, subtaskId) { const t=S.tasks.find(x=>x.id===taskId); if(!t)return; const st=t.subtasks.find(x=>x.id===subtaskId); if(!st)return; st.done=!st.done; saveData(); renderAll(); }
 function setFilter(f,el){ S.filter=f; document.querySelectorAll('.fchip').forEach(c=>c.classList.remove('active')); el.classList.add('active'); renderTasks(); }
 
+function setSubjFilter(val) {
+  S.subjFilter = val;
+  renderTasks();
+}
+
 function getFiltered(){
   const standardTasks = S.tasks.filter(t => !t.isBacklog);
+  let result = standardTasks;
+
+  // 1. Status Filter
   switch(S.filter){
-    case 'pending':return standardTasks.filter(t=>!t.isDone); 
-    case 'done':return standardTasks.filter(t=>t.isDone);
-    case 'high':return standardTasks.filter(t=>t.priority==='high'); 
-    default:return standardTasks;
+    case 'pending': result = result.filter(t=>!t.isDone); break;
+    case 'done': result = result.filter(t=>t.isDone); break;
+    case 'high': result = result.filter(t=>t.priority==='high'); break;
   }
+
+  // 2. Subject Filter
+  if(S.subjFilter && S.subjFilter !== 'all') {
+      result = result.filter(t => t.subj === S.subjFilter);
+  }
+
+  return result;
 }
+
 
 function openBacklogVaultModal() {
   const backlogTasks = S.tasks.filter(t => t.isBacklog);
@@ -698,9 +793,22 @@ function renderTasks(){
   if(badge){badge.style.display=pending?'flex':'none'; badge.textContent=pending;}
 }
 function populateSubjDropdown(){
-  const sel=document.getElementById('tSubj'); if(!sel)return; const cur=sel.value;
-  sel.innerHTML='<option value="">📁 Subject</option>'+S.subjects.map(s=>`<option value="${s.name}" ${s.name===cur?'selected':''}>${s.emoji} ${s.name}</option>`).join('');
+  // Add Task वाला ड्रॉपडाउन
+  const sel = document.getElementById('tSubj'); 
+  if(sel) {
+      const cur = sel.value;
+      sel.innerHTML = '<option value="">📁 Subject</option>' + S.subjects.map(s=>`<option value="${s.name}" ${s.name===cur?'selected':''}>${s.emoji} ${s.name}</option>`).join('');
+  }
+
+  // Filter वाला नया ड्रॉपडाउन
+  const filterSel = document.getElementById('subjFilterSelect');
+  if(filterSel) {
+      const curFilter = filterSel.value || 'all';
+      filterSel.innerHTML = '<option value="all">📁 All Subjects</option>' + S.subjects.map(s=>`<option value="${s.name}" ${s.name===curFilter?'selected':''}>${s.emoji} ${s.name}</option>`).join('');
+      S.subjFilter = filterSel.value; // State sync
+  }
 }
+
 
 /* ████████████████████████████████████████████████████████████
                   9. TIMER, ZEN MODE & EYE STRAIN 
@@ -952,8 +1060,13 @@ function renderDashboard(){
      if(liveToday <= 1 && pendingBacklogs > 0) { aiUi.style.display = 'flex'; } else { aiUi.style.display = 'none'; }
   }
 
-  const standardTasks = S.tasks.filter(t => !t.isBacklog);
-  const total=standardTasks.length; const done=standardTasks.filter(t=>t.isDone).length; const pending=total-done; const pct=total?Math.round(done/total*100):0;
+  const standardTasks = S.tasks.filter(t => !t.isBacklog); // यह Recent Tasks की लिस्ट के लिए है
+  
+  // 🚀 यहाँ हमने S.tasks लगा दिया ताकि LIVE और BACKLOG दोनों काउंट हों
+  const total = S.tasks.length; 
+  const done = S.tasks.filter(t => t.isDone).length; 
+  const pending = total - done; 
+  const pct = total ? Math.round((done / total) * 100) : 0;
   const backlogCount = S.tasks.filter(t => t.isBacklog && !t.isDone).length; document.getElementById('backlogBannerDesc').textContent = `${backlogCount} class backlogs active`;
   animNum('dTotal',total); animNum('dPending',pending); animNum('dXP',S.xp); animNum('dStreak',calcStreak());
   setTimeout(()=>{const r = document.getElementById('pRing'); if(r) r.style.strokeDashoffset=(239-239*pct/100).toFixed(1);},100);
@@ -1103,3 +1216,30 @@ function showToast(msg,type=''){ const t=document.getElementById('toast'); t.tex
 
 // MASTER RENDER
 function renderAll(){ checkLevelUp(); checkBuffState(); renderDashboard(); renderTasks(); renderSubjects(); renderProfile(); renderTimerLog(); populateSubjDropdown(); updateTodayDate(); renderWeeklyStudyChart(); }
+
+/* ████ MISSING FUNCTIONS FIX (DATE & MOTIVATION) ████ */
+
+// 1. Dashboard par Date dikhane ke liye
+function updateTodayDate() {
+    const today = new Date();
+    const options = { weekday: 'long', month: 'short', day: 'numeric' };
+    const dateEl = document.getElementById('todayDate');
+    if (dateEl) {
+        dateEl.textContent = today.toLocaleDateString('en-IN', options);
+    }
+}
+
+// 2. Motivation Quote load aur change karne ke liye
+function loadQuotesEngine() {
+    const quoteEl = document.getElementById('dashQuote');
+    if (quoteEl) {
+        // Pehli baar turant quote dikhaye
+        quoteEl.textContent = pickQuote();
+        
+        // Har 12 second me naya quote automatically change ho
+        setInterval(() => {
+            quoteEl.textContent = pickQuote();
+        }, 12000);
+    }
+}
+

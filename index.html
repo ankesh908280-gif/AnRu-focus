@@ -170,6 +170,15 @@
           </div>
       </div>
 
+      <!-- 💬 3D DOUBT ROOM BUTTON -->
+      <div class="doubt-3d-btn-container">
+          <button class="doubt-3d-btn" onclick="window.location.href='doubt-room.html';">
+              <i class="fa-solid fa-satellite-dish"></i> Enter Live Doubt Room
+              <span class="doubt-3d-badge">NEW 🔥</span>
+          </button>
+      </div>
+
+
       <div class="prog-card glass">
         <div class="ring-wrap">
           <svg width="90" height="90" viewBox="0 0 90 90">
@@ -232,12 +241,18 @@
         <button class="btn btn-grad" onclick="addTask()">Add to Mission List 🔥</button>
       </div>
       
-      <div class="chip-scroll">
+      <div class="chip-scroll" style="align-items: center;">
         <button class="fchip active" onclick="setFilter('all',this)">All</button>
         <button class="fchip" onclick="setFilter('pending',this)">⏳ Pending</button>
         <button class="fchip" onclick="setFilter('done',this)">✅ Done</button>
         <button class="fchip" onclick="setFilter('high',this)">🔴 High</button>
+        
+        <!-- नया सब्जेक्ट फ़िल्टर ड्रॉपडाउन -->
+        <select id="subjFilterSelect" class="fchip" style="background: rgba(255,255,255,0.05); padding: 8px 12px; outline: none; color: var(--textMuted); cursor: pointer; border-radius: 20px; font-weight: 600;" onchange="setSubjFilter(this.value)">
+          <option value="all">📁 All Subjects</option>
+        </select>
       </div>
+
       <div id="taskList"></div>
     </div>
 
@@ -539,6 +554,36 @@
       <div style="text-align:center; font-size:11px; color:#888; font-style:italic; border-top:1px solid #eee; padding-top:10px;">"Consistency is the ultimate superpower."</div>
     </div>
     <button class="btn btn-grad" onclick="printReport()">Download / Print Report 🖨️</button>
+  </div>
+</div>
+
+<!-- 🔐 CUSTOM FORGOT PASSWORD MODAL -->
+<div class="modal-overlay" id="forgotPassModal">
+  <div class="modal-box glass2" style="max-width:340px; text-align:center; padding:24px;">
+    <button class="modal-close" onclick="document.getElementById('forgotPassModal').classList.remove('open')">✕</button>
+    <div style="font-size:36px; margin-bottom:10px;">🔑</div>
+    <div class="modal-title" style="font-size:20px; margin-bottom:6px;">Reset Password</div>
+    <p style="font-size:12px; color:var(--textSub); margin-bottom:18px;" id="fpSubText">
+      Enter your registered email address to verify your account.
+    </p>
+
+    <!-- Step 1: Email Input -->
+    <div id="fpStep1">
+      <div class="inp-wrap" style="text-align:left; margin-bottom:16px;">
+        <span class="ico">📧</span>
+        <input type="email" id="fpEmail" placeholder="name@example.com" style="width:100%;">
+      </div>
+      <button class="btn btn-grad" style="width:100%; border-radius:12px; padding:12px;" onclick="fpVerifyEmail()">Verify Email 🚀</button>
+    </div>
+
+    <!-- Step 2: New Password Input (Initially Hidden) -->
+    <div id="fpStep2" style="display:none;">
+      <div class="inp-wrap" style="text-align:left; margin-bottom:16px;">
+        <span class="ico">🔒</span>
+        <input type="password" id="fpNewPass" placeholder="New Password (min 4 chars)" style="width:100%;">
+      </div>
+      <button class="btn btn-grad" style="width:100%; border-radius:12px; padding:12px;" onclick="fpSaveNewPassword()">Update Password ✨</button>
+    </div>
   </div>
 </div>
 

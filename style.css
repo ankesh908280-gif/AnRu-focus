@@ -325,13 +325,22 @@ input::placeholder, textarea::placeholder { color: var(--textMuted); }
                   9. PROFILE & XP SHOP 
 ████████████████████████████████████████████████████████████ 
 */
-.holo-scene { perspective: 1000px; width: 100%; height: 340px; margin: 10px 0 20px 0; }
+/* यहाँ हाइट 340px से बढ़ाकर 390px कर दी गई है */
+.holo-scene { perspective: 1000px; width: 100%; height: 390px; margin: 10px 0 20px 0; }
+
 .holo-card { width: 100%; height: 100%; position: relative; transition: transform 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275); transform-style: preserve-3d; cursor: pointer; }
 .holo-card.is-flipped { transform: rotateY(180deg); }
-.holo-face { position: absolute; width: 100%; height: 100%; backface-visibility: hidden; border-radius: 24px; border: 1px solid var(--glassBorder); background: var(--glass); backdrop-filter: blur(20px); display: flex; flex-direction: column; overflow: hidden; box-shadow: var(--shadowSm); }
+
+/* यहाँ overflow: hidden की जगह overflow-y: auto लगाया गया है ताकि स्क्रॉल हो सके */
+.holo-face { position: absolute; width: 100%; height: 100%; backface-visibility: hidden; border-radius: 24px; border: 1px solid var(--glassBorder); background: var(--glass); backdrop-filter: blur(20px); display: flex; flex-direction: column; overflow-y: auto; overflow-x: hidden; box-shadow: var(--shadowSm); }
+
 .holo-face::after { content: ''; position: absolute; top: 0; left: -100%; width: 50%; height: 100%; background: linear-gradient(to right, transparent, rgba(255,255,255,0.2), transparent); transform: skewX(-20deg); animation: holoSweep 6s infinite; pointer-events: none; z-index: 10; }
+
 .holo-front { padding: 30px 20px; align-items: center; justify-content: center; text-align: center; }
-.holo-back { transform: rotateY(180deg); padding: 15px; background: rgba(0,0,0,0.4); justify-content: center; }
+
+/* यहाँ justify-content: center को flex-start कर दिया गया है ताकि कंटेंट ऊपर से कटना बंद हो जाए */
+.holo-back { transform: rotateY(180deg); padding: 20px 15px; background: rgba(0,0,0,0.4); justify-content: flex-start; }
+
 
 .pa-ring { width: 110px; height: 110px; position: relative; margin: 0 auto 16px; cursor: pointer; z-index: 15; transition: transform 0.3s; }
 .pa-ring:hover { transform: scale(1.05); }
@@ -465,3 +474,73 @@ input::placeholder, textarea::placeholder { color: var(--textMuted); }
 .qs-card-3d:hover .qs-arrow-btn i { transform: translateX(4px); transition: transform 0.3s ease; }
 .qs-shimmer { position: absolute; top: 0; left: -100%; width: 50%; height: 100%; background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent); transform: skewX(-20deg); z-index: 1; pointer-events: none; animation: shimmerAnim 4s infinite; }
 @keyframes shimmerAnim { 0% { left: -100%; } 20% { left: 200%; } 100% { left: 200%; } }
+/* =========================================================
+   💬 3D DOUBT ROOM BUTTON STYLES
+   ========================================================= */
+.doubt-3d-btn-container {
+    margin: 24px 0;
+    perspective: 1000px;
+    width: 100%;
+}
+
+.doubt-3d-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    padding: 16px 20px;
+    background: linear-gradient(135deg, #ff007f 0%, #7928ca 100%);
+    border-radius: 16px;
+    color: #fff;
+    font-family: 'Playfair Display', serif;
+    font-size: 18px;
+    font-weight: 900;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    position: relative;
+    transform-style: preserve-3d;
+    transition: all 0.2s ease;
+    /* 3D Depth Shadow */
+    box-shadow: 0 10px 0 #4a0f7a, 0 15px 25px rgba(121, 40, 202, 0.4);
+    border: none;
+    cursor: pointer;
+    outline: none;
+}
+
+.doubt-3d-btn:hover {
+    transform: translateY(2px);
+    box-shadow: 0 8px 0 #4a0f7a, 0 12px 20px rgba(121, 40, 202, 0.4);
+}
+
+.doubt-3d-btn:active {
+    /* Button Press Effect */
+    transform: translateY(10px);
+    box-shadow: 0 0 0 #4a0f7a, 0 5px 10px rgba(121, 40, 202, 0.4);
+}
+
+.doubt-3d-btn i {
+    margin-right: 12px;
+    font-size: 22px;
+    animation: floatIcon 2s infinite ease-in-out;
+}
+
+.doubt-3d-badge {
+    position: absolute;
+    top: -12px;
+    right: -5px;
+    background: #FFD700;
+    color: #000;
+    font-size: 11px;
+    font-family: 'Outfit', sans-serif;
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-weight: 800;
+    box-shadow: 0 4px 10px rgba(255, 215, 0, 0.5);
+    animation: pulseBadge 1.5s infinite;
+}
+
+@keyframes pulseBadge {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.15) rotate(5deg); }
+    100% { transform: scale(1); }
+}
