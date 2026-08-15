@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+  <title>Notice Board - AnRu Focus</title>
+  
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=Playfair+Display:wght@700;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="style.css">
+
+  <style>
+    body { display: flex; flex-direction: column; height: 100dvh; overflow: hidden; background: var(--bgGrad); }
+    
+    /* Header */
+    .chat-header { display: flex; align-items: center; justify-content: space-between; padding: 15px 20px; background: rgba(15,12,41,0.85); backdrop-filter: blur(20px); border-bottom: 1px solid var(--glassBorder); z-index: 100; box-shadow: 0 4px 30px rgba(0,0,0,0.3); }
+    .chat-header-info { display: flex; align-items: center; gap: 12px; }
+    .chat-title { font-family: 'Playfair Display', serif; font-size: 20px; font-weight: 800; background: var(--grad); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+    .admin-badge { display: none; background: rgba(248,113,113,0.2); color: var(--danger); border: 1px solid var(--danger); padding: 4px 10px; border-radius: 12px; font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; box-shadow: 0 0 10px rgba(248,113,113,0.4); animation: adminGlow 2s infinite; }
+
+    /* Notice Area */
+    .notice-area { flex: 1; padding: 20px 15px; overflow-y: auto; display: flex; flex-direction: column; gap: 16px; scroll-behavior: smooth; }
+    .notice-area::-webkit-scrollbar { display: none; }
+
+    /* Notice Card Design */
+    .notice-card { background: rgba(255,255,255,0.05); border: 1px solid var(--glassBorder); border-radius: 16px; padding: 16px; position: relative; animation: slideUpFade 0.4s ease; backdrop-filter: blur(10px); box-shadow: 0 10px 30px rgba(0,0,0,0.2); transition: transform 0.2s; }
+    .notice-card:hover { transform: translateY(-3px); border-color: rgba(255,255,255,0.3); }
+    
+    .notice-card::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 5px; border-radius: 16px 0 0 16px; }
+    .notice-card.cat-general::before { background: var(--p1); }
+    .notice-card.cat-homework::before { background: var(--warn); }
+    .notice-card.cat-exam::before { background: var(--danger); }
+    .notice-card.cat-holiday::before { background: var(--success); }
+
+    .n-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+    .n-cat { font-size: 11px; font-weight: 800; text-transform: uppercase; padding: 4px 10px; border-radius: 12px; display: inline-flex; align-items: center; gap: 6px; }
+    .cat-general .n-cat { background: rgba(102,126,234,0.2); color: #fff; }
+    .cat-homework .n-cat { background: rgba(251,191,36,0.2); color: var(--warn); }
+    .cat-exam .n-cat { background: rgba(248,113,113,0.2); color: var(--danger); }
+    .cat-holiday .n-cat { background: rgba(74,222,128,0.2); color: var(--success); }
+    
+    .n-date { font-size: 10px; color: var(--textMuted); }
+    .n-title { font-size: 16px; font-weight: 700; color: #fff; margin-bottom: 6px; }
+    .n-desc { font-size: 13px; color: var(--textSub); line-height: 1.5; white-space: pre-wrap; }
+    .n-author { font-size: 11px; color: var(--textMuted); margin-top: 12px; display: flex; align-items: center; gap: 6px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 10px; }
+    
+    .del-btn { position: absolute; bottom: 12px; right: 16px; background: rgba(248,113,113,0.1); color: var(--danger); border: none; width: 30px; height: 30px; border-radius: 50%; font-size: 12px; cursor: pointer; display: none; }
+    .del-btn:hover { background: var(--danger); color: #fff; transform: scale(1.1); }
+
+    /* Admin Input Area */
+    .admin-post-area { padding: 15px 20px; background: rgba(15,12,41,0.95); backdrop-filter: blur(30px); border-top: 1px solid var(--glassBorder); display: none; flex-direction: column; gap: 10px; z-index: 100; padding-bottom: calc(15px + env(safe-area-inset-bottom, 10px)); }
+    .admin-post-area input, .admin-post-area textarea, .admin-post-area select { padding: 10px 14px; border-radius: 12px; }
+
+    @keyframes slideUpFade { 0% { opacity: 0; transform: translateY(20px); } 100% { opacity: 1; transform: translateY(0); } }
+    @keyframes adminGlow { 0%, 100% { box-shadow: 0 0 10px rgba(248,113,113,0.4); } 50% { box-shadow: 0 0 20px rgba(248,113,113,0.8); } }
+  </style>
+</head>
+<body>
+
+  <!-- Top Header -->
+  <div class="chat-header">
+    <div class="chat-header-info">
+      <button class="btn-icon" onclick="window.location.href='index.html'" title="Back to App">
+        <i class="fa-solid fa-arrow-left"></i>
+      </button>
+      <div>
+        <div style="display:flex; align-items:center; gap:8px;">
+          <div class="chat-title">Digital Notice Board</div>
+        </div>
+        <div style="font-size:11px; color:var(--textMuted); margin-top:2px;">Official School Announcements</div>
+      </div>
+    </div>
+    <div class="admin-badge" id="adminBadge">👑 Admin</div>
+  </div>
+
+  <!-- Notices List Area -->
+  <div class="notice-area" id="noticeContainer">
+    <div style="text-align:center; margin-top: 50px;">
+      <i class="fa-solid fa-spinner fa-spin" style="font-size: 24px; color: var(--p1);"></i>
+      <p style="font-size: 12px; color: var(--textMuted); margin-top: 10px;">Loading notices...</p>
+    </div>
+  </div>
+
+  <!-- Admin Post Area (Hidden for normal students) -->
+  <div class="admin-post-area" id="adminInputArea">
+    <div style="display: flex; gap: 10px;">
+      <select id="nCategory" style="width: 40%; background: rgba(255,255,255,0.1); color: #fff; border: 1px solid var(--glassBorder);">
+        <option value="general">📢 General</option>
+        <option value="homework">📝 Homework</option>
+        <option value="exam">🚨 Exam</option>
+        <option value="holiday">🌴 Holiday</option>
+      </select>
+      <input type="text" id="nTitle" placeholder="Notice Title..." style="flex: 1; background: rgba(255,255,255,0.05); color: #fff; border: 1px solid var(--glassBorder);">
+    </div>
+    <div style="display: flex; gap: 10px; align-items: flex-end;">
+      <textarea id="nDesc" rows="2" placeholder="Write description/homework details here..." style="flex: 1; background: rgba(255,255,255,0.05); color: #fff; border: 1px solid var(--glassBorder); resize: none;"></textarea>
+      <button class="btn-sm" style="height: 100%; padding: 0 20px; font-size: 16px;" onclick="postNotice()">
+        <i class="fa-solid fa-paper-plane"></i>
+      </button>
+    </div>
+  </div>
+
+  <!-- Audio & Toasts -->
+  <div class="toast" id="toast"></div>
+  <audio id="sfxClick" src="https://assets.mixkit.co/sfx/preview/mixkit-sci-fi-click-900.mp3"></audio>
+  <audio id="sfxSend" src="https://assets.mixkit.co/sfx/preview/mixkit-fast-small-sweep-transition-166.mp3"></audio>
+
+  <!-- Firebase & Scripts -->
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+  <script src="app.js"></script>
+  <script src="notice.js"></script>
+
+</body>
+</html>

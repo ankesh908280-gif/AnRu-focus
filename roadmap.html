@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+  <title>Syllabus Roadmap - AnRu Focus</title>
+  
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=Playfair+Display:wght@700;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="style.css">
+
+  <style>
+    body { display: flex; flex-direction: column; height: 100dvh; overflow: hidden; background: var(--bgGrad); }
+    
+    .chat-header { display: flex; align-items: center; justify-content: space-between; padding: 15px 20px; background: rgba(15,12,41,0.85); backdrop-filter: blur(20px); border-bottom: 1px solid var(--glassBorder); z-index: 100; box-shadow: 0 4px 30px rgba(0,0,0,0.3); }
+    .chat-title { font-family: 'Playfair Display', serif; font-size: 20px; font-weight: 800; background: var(--grad); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+
+    /* Selectors (Class & Subject) */
+    .selector-container { padding: 15px 20px 5px; background: rgba(0,0,0,0.2); border-bottom: 1px solid var(--glassBorder); }
+    .scroll-row { display: flex; gap: 10px; overflow-x: auto; padding-bottom: 10px; scrollbar-width: none; }
+    .scroll-row::-webkit-scrollbar { display: none; }
+    
+    .pill-btn { padding: 8px 16px; border-radius: 20px; background: rgba(255,255,255,0.05); border: 1px solid var(--glassBorder); color: var(--textMuted); font-family: 'Outfit'; font-size: 13px; font-weight: 600; white-space: nowrap; cursor: pointer; transition: 0.3s; }
+    .pill-btn.active { background: var(--grad); color: #fff; border-color: transparent; box-shadow: var(--shadowSm); transform: scale(1.05); }
+
+    /* Progress Info */
+    .progress-section { padding: 20px; text-align: center; }
+    .prog-text { font-size: 28px; font-family: 'Playfair Display'; font-weight: 900; color: #fff; margin-bottom: 5px; }
+    .prog-bar-container { height: 8px; background: rgba(255,255,255,0.1); border-radius: 10px; overflow: hidden; position: relative; margin-top: 10px; }
+    .prog-bar-fill { height: 100%; background: var(--grad); width: 0%; transition: width 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+
+    /* Roadmap List */
+    .roadmap-area { flex: 1; padding: 10px 20px 40px; overflow-y: auto; scroll-behavior: smooth; position: relative; }
+    .roadmap-area::-webkit-scrollbar { display: none; }
+    
+    /* The Vertical Line */
+    .roadmap-area::before { content: ''; position: absolute; left: 34px; top: 20px; bottom: 40px; width: 2px; background: rgba(255,255,255,0.1); z-index: 1; }
+
+    .chapter-item { display: flex; align-items: center; gap: 15px; margin-bottom: 20px; position: relative; z-index: 2; cursor: pointer; }
+    
+    .ch-check { width: 30px; height: 30px; border-radius: 50%; background: var(--glass); border: 2px solid var(--glassBorder); display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: 0.3s; color: transparent; font-size: 14px; }
+    .chapter-item.completed .ch-check { background: var(--success); border-color: var(--success); color: #000; box-shadow: 0 0 15px rgba(74,222,128,0.4); transform: scale(1.1); }
+    
+    .ch-card { flex: 1; background: rgba(255,255,255,0.05); border: 1px solid var(--glassBorder); padding: 14px 16px; border-radius: 16px; transition: 0.3s; backdrop-filter: blur(10px); }
+    .chapter-item.completed .ch-card { background: linear-gradient(135deg, rgba(74,222,128,0.1), transparent); border-color: rgba(74,222,128,0.3); opacity: 0.7; }
+    
+    .ch-title { font-size: 14px; font-weight: 600; color: #fff; transition: 0.3s; }
+    .chapter-item.completed .ch-title { text-decoration: line-through; color: var(--textMuted); }
+
+    @keyframes popIn { 0% { transform: scale(0.8); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
+  </style>
+</head>
+<body>
+
+  <div class="chat-header">
+    <div class="chat-header-info">
+      <button class="btn-icon" onclick="window.location.href='index.html'">
+        <i class="fa-solid fa-arrow-left"></i>
+      </button>
+      <div>
+        <div class="chat-title">Syllabus Roadmap</div>
+        <div style="font-size:11px; color:var(--textMuted); margin-top:2px;">Track your Master Plan 🗺️</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="selector-container">
+    <div style="font-size:11px; color:var(--textMuted); margin-bottom:8px; font-weight:700; text-transform:uppercase;">Select Class</div>
+    <div class="scroll-row" id="classSelector">
+        <!-- Classes will be injected here via JS -->
+    </div>
+    
+    <div style="font-size:11px; color:var(--textMuted); margin:12px 0 8px; font-weight:700; text-transform:uppercase;">Select Subject</div>
+    <div class="scroll-row" id="subjectSelector">
+        <!-- Subjects will be injected here via JS -->
+    </div>
+  </div>
+
+  <div class="progress-section">
+      <div class="prog-text" id="progPercentage">0%</div>
+      <div style="font-size:12px; color:var(--textMuted);" id="progLabel">0 out of 0 Chapters Completed</div>
+      <div class="prog-bar-container">
+          <div class="prog-bar-fill" id="progBarFill"></div>
+      </div>
+  </div>
+
+  <div class="roadmap-area" id="roadmapArea">
+      <!-- Chapters will be injected here via JS -->
+  </div>
+
+  <audio id="sfxClick" src="https://assets.mixkit.co/sfx/preview/mixkit-sci-fi-click-900.mp3"></audio>
+  <audio id="sfxSuccess" src="https://assets.mixkit.co/sfx/preview/mixkit-fast-small-sweep-transition-166.mp3"></audio>
+
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+  <script src="app.js"></script>
+  <script src="roadmap.js"></script>
+
+</body>
+</html>
