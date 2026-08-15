@@ -67,7 +67,7 @@
 
   <div class="main-content">
     
-    <!-- DASHBOARD TAB -->
+    <!-- DASHBOARD TAB (SUPER CLEAN) -->
     <div class="page active" id="page-dash">
       <div class="welcome-banner">
         <h2 id="wMsg">Hey Champion! 👋</h2>
@@ -135,9 +135,49 @@
         <div class="stat-card sc3"><div class="si">🎯</div><div class="sn" id="dXP">0</div><div class="sl">Total XP Level</div></div>
         <div class="stat-card sc4"><div class="si">⚡</div><div class="sn" id="dStreak">0</div><div class="sl" id="streakLabel">Day Streak</div></div>
       </div>
+
+      <div class="prog-card glass">
+        <div class="ring-wrap">
+          <svg width="90" height="90" viewBox="0 0 90 90">
+            <circle class="ring-track" cx="45" cy="45" r="38"/>
+            <circle class="ring-prog" id="pRing" cx="45" cy="45" r="38" fill="none" stroke-width="10" stroke-linecap="round" stroke-dasharray="239" stroke-dashoffset="239" stroke="url(#rg)" transform="rotate(-90 45 45)"/>
+            <defs><linearGradient id="rg" x1="0%" y1="0%" x2="100%" y2="0%"><stop offset="0%" stop-color="var(--p1)"/><stop offset="100%" stop-color="var(--p3)"/></linearGradient></defs>
+          </svg>
+          <div class="ring-text"><div class="ring-pct" id="pPct">0%</div><div class="ring-done" id="pDone">done</div></div>
+        </div>
+        <div class="prog-info">
+          <h4 id="ceoRankLabel">Rank: Rookie 🌟</h4>
+          <p id="pDesc">Add tasks to start tracking your mission!</p>
+          <div class="prog-bar"><div class="prog-bar-fill" id="pBar" style="width:0%"></div></div>
+        </div>
+      </div>
+
+      <div class="sec-head">
+        <div class="sec-title">Recent Tasks</div><button class="see-all" onclick="switchPage('tasks')">See All →</button>
+      </div>
+      <div id="recentList"></div>
+
+      <div class="sec-head" style="margin-top:24px;">
+        <div class="sec-title" style="color:var(--warn);">🕵️ Secret Missions</div>
+      </div>
+      <div class="glass" id="secretMissionCard" style="padding:16px; margin-bottom:10px; border: 1px solid rgba(251,191,36,0.3); background: linear-gradient(135deg, rgba(251,191,36,0.05), rgba(0,0,0,0.2)); border-radius: 16px;">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+          <div style="font-weight:700; font-size:13px; color:var(--textSub)">Complete to earn rewards!</div>
+          <div style="display:flex; gap:6px; align-items:center;">
+            <button class="btn-icon" style="width:28px; height:28px; font-size:12px; background:var(--glass2); border:1px solid var(--glassBorder); color:#fff;" onclick="changeSecretMission()" title="Change Mission">🔁</button>
+            <div style="font-size:11px; background:var(--warn); color:#000; padding:3px 10px; border-radius:12px; font-weight:800; box-shadow: 0 0 10px rgba(251,191,36,0.3);">+50 XP</div>
+          </div>
+        </div>
+        <div id="smText" style="font-size:15px; color:#fff; margin-bottom:16px; font-weight:600; line-height:1.4;">Loading mission...</div>
+        <button id="smBtn" class="btn" style="width:100%; background:var(--grad); color:#fff; border-radius:12px; font-size:13px;" onclick="claimSecretMission()">Verify & Claim Reward 🎁</button>
+      </div>
+    </div>
+
+    <!-- 🏫 HUB TAB (ALL TOOLS, TIMER & QUICK STUDY MOVED HERE) -->
+    <div class="page" id="page-hub">
       
       <!-- QUICK STUDY SECTION -->
-      <div class="quick-study-pro-section">
+      <div class="quick-study-pro-section" style="margin-top: 5px;">
           <div class="qs-pro-header">
               <h3 class="qs-pro-title">Quick Study <span class="bolt-anim">⚡</span></h3>
               <span class="qs-pro-badge">PRO</span>
@@ -170,51 +210,81 @@
           </div>
       </div>
 
-      <!-- 💬 3D DOUBT ROOM BUTTON -->
-      <div class="doubt-3d-btn-container">
-          <button class="doubt-3d-btn" onclick="window.location.href='doubt-room.html';">
-              <i class="fa-solid fa-satellite-dish"></i> Enter Live Doubt Room
-              <span class="doubt-3d-badge">NEW 🔥</span>
-          </button>
+      <!-- 🏫 SCHOOL ACADEMIC HUB SECTION (PREMIUM 3D LOOK) -->
+      <div class="sec-head" style="margin-top:30px;">
+        <div class="sec-title" style="color:var(--p3);">🏫 School Academic Hub</div>
       </div>
-
-
-      <div class="prog-card glass">
-        <div class="ring-wrap">
-          <svg width="90" height="90" viewBox="0 0 90 90">
-            <circle class="ring-track" cx="45" cy="45" r="38"/>
-            <circle class="ring-prog" id="pRing" cx="45" cy="45" r="38" fill="none" stroke-width="10" stroke-linecap="round" stroke-dasharray="239" stroke-dashoffset="239" stroke="url(#rg)" transform="rotate(-90 45 45)"/>
-            <defs><linearGradient id="rg" x1="0%" y1="0%" x2="100%" y2="0%"><stop offset="0%" stop-color="var(--p1)"/><stop offset="100%" stop-color="var(--p3)"/></linearGradient></defs>
-          </svg>
-          <div class="ring-text"><div class="ring-pct" id="pPct">0%</div><div class="ring-done" id="pDone">done</div></div>
-        </div>
-        <div class="prog-info">
-          <h4 id="ceoRankLabel">Rank: Rookie 🌟</h4>
-          <p id="pDesc">Add tasks to start tracking your mission!</p>
-          <div class="prog-bar"><div class="prog-bar-fill" id="pBar" style="width:0%"></div></div>
-        </div>
-      </div>
+      <p style="font-size:12px; color:var(--textMuted); margin-bottom:18px;">Official school tools, focus timers & study roadmaps.</p>
       
-      <div class="sec-head">
-        <div class="sec-title">Recent Tasks</div><button class="see-all" onclick="switchPage('tasks')">See All →</button>
-      </div>
-      <div id="recentList"></div>
-
-      <div class="sec-head" style="margin-top:24px;">
-        <div class="sec-title" style="color:var(--warn);">🕵️ Secret Missions</div>
-      </div>
-      <div class="glass" id="secretMissionCard" style="padding:16px; margin-bottom:10px; border: 1px solid rgba(251,191,36,0.3); background: linear-gradient(135deg, rgba(251,191,36,0.05), rgba(0,0,0,0.2)); border-radius: 16px;">
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
-          <div style="font-weight:700; font-size:13px; color:var(--textSub)">Complete to earn rewards!</div>
-          <div style="display:flex; gap:6px; align-items:center;">
-            <button class="btn-icon" style="width:28px; height:28px; font-size:12px; background:var(--glass2); border:1px solid var(--glassBorder); color:#fff;" onclick="changeSecretMission()" title="Change Mission">🔁</button>
-            <div style="font-size:11px; background:var(--warn); color:#000; padding:3px 10px; border-radius:12px; font-weight:800; box-shadow: 0 0 10px rgba(251,191,36,0.3);">+50 XP</div>
+      <div class="qs-pro-cards">
+          
+          <!-- 0. Focus Timer -->
+          <div class="qs-card-3d glass-panel" onclick="switchPage('timer')" onpointerdown="playQsHover()" onmouseenter="playQsHover()">
+              <div class="qs-card-content">
+                  <div class="qs-icon-wrapper gradient-yellow-glow"><i class="fa-solid fa-stopwatch qs-floating-icon"></i><div class="qs-icon-ring"></div></div>
+                  <div class="qs-text-content">
+                      <h4 class="qs-card-title">Focus Timer</h4>
+                      <p class="qs-card-desc">Deep work sessions & Pomodoro.</p>
+                  </div>
+                  <div class="qs-arrow-btn"><i class="fa-solid fa-arrow-right-long"></i></div>
+              </div>
+              <div class="qs-shimmer"></div>
           </div>
-        </div>
-        <div id="smText" style="font-size:15px; color:#fff; margin-bottom:16px; font-weight:600; line-height:1.4;">Loading mission...</div>
-        <button id="smBtn" class="btn" style="width:100%; background:var(--grad); color:#fff; border-radius:12px; font-size:13px;" onclick="claimSecretMission()">Verify & Claim Reward 🎁</button>
+
+          <!-- 1. Live Doubt Room -->
+          <div class="qs-card-3d glass-panel" onclick="window.location.href='doubt-room.html'" onpointerdown="playQsHover()" onmouseenter="playQsHover()">
+              <div class="qs-card-content">
+                  <div class="qs-icon-wrapper gradient-pink-glow"><i class="fa-solid fa-satellite-dish qs-floating-icon"></i><div class="qs-icon-ring"></div></div>
+                  <div class="qs-text-content">
+                      <h4 class="qs-card-title">Live Doubt Room ⚡</h4>
+                      <p class="qs-card-desc">Discuss concepts & share notes securely.</p>
+                  </div>
+                  <div class="qs-arrow-btn"><i class="fa-solid fa-arrow-right-long"></i></div>
+              </div>
+              <div class="qs-shimmer"></div>
+          </div>
+
+          <!-- 2. Digital Notice Board -->
+          <div class="qs-card-3d glass-panel" onclick="window.location.href='notice-board.html'" onpointerdown="playQsHover()" onmouseenter="playQsHover()">
+              <div class="qs-card-content">
+                  <div class="qs-icon-wrapper gradient-blue-glow"><i class="fa-solid fa-clipboard-list qs-floating-icon"></i><div class="qs-icon-ring"></div></div>
+                  <div class="qs-text-content">
+                      <h4 class="qs-card-title">Digital Notice Board</h4>
+                      <p class="qs-card-desc">Official updates & homework from Teachers.</p>
+                  </div>
+                  <div class="qs-arrow-btn"><i class="fa-solid fa-arrow-right-long"></i></div>
+              </div>
+              <div class="qs-shimmer"></div>
+          </div>
+
+          <!-- 3. Anonymous Ask & Resolve -->
+          <div class="qs-card-3d glass-panel" onclick="window.location.href='ask-resolve.html'" onpointerdown="playQsHover()" onmouseenter="playQsHover()">
+              <div class="qs-card-content">
+                  <div class="qs-icon-wrapper gradient-red-glow"><i class="fa-solid fa-user-secret qs-floating-icon"></i><div class="qs-icon-ring"></div></div>
+                  <div class="qs-text-content">
+                      <h4 class="qs-card-title">Ask Anonymously</h4>
+                      <p class="qs-card-desc">100% safe & private doubt resolution.</p>
+                  </div>
+                  <div class="qs-arrow-btn"><i class="fa-solid fa-arrow-right-long"></i></div>
+              </div>
+              <div class="qs-shimmer"></div>
+          </div>
+
+          <!-- 4. Syllabus Roadmap -->
+          <div class="qs-card-3d glass-panel" onclick="window.location.href='roadmap.html'" onpointerdown="playQsHover()" onmouseenter="playQsHover()">
+              <div class="qs-card-content">
+                  <div class="qs-icon-wrapper gradient-green-glow"><i class="fa-solid fa-map-location-dot qs-floating-icon"></i><div class="qs-icon-ring"></div></div>
+                  <div class="qs-text-content">
+                      <h4 class="qs-card-title">Syllabus Roadmap</h4>
+                      <p class="qs-card-desc">Track chapters & monitor your progress.</p>
+                  </div>
+                  <div class="qs-arrow-btn"><i class="fa-solid fa-arrow-right-long"></i></div>
+              </div>
+              <div class="qs-shimmer"></div>
+          </div>
+
       </div>
-    </div>
+    </div> <!-- 🔴 YAHI WO </div> THA JO PEHLE CHHUT GAYA THA! (Closes page-hub) -->
 
     <!-- TASKS TAB -->
     <div class="page" id="page-tasks">
@@ -247,7 +317,6 @@
         <button class="fchip" onclick="setFilter('done',this)">✅ Done</button>
         <button class="fchip" onclick="setFilter('high',this)">🔴 High</button>
         
-        <!-- नया सब्जेक्ट फ़िल्टर ड्रॉपडाउन -->
         <select id="subjFilterSelect" class="fchip" style="background: rgba(255,255,255,0.05); padding: 8px 12px; outline: none; color: var(--textMuted); cursor: pointer; border-radius: 20px; font-weight: 600;" onchange="setSubjFilter(this.value)">
           <option value="all">📁 All Subjects</option>
         </select>
@@ -339,7 +408,7 @@
       <div class="subj-grid" id="subjGrid"></div>
     </div>
 
-    <!-- PROFILE & SHOP TAB (PHASE 2 UPGRADE) -->
+    <!-- PROFILE & SHOP TAB -->
     <div class="page" id="page-profile">
       
       <div class="sec-head" style="margin-bottom:0px; display:flex; justify-content:space-between; align-items:center;">
@@ -381,13 +450,9 @@
         </div>
       </div>
 
-      <!-- ==============================================
-           🚀 PHASE 2: NEW EXPANDED XP SHOP SECTION
-           ============================================== -->
+      <!-- XP SHOP SECTION -->
       <div class="sec-head" style="margin-top:10px;"><div class="sec-title">🛒 XP Theme & Perks Shop</div></div>
       <div class="glass settings-card" style="margin-bottom:20px; padding:10px;">
-        
-        <!-- Category: Power-Ups -->
         <div style="font-size:11px; font-weight:800; color:var(--textSub); margin:8px 0 8px 10px; text-transform:uppercase; letter-spacing:1px;">🚀 Power-Ups</div>
         
         <div class="shop-item" style="border-color: var(--p3); background: rgba(168, 85, 247, 0.1);">
@@ -410,7 +475,6 @@
           <button class="btn-sm" style="background:rgba(255,255,255,0.1); border:1px solid rgba(255,255,255,0.2);" onclick="buyShopItem('timetravel', 1500)">1500 XP</button>
         </div>
 
-        <!-- Category: Exclusive Titles/Badges -->
         <div style="font-size:11px; font-weight:800; color:var(--textSub); margin:20px 0 8px 10px; text-transform:uppercase; letter-spacing:1px;">🏅 Exclusive Titles</div>
         
         <div class="shop-item">
@@ -428,7 +492,6 @@
           <button class="btn-sm" id="btnBadgeLegend" style="background:rgba(255,255,255,0.1); border:1px solid rgba(255,255,255,0.2);" onclick="buyShopItem('badge_legend', 1000)">1000 XP</button>
         </div>
 
-        <!-- Category: Premium Themes -->
         <div style="font-size:11px; font-weight:800; color:var(--textSub); margin:20px 0 8px 10px; text-transform:uppercase; letter-spacing:1px;">🎨 Premium Themes</div>
         
         <div class="shop-item">
@@ -461,7 +524,6 @@
           <button class="btn-sm" id="btnThemeOcean" onclick="buyShopItem('ocean', 300)">300 XP</button>
         </div>
       </div>
-      <!-- ============================================== -->
 
       <div class="sec-head"><div class="sec-title">Settings & Cloud Controls</div></div>
       <div class="glass settings-card">
@@ -510,10 +572,11 @@
     </div>
   </div>
 
+  <!-- PERFECT 5-TAB BOTTOM NAVIGATION -->
   <div class="bottom-nav">
     <button class="bnav-item active" id="bn-dash" onclick="switchPage('dash',this)"><span class="bni">🏠</span>Dashboard</button>
+    <button class="bnav-item" id="bn-hub" onclick="switchPage('hub',this)"><span class="bni">🏫</span>Hub</button>
     <button class="bnav-item" id="bn-tasks" onclick="switchPage('tasks',this)"><span class="bni">📋</span>Tasks<span class="bnav-badge" id="pendingBadge" style="display:none">0</span></button>
-    <button class="bnav-item" id="bn-timer" onclick="switchPage('timer',this)"><span class="bni">⏱️</span>Timer</button>
     <button class="bnav-item" id="bn-subjects" onclick="switchPage('subjects',this)"><span class="bni">📁</span>Subjects</button>
     <button class="bnav-item" id="bn-profile" onclick="switchPage('profile',this)"><span class="bni">👤</span>Profile</button>
   </div>
