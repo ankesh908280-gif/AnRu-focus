@@ -173,7 +173,7 @@
       </div>
     </div>
 
-    <!-- 🏫 HUB TAB (ALL TOOLS, TIMER & QUICK STUDY MOVED HERE) -->
+    <!-- 🏫 HUB TAB -->
     <div class="page" id="page-hub">
       
       <!-- QUICK STUDY SECTION -->
@@ -210,7 +210,7 @@
           </div>
       </div>
 
-      <!-- 🏫 SCHOOL ACADEMIC HUB SECTION (PREMIUM 3D LOOK) -->
+      <!-- 🏫 SCHOOL ACADEMIC HUB SECTION -->
       <div class="sec-head" style="margin-top:30px;">
         <div class="sec-title" style="color:var(--p3);">🏫 School Academic Hub</div>
       </div>
@@ -218,7 +218,6 @@
       
       <div class="qs-pro-cards">
           
-          <!-- 0. Focus Timer -->
           <div class="qs-card-3d glass-panel" onclick="switchPage('timer')" onpointerdown="playQsHover()" onmouseenter="playQsHover()">
               <div class="qs-card-content">
                   <div class="qs-icon-wrapper gradient-yellow-glow"><i class="fa-solid fa-stopwatch qs-floating-icon"></i><div class="qs-icon-ring"></div></div>
@@ -231,7 +230,6 @@
               <div class="qs-shimmer"></div>
           </div>
 
-          <!-- 1. Live Doubt Room -->
           <div class="qs-card-3d glass-panel" onclick="window.location.href='doubt-room.html'" onpointerdown="playQsHover()" onmouseenter="playQsHover()">
               <div class="qs-card-content">
                   <div class="qs-icon-wrapper gradient-pink-glow"><i class="fa-solid fa-satellite-dish qs-floating-icon"></i><div class="qs-icon-ring"></div></div>
@@ -244,7 +242,6 @@
               <div class="qs-shimmer"></div>
           </div>
 
-          <!-- 2. Digital Notice Board -->
           <div class="qs-card-3d glass-panel" onclick="window.location.href='notice-board.html'" onpointerdown="playQsHover()" onmouseenter="playQsHover()">
               <div class="qs-card-content">
                   <div class="qs-icon-wrapper gradient-blue-glow"><i class="fa-solid fa-clipboard-list qs-floating-icon"></i><div class="qs-icon-ring"></div></div>
@@ -257,7 +254,6 @@
               <div class="qs-shimmer"></div>
           </div>
 
-          <!-- 3. Anonymous Ask & Resolve -->
           <div class="qs-card-3d glass-panel" onclick="window.location.href='ask-resolve.html'" onpointerdown="playQsHover()" onmouseenter="playQsHover()">
               <div class="qs-card-content">
                   <div class="qs-icon-wrapper gradient-red-glow"><i class="fa-solid fa-user-secret qs-floating-icon"></i><div class="qs-icon-ring"></div></div>
@@ -270,7 +266,6 @@
               <div class="qs-shimmer"></div>
           </div>
 
-          <!-- 4. Syllabus Roadmap -->
           <div class="qs-card-3d glass-panel" onclick="window.location.href='roadmap.html'" onpointerdown="playQsHover()" onmouseenter="playQsHover()">
               <div class="qs-card-content">
                   <div class="qs-icon-wrapper gradient-green-glow"><i class="fa-solid fa-map-location-dot qs-floating-icon"></i><div class="qs-icon-ring"></div></div>
@@ -284,7 +279,7 @@
           </div>
 
       </div>
-    </div> <!-- 🔴 YAHI WO </div> THA JO PEHLE CHHUT GAYA THA! (Closes page-hub) -->
+    </div> 
 
     <!-- TASKS TAB -->
     <div class="page" id="page-tasks">
@@ -689,7 +684,7 @@
         if (navigator.vibrate) { navigator.vibrate(40); }
         setTimeout(() => { window.location.href = url; }, 300); 
     }
-</scrip>
+</script>
 <script>
   if ('serviceWorker' in navigator) {
     navigator.serviceWorker.register('sw.js')
