@@ -1,13 +1,13 @@
 /* ████████████████████████████████████████████████████████████
-      AI COMBAT QUIZ ENGINE + POWER-UPS + LEADERBOARD (HINDI)
+      AI COMBAT QUIZ ENGINE + POWER-UPS + LEADERBOARD (FIXED)
 ████████████████████████████████████████████████████████████ */
 
-// 1. API KEY (GitHub Bypass Format)
+// ⚠️ ध्यान दें: यहाँ अपनी असली Gemini API Key डालें 
 const ai_part1 = "AQ.Ab8RN6LVKzjnCCH";
 const ai_part2 = "SDFpTyX7LKA7JwxLFg6AqiNMPi7siqdJGKg";
 const AI_GEMINI_KEY = ai_part1 + ai_part2;
 
-// --- DISTINCT STATE VARIABLES ---
+// --- STATE VARIABLES ---
 let ai_QuizData = [];
 let ai_QIdx = 0;
 let ai_Score = 0;
@@ -24,6 +24,17 @@ let ai_Inventory = {
     'revive': 0
 };
 
+// 🔥 FIX 1: पेज लोड होते ही फोन की मेमोरी (localStorage) से खरीदे गए आइटम्स निकालो
+const savedInv = localStorage.getItem('ai_combat_inventory');
+if(savedInv) {
+    try { ai_Inventory = JSON.parse(savedInv); } catch(e) {}
+}
+
+// 🔥 FIX 2: आइटम्स को परमानेंट फोन में सेव करने का फंक्शन
+function saveInventory() {
+    localStorage.setItem('ai_combat_inventory', JSON.stringify(ai_Inventory));
+}
+
 // ==========================================
 // 1. LEADERBOARD & XP SYNC
 // ==========================================
@@ -31,8 +42,19 @@ let ai_Inventory = {
 document.addEventListener("DOMContentLoaded", () => {
     fetchLeaderboard();
     updateInventoryUI();
-    if(typeof updateArenaXP === 'function') updateArenaXP();
+    
+    // 🔥 FIX 3: Live XP Radar - हर 1 सेकंड में मेन ऐप से XP चेक करेगा 
+    // (इससे Firebase के लोड होने वाले 0 XP बग की प्रॉब्लम सॉल्व हो जाएगी)
+    setInterval(updateArenaXP, 1000); 
 });
+
+window.updateArenaXP = function() {
+    const xpDisplay = document.getElementById('combatXpDisplay');
+    if(xpDisplay) {
+        let currentXp = (typeof S !== 'undefined' && S.xp !== undefined) ? S.xp : 0;
+        xpDisplay.textContent = currentXp + ' XP';
+    }
+};
 
 async function fetchLeaderboard() {
     const listUI = document.getElementById('leaderboardList');
@@ -67,14 +89,11 @@ async function fetchLeaderboard() {
 function syncXpToMainApp(amount) {
     if(typeof S === 'undefined' || !S.session || S.session.isGuest) return;
     
-    // Add/Subtract XP from Main App
-    S.xp += amount;
+    S.xp += amount; // Main App के डेटाबेस में XP जोड़ो/घटाओ
     
-    // Save to Firebase via main app logic
-    if(typeof saveData === 'function') saveData();
+    if(typeof saveData === 'function') saveData(); // Cloud (Firebase) पर सेव करो
     
-    // Update local UI
-    if(typeof updateArenaXP === 'function') updateArenaXP();
+    updateArenaXP(); // हेडर तुरंत अपडेट करो
     if(typeof renderDashboard === 'function') renderDashboard();
     
     fetchLeaderboard(); 
@@ -92,8 +111,9 @@ window.buyAIPowerUp = function(type, cost) {
     }
 
     if(S.xp >= cost) {
-        syncXpToMainApp(-cost); // Deduct XP
+        syncXpToMainApp(-cost); // मेन ऐप से XP काटो
         ai_Inventory[type]++;
+        saveInventory(); // 🔥 FIX 4: खरीदते ही आइटम फोन में हमेशा के लिए सेव करो
         updateInventoryUI();
         if(typeof showToast === 'function') showToast(`Item Purchased! -${cost} XP`, "success");
     } else {
@@ -112,7 +132,7 @@ function updateInventoryUI() {
 }
 
 // ==========================================
-// 3. AI QUESTION GENERATOR (HINDI FIX)
+// 3. AI QUESTION GENERATOR (HINDI SETTINGS)
 // ==========================================
 
 window.startAIMatch = async function() {
@@ -166,7 +186,7 @@ window.startAIMatch = async function() {
 async function fetchAIQuestions(userClass, subject, topic, level, count) {
     const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.6-flash:generateContent?key=${AI_GEMINI_KEY}`;
     
-    // 🔥 STRICT HINDI PROMPT FOR UP BOARD STUDENTS
+    // 🔥 UP Board Hindi Medium Prompt
     const systemPrompt = `You are an expert exam creator for UP Board (Hindi Medium) students. 
     Generate exactly ${count} multiple-choice questions based strictly on:
     - Target Audience: ${userClass} (UP Board)
@@ -176,7 +196,7 @@ async function fetchAIQuestions(userClass, subject, topic, level, count) {
     
     CRITICAL INSTRUCTIONS: 
     1. The questions, options, and hints MUST be entirely in HINDI language (Devanagari script).
-    2. Your entire response MUST be ONLY a valid raw JSON array. DO NOT use markdown code blocks (\`\`\`json). No text outside the JSON.
+    2. Your entire response MUST be ONLY a valid raw JSON array. DO NOT use markdown code blocks (\`\`\`json\`). No text outside the JSON.
     3. Use LaTeX like $equation$ for math/science formulas if needed.
     
     Format:
@@ -287,7 +307,7 @@ window.useAIPowerUp = function(type) {
         ai_Inventory[type]--;
         clearInterval(ai_TimerInt);
         document.getElementById('qTimerText').innerHTML = "❄️ Freeze!";
-        setTimeout(startAITimer, 10000); // Freezes for 10 seconds
+        setTimeout(startAITimer, 10000); // 10 seconds freeze
     }
     else if(type === 'hint' && !ai_IsAnswered) {
         ai_Inventory[type]--;
@@ -295,11 +315,10 @@ window.useAIPowerUp = function(type) {
     }
     else if(type === 'skip' && !ai_IsAnswered) {
         ai_Inventory[type]--;
-        ai_Score++; // Give point automatically
+        ai_Score++; 
         nextAIQuestion();
     }
     else if(type === 'revive' && ai_IsAnswered) {
-        // Can only be used if answered incorrectly
         const correctIdx = ai_QuizData[ai_QIdx].correct;
         const wrongElement = document.querySelector('.q-option.wrong');
         
@@ -318,6 +337,7 @@ window.useAIPowerUp = function(type) {
         return; 
     }
 
+    saveInventory(); // 🔥 FIX 5: इस्तेमाल करने के बाद भी बची हुई संख्या को सेव करो
     updateInventoryUI();
 };
 
