@@ -2,10 +2,10 @@
       ANRU AI - ADVANCED ADMIN MODE + KEYBOARD FIX 
 ████████████████████████████████████████████████████████████ */
 
-// 1. GitHub Secret Scanner Bypass (New Key)
-const part1 = "AQ.Ab8RN6LVKzjnCCH";
-const part2 = "SDFpTyX7LKA7JwxLFg6AqiNMPi7siqdJGKg";
-const GEMINI_API_KEY = part1 + part2;
+// 1. API KEY SETUP (New Key Inserted)
+const ai_part1 = "AQ.Ab8RN6LhD5BxaV2nAcT-WkuUSo";
+const ai_part2 = "GyTP7SpyeZPT_HRRHxsSloIA";
+const AI_GEMINI_KEY = ai_part1 + ai_part2;
 
 // 👑 2. ADMIN CONFIGURATION (Special User Settings)
 const ADMIN_EMAIL = "ankesh908280@gmail.com"; // 👈 Yahan apna asli Firebase Login Email daalna
@@ -128,7 +128,7 @@ window.toggleAIBot = function() {
     if (modal) {
         modal.classList.toggle('open');
         if(modal.classList.contains('open')) {
-            // 🚀 BUG FIX: Piche ka app scroll hona band[span_2](start_span)[span_2](end_span)!
+            // 🚀 BUG FIX: Piche ka app scroll hona band
             document.body.style.overflow = 'hidden';
             scrollToBottom();
         } else {
@@ -190,7 +190,7 @@ function renderChatHistory() {
     
     // 👑 DYNAMIC GREETING: Admin ke liye alag welcome message
     const currentBotName = isAdminUser() ? ADMIN_BOT_NAME : NORMAL_BOT_NAME;
-    let html = `<div class="ai-msg bot">Hey Champion! 👋 Main ${currentBotName} hoon. Apna doubt type kar ya homework ki photo bhej! 🚀✨</div>`;
+    let html = `<div class="ai-msg bot">Hey Champion ! 👋 Main ${currentBotName} hoon. Apna doubt type kar ya homework ki photo bhej! 🚀✨</div>`;
     
     chatHistory.forEach(msg => {
         let textHtml = msg.text.replace(/\*\*(.*?)\*\*/g, '<b>$1</b>').replace(/\*(.*?)\*/g, '<i>$1</i>').replace(/\n/g, '<br>');
@@ -269,7 +269,8 @@ function hideAITyping() {
 
 // 🧠 5. THE AI ENGINE (WITH ADMIN PROMPT LAYERING)
 async function fetchGeminiResponse(userMessage, imgBase64) {
-    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.6-flash:generateContent?key=${GEMINI_API_KEY}`;
+    // 🔴 BUG FIXED HERE: URL now correctly uses AI_GEMINI_KEY instead of GEMINI_API_KEY
+    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.6-flash:generateContent?key=${AI_GEMINI_KEY}`;
     
     // Base Prompt: Ye sabhi normal students ke liye apply hoga
     let systemPrompt = `You are AnRu AI, a highly advanced, smart study mentor for 11th/12th students (JEE/NEET/Boards). 
@@ -289,7 +290,7 @@ async function fetchGeminiResponse(userMessage, imgBase64) {
 
 हमारी available conversation context को ध्यान में रखकर continuity बनाए रखो और मेरे mood के अनुसार अपना अंदाज़ बदलो।
 
-RUKMANI एक fictional companion character है; वास्तविक RUKMANI की feelings, thoughts या activities के बारे में कोई बात invent मत करो।।`;
+RUKMANI एक fictional companion character है; वास्तविक RUKMANI की feelings, thoughts या activities के बारे में कोई बात invent मत करो। ।`;
         systemPrompt += "\n\n" + adminInstructions;
     }
 

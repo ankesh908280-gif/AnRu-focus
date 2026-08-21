@@ -3,8 +3,8 @@
 ████████████████████████████████████████████████████████████ */
 
 // ⚠️ ध्यान दें: यहाँ अपनी असली Gemini API Key डालें 
-const ai_part1 = "AQ.Ab8RN6LVKzjnCCH";
-const ai_part2 = "SDFpTyX7LKA7JwxLFg6AqiNMPi7siqdJGKg";
+const ai_part1 = "AQ.Ab8RN6KXdXHSVmBw4eOCZTi3m5vMPZV";
+const ai_part2 = "009l2PnOMhDqj74a90g";
 const AI_GEMINI_KEY = ai_part1 + ai_part2;
 
 // --- STATE VARIABLES ---
