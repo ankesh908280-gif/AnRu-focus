@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>AnRu Focus Engine</title>
+  
+  <!-- Premium Fonts & Icons -->
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="focus.css">
+</head>
+<body>
+
+  <!-- Ambient Background Glows -->
+  <div class="ambient-light light-top-left"></div>
+  <div class="ambient-light light-bottom-right"></div>
+
+  <div class="focus-layout">
+    
+    <!-- ==========================================
+         LEFT COLUMN (MAIN TIMER) 
+    =========================================== -->
+    <div class="focus-left">
+      
+      <!-- 1. FIXED/STICKY HEADER -->
+      <header class="f-header">
+        <div class="f-header-left">
+          <!-- Back button to Main App Hub -->
+          <a href="index.html" class="f-icon-btn f-back-btn"><i class="fa-solid fa-chevron-left"></i></a>
+          
+          <div class="f-brand">
+            <svg class="f-logo" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M12 2L2 22H6L12 10L18 22H22L12 2Z" fill="url(#logo-gradient)"/>
+              <defs>
+                <linearGradient id="logo-gradient" x1="0" y1="0" x2="24" y2="24">
+                  <stop stop-color="#a855f7"/><stop offset="1" stop-color="#3b82f6"/>
+                </linearGradient>
+              </defs>
+            </svg>
+            <div class="f-brand-text">
+              <h1>AnRu <span>Focus</span></h1>
+              <p>Stay Focused • Achieve More</p>
+            </div>
+          </div>
+        </div>
+        
+        <div class="f-header-right">
+          <div class="f-user-avatar">
+            <img src="https://ui-avatars.com/api/?name=User&background=a855f7&color=fff" alt="User Avatar" id="user-avatar-img">
+            <div class="f-premium-crown"><i class="fa-solid fa-crown"></i></div>
+          </div>
+        </div>
+      </header>
+
+      <!-- 2. MODE TABS INSIDE A BOX -->
+      <div class="f-mode-wrapper">
+        <div class="f-mode-tabs">
+          <button class="f-tab active" data-mode="focus" onclick="setMode('focus', this)">
+            <i class="fa-solid fa-bullseye"></i> Focus
+          </button>
+          <button class="f-tab" data-mode="short" onclick="setMode('short', this)">
+            <i class="fa-solid fa-mug-hot"></i> Short Break
+          </button>
+          <button class="f-tab" data-mode="long" onclick="setMode('long', this)">
+            <i class="fa-solid fa-moon"></i> Long Break
+          </button>
+          <button class="f-tab" data-mode="stopwatch" onclick="setMode('stopwatch', this)">
+            <i class="fa-solid fa-stopwatch"></i> Count-Up
+          </button>
+        </div>
+      </div>
+
+      <!-- 🌟 THE ULTIMATE NEON TIMER RING 🌟 -->
+      <div class="f-timer-wrapper">
+        
+        <!-- 4. BIGGER 3D GLOWING PLATFORM WITH RAISED CENTER -->
+        <div class="f-timer-platform">
+          <div class="f-platform-glow"></div>
+          <div class="f-platform-ring r1"></div>
+          <div class="f-platform-ring r2"></div>
+          <div class="f-platform-core"></div> <!-- Raised Center -->
+        </div>
+
+        <!-- Timer Ring System -->
+        <div class="f-timer-ring-container">
+          
+          <!-- Deep Background Glow -->
+          <div class="f-ring-bg-glow"></div>
+
+          <!-- 3. CIRCULAR COMET LIGHT TRAILS (OPPOSITE DIRECTION) -->
+          <div class="f-orbits">
+            <div class="f-comet-system orange-comet">
+              <div class="comet-tail"></div>
+              <div class="comet-head"></div>
+            </div>
+            <div class="f-comet-system blue-comet">
+              <div class="comet-tail"></div>
+              <div class="comet-head"></div>
+            </div>
+          </div>
+
+          <!-- Main SVG Progress Ring -->
+          <svg class="f-ring-svg" viewBox="0 0 340 340">
+            <defs>
+              <linearGradient id="ring-neon-gradient" x1="0%" y1="100%" x2="100%" y2="0%">
+                <stop offset="0%" stop-color="#ff7e5f" />
+                <stop offset="30%" stop-color="#ec4899" />
+                <stop offset="70%" stop-color="#a855f7" />
+                <stop offset="100%" stop-color="#00c6ff" />
+              </linearGradient>
+            </defs>
+            <circle class="f-svg-track" cx="170" cy="170" r="150"></circle>
+            <circle class="f-svg-progress" id="main-timer-ring" cx="170" cy="170" r="150"></circle>
+          </svg>
+
+          <!-- Center Timer Content -->
+          <div class="f-timer-inner">
+            <div class="f-timer-icon"><i class="fa-solid fa-brain"></i></div>
+            <div class="f-timer-label">Focus Time</div>
+            <!-- Gradient Text -->
+            <div class="f-timer-time text-gradient" id="main-time-display">25:00</div>
+            <!-- Small Start Button -->
+            <button class="f-timer-btn" id="main-play-btn" onclick="toggleTimer()">
+              <i class="fa-solid fa-play"></i> Start Focus
+            </button>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- 5. PRESETS MOVED DOWN (Margin handled in CSS) -->
+      <div class="f-presets-row">
+        <div class="f-preset-card active" onclick="setPreset(25, this, 'focus')">
+          <div class="f-preset-icon icon-purple"><i class="fa-solid fa-bolt"></i></div>
+          <div class="f-preset-title">Pomodoro</div>
+          <div class="f-preset-desc">25m</div>
+          <div class="f-preset-active-line"></div>
+        </div>
+        <div class="f-preset-card" onclick="setPreset(50, this, 'deepwork')">
+          <div class="f-preset-icon icon-blue"><i class="fa-solid fa-laptop"></i></div>
+          <div class="f-preset-title">Deep Work</div>
+          <div class="f-preset-desc">50m</div>
+          <div class="f-preset-active-line"></div>
+        </div>
+        <div class="f-preset-card" onclick="setPreset(45, this, 'study')">
+          <div class="f-preset-icon icon-pink"><i class="fa-solid fa-book-open"></i></div>
+          <div class="f-preset-title">Study</div>
+          <div class="f-preset-desc">45m</div>
+          <div class="f-preset-active-line"></div>
+        </div>
+        <div class="f-preset-card" onclick="customTimer(this)">
+          <div class="f-preset-icon icon-orange"><i class="fa-solid fa-gear"></i></div>
+          <div class="f-preset-title">Custom</div>
+          <div class="f-preset-desc">Set Time</div>
+          <div class="f-preset-active-line"></div>
+        </div>
+      </div>
+
+      <!-- 6. GLOWING PROGRESS BAR -->
+      <div class="f-progress-card">
+        <div class="f-prog-header">
+          <div class="f-prog-title"><i class="fa-solid fa-chart-column"></i> Today's Progress</div>
+          <div class="f-prog-count" id="ui-sess-count">0 / 6 Sessions</div>
+        </div>
+        <div class="f-prog-track">
+          <div class="f-prog-fill glow-fill" id="ui-sess-fill"></div>
+        </div>
+        <div class="f-prog-footer">
+          <div class="f-prog-time" id="daily-time-text" style="display: none;"><i class="fa-regular fa-clock"></i> 0h 0m</div>
+          <div class="f-prog-pct" id="ui-sess-pct">0%</div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ==========================================
+         RIGHT COLUMN (ANALYTICS) 
+    =========================================== -->
+    <div class="focus-right">
+      
+      <header class="f-right-header">
+        <a href="index.html" class="f-icon-btn f-back-btn-desktop"><i class="fa-solid fa-chevron-left"></i></a>
+        <h2><i class="fa-solid fa-brain"></i> Focus Session</h2>
+        <button class="f-icon-btn-transparent"><i class="fa-solid fa-gear"></i></button>
+      </header>
+
+      <!-- Today's Focus Overview -->
+      <div class="f-glass-card f-today-focus">
+        <div class="f-tf-left">
+          <div class="f-tf-icon"><i class="fa-regular fa-calendar-check"></i></div>
+          <div class="f-tf-info">
+            <div class="f-tf-label">Today's Focus</div>
+            <div class="f-tf-value" id="ui-today-time">0h 0m</div>
+            <div class="f-tf-diff" id="ui-today-diff">
+              <i class="fa-solid fa-caret-up"></i> <span>0%</span> vs yesterday
+            </div>
+          </div>
+        </div>
+        <div class="f-tf-right">
+          <div class="f-goal-ring-wrapper">
+            <svg viewBox="0 0 80 80">
+              <defs>
+                <linearGradient id="goal-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" stop-color="#ec4899" />
+                  <stop offset="100%" stop-color="#00c6ff" />
+                </linearGradient>
+              </defs>
+              <circle class="f-goal-track" cx="40" cy="40" r="34"></circle>
+              <circle class="f-goal-progress" id="ui-goal-ring" cx="40" cy="40" r="34"></circle>
+            </svg>
+            <div class="f-goal-text">
+              <span id="ui-goal-pct">0%</span>
+              <small>Goal</small>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 7. GLOWING ANALYTICS CHART WITH MONTH/YEAR -->
+      <div class="f-glass-card f-chart-card">
+        <div class="f-chart-header">
+          <div>
+            <div class="f-chart-title"><i class="fa-solid fa-chart-simple"></i> Focus Analytics</div>
+            <!-- Month & Year Added -->
+            <div class="f-chart-date" id="ui-chart-date-range" style="font-size:11px; color:var(--textMuted); margin-top:2px;">Month Year</div>
+          </div>
+          <div class="f-chart-dropdown">This Week <i class="fa-solid fa-chevron-down"></i></div>
+        </div>
+        
+        <div class="f-chart-body">
+          <div class="f-chart-y-axis">
+            <span>3h</span><span>2h</span><span>1h</span><span>0m</span>
+          </div>
+          <div class="f-chart-bars-area" id="ui-weekly-chart">
+            <!-- JS will inject glowing bars here -->
+          </div>
+        </div>
+      </div>
+
+      <!-- 8. MINI STATS STRICTLY IN ONE LINE -->
+      <div class="f-mini-stats-row">
+        <div class="f-glass-card f-mini-stat">
+          <div class="f-ms-icon ms-orange"><i class="fa-solid fa-fire"></i></div>
+          <div class="f-ms-info">
+            <div class="f-ms-head">Best Session <i class="fa-solid fa-trophy text-gold"></i></div>
+            <div class="f-ms-val" id="ui-best-time">0m</div>
+            <div class="f-ms-sub" id="ui-best-date">--</div>
+          </div>
+        </div>
+        
+        <div class="f-glass-card f-mini-stat">
+          <div class="f-ms-icon ms-green"><i class="fa-solid fa-check"></i></div>
+          <div class="f-ms-info">
+            <div class="f-ms-head">Total Sessions <i class="fa-regular fa-calendar text-muted"></i></div>
+            <div class="f-ms-val" id="ui-total-sess">0</div>
+            <div class="f-ms-sub">This Week</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Session History -->
+      <div class="f-history-section">
+        <div class="f-history-header">
+          <h3>Session History</h3>
+          <button class="f-view-all">View All</button>
+        </div>
+        <div class="f-history-list" id="ui-history-list">
+          <!-- JS will inject history items here -->
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+
+  <script src="focus.js"></script>
+</body>
+</html>

@@ -1,0 +1,44 @@
+/* ████████████████████████████████████████████████████████████
+                  SIDEBAR & ADMIN MODULE CSS
+████████████████████████████████████████████████████████████ */
+
+/* Hamburger Button */
+.menu-btn { background: none; border: none; color: #fff; font-size: 24px; cursor: pointer; transition: 0.2s; margin-right: 12px; display: flex; align-items: center;}
+.menu-btn:hover { transform: scale(1.1); color: var(--p1); text-shadow: 0 0 10px var(--p1); }
+
+/* Sidebar Overlay & Menu */
+.sidebar-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.6); backdrop-filter: blur(5px); z-index: 9998; opacity: 0; pointer-events: none; transition: 0.3s ease; }
+.sidebar-overlay.active { opacity: 1; pointer-events: auto; }
+
+.sidebar-menu { position: fixed; top: 0; left: -300px; width: 280px; height: 100vh; background: rgba(15,12,41,0.85); backdrop-filter: blur(25px); border-right: 1px solid rgba(255,255,255,0.1); z-index: 9999; overflow-y: auto; transition: 0.4s cubic-bezier(0.25, 0.8, 0.25, 1); box-shadow: 10px 0 30px rgba(0,0,0,0.5); display: flex; flex-direction: column; }
+.sidebar-menu.active { left: 0; }
+.sidebar-menu::-webkit-scrollbar { display: none; }
+
+/* Sidebar Header */
+.sb-header { padding: 25px 20px; border-bottom: 1px solid rgba(255,255,255,0.08); display: flex; align-items: center; justify-content: space-between; background: linear-gradient(135deg, rgba(255,255,255,0.05), transparent); }
+.sb-user-info { display: flex; align-items: center; gap: 12px; }
+.sb-avatar { width: 45px; height: 45px; border-radius: 50%; background: var(--grad); display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 18px; color: #fff; background-size: cover; background-position: center; border: 2px solid rgba(255,255,255,0.2); box-shadow: 0 5px 15px rgba(0,0,0,0.3);}
+.sb-name { font-size: 16px; font-weight: 700; color: #fff; }
+.sb-rank { font-size: 11px; color: var(--warn); font-weight: 600; margin-top: 3px; background: rgba(251,191,36,0.15); padding: 2px 8px; border-radius: 10px; display: inline-block;}
+.sb-close { background: rgba(255,255,255,0.1); width: 30px; height: 30px; border-radius: 50%; border: none; color: #fff; font-size: 14px; cursor: pointer; transition: 0.2s;}
+.sb-close:hover { background: var(--danger); transform: rotate(90deg); }
+
+/* Sidebar Items */
+.sb-content { padding: 20px 15px; flex: 1; }
+.sb-label { font-size: 10px; color: var(--textMuted); text-transform: uppercase; font-weight: 800; letter-spacing: 1px; margin-bottom: 10px; padding-left: 5px; margin-top: 15px;}
+.sb-label:first-child { margin-top: 0; }
+
+.sb-item { display: flex; align-items: center; gap: 12px; padding: 12px 15px; border-radius: 12px; color: var(--textSub); cursor: pointer; transition: 0.2s; margin-bottom: 5px; text-decoration: none; font-size: 14px; font-weight: 600;}
+.sb-item:hover { background: rgba(255,255,255,0.08); color: #fff; transform: translateX(5px); border-left: 3px solid var(--p1); }
+.sb-item .ico { font-size: 18px; width: 24px; text-align: center; }
+
+/* Admin Footer */
+.sb-footer { padding: 20px; text-align: center; border-top: 1px solid rgba(255,255,255,0.08); }
+.sb-version { font-size: 11px; color: var(--textMuted); font-family: monospace; cursor: pointer; display: inline-block; padding: 5px 15px; border-radius: 20px; transition: 0.2s; user-select: none;}
+.sb-version:active { background: rgba(255,255,255,0.1); color: #fff; }
+
+/* Admin Dashboard Items */
+.admin-fb-card { background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.1); padding: 12px; border-radius: 10px; margin-bottom: 10px; text-align: left; }
+.admin-fb-header { display: flex; justify-content: space-between; margin-bottom: 6px; font-size: 10px; color: var(--textMuted); }
+.admin-fb-user { font-weight: 700; color: var(--warn); font-size: 12px; margin-bottom: 4px;}
+.admin-fb-msg { font-size: 13px; color: #fff; line-height: 1.4; word-wrap: break-word;}

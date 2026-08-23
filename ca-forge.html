@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Daily Current Affairs Forge</title>
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=Playfair+Display:wght@700;900&display=swap" rel="stylesheet">
+    
+    <!-- Confetti for Victory Animations 🎉 -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+    <!-- FIREBASE SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+    
+    <style>
+        body, .quiz-container, .btn, .q-card {
+            -webkit-touch-callout: none; -webkit-user-select: none; user-select: none;
+        }
+        #newsBriefList li, .explanation-box { -webkit-user-select: auto; user-select: auto; }
+    </style>
+
+    <!-- CSS Link -->
+    <link rel="stylesheet" href="ca-forge.css">
+</head>
+<body class="theme-default" id="arenaBody">
+    
+    <div class="bg-orbs"></div>
+
+    <!-- 🤖 AI LOADING OVERLAY -->
+    <div id="aiLoadingOverlay" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.85); z-index:99999; justify-content:center; align-items:center; flex-direction:column; backdrop-filter:blur(15px);">
+        <div style="font-size:60px; animation:bounceIcon 1s infinite;">📰⚡</div>
+        <h3 style="color:#4ade80; margin-top:20px; font-family:'Playfair Display', serif; font-size:24px; text-align:center;">Scanning Live News...</h3>
+        <p style="color:#aaa; font-size:13px; margin-top:5px; text-align:center; padding: 0 20px;">Gemini 3.6 is forging today's top current affairs & creating your quiz!</p>
+    </div>
+
+    <div class="quiz-container" id="quizApp">
+        <!-- HEADER -->
+        <div class="q-header">
+            <button class="btn-icon hover-glow" onclick="window.location.href='index.html'" title="Back to Main App">←</button>
+            <div class="q-title anim-pulse" style="font-size:18px;">Current Affairs Forge 🌍</div>
+            <div class="q-xp hover-glow" id="combatXpDisplay">0 XP</div>
+        </div>
+
+        <!-- ==========================================
+             1. SETUP SCREEN (Category Selection)
+        =========================================== -->
+        <div class="q-screen active" id="screenSetup">
+            
+            <div class="glass q-card setup-card anim-slide-up">
+                <h2 class="card-heading">Daily News Generator</h2>
+                <p style="font-size:12px; color:var(--textMuted); text-align:center; margin-bottom:15px;">Generate fresh MCQs from today's live news.</p>
+                
+                <div class="inp-wrap">
+                    <span class="ico">🏷️</span>
+                    <select id="caCategory">
+                        <option value="Mix Current Affairs (All Topics)">🌍 Mix (All Topics)</option>
+                        <option value="Sports Current Affairs">🏏 Sports & Tournaments</option>
+                        <option value="National Politics and Govt Schemes India">🇮🇳 National & Govt Schemes</option>
+                        <option value="International News and Summits">🗺️ International & Summits</option>
+                        <option value="Economy, Banking and Appointments">🏦 Economy & Appointments</option>
+                    </select>
+                </div>
+
+                <div class="inp-wrap" style="margin-top: 15px;">
+                    <span class="ico">🔢</span>
+                    <select id="caCount">
+                        <option value="5">5 Top Questions (Quick)</option>
+                        <option value="10" selected>10 Questions (Standard)</option>
+                        <option value="15">15 Questions (Deep Dive)</option>
+                    </select>
+                </div>
+
+                <div style="display:flex; flex-direction:column; gap:12px; margin-top: 20px;">
+                    <button class="btn btn-grad hover-glow anim-pulse" style="background: linear-gradient(135deg, #3b82f6, #2563eb); font-size:16px;" onclick="generateCA()">Fetch Today's News 🚀</button>
+                </div>
+            </div>
+
+            <!-- 🗂️ THE REVISION VAULT BANNER -->
+            <div class="glass q-card hover-scale anim-slide-up" style="animation-delay: 0.1s; border-color: rgba(251,191,36,0.5); background: linear-gradient(135deg, rgba(251,191,36,0.1), transparent); cursor: pointer;" onclick="openVault()">
+                <div style="display:flex; align-items:center; justify-content:space-between;">
+                    <div style="display:flex; align-items:center; gap:12px;">
+                        <span style="font-size:30px; filter: drop-shadow(0 0 10px rgba(251,191,36,0.5));">🗂️</span>
+                        <div>
+                            <h3 style="color:var(--warn); margin:0; font-size:16px;">Revision Vault</h3>
+                            <div style="font-size:11px; color:var(--textSub); margin-top:3px;">Access past quizzes & ⭐ Bookmarks</div>
+                        </div>
+                    </div>
+                    <div style="color:var(--warn); font-size:20px;">➔</div>
+                </div>
+            </div>
+            
+        </div>
+
+        <!-- ==========================================
+             2. 60-SEC NEWS BRIEF SCREEN
+        =========================================== -->
+        <div class="q-screen" id="screenBrief">
+            <div class="glass q-card anim-slide-up">
+                <div style="display:flex; align-items:center; gap:10px; margin-bottom:15px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom:10px;">
+                    <span style="font-size:24px;">⏱️</span>
+                    <h2 class="card-heading" style="margin:0; color:var(--p1); font-size:18px;">60-Sec News Brief</h2>
+                </div>
+                <p style="font-size:12px; color:var(--textMuted); margin-bottom:15px; font-style:italic;">Read this carefully before starting the quiz!</p>
+                
+                <ul id="newsBriefList" style="color:#e2e8f0; font-size:14px; line-height:1.7; padding-left:20px; display:flex; flex-direction:column; gap:10px;">
+                    <!-- AI will populate summary here -->
+                </ul>
+
+                <button class="btn btn-grad hover-glow" style="margin-top:25px; background: linear-gradient(135deg, #10b981, #059669);" onclick="startCAQuiz()">I've Read It. Start Quiz ➔</button>
+            </div>
+        </div>
+
+        <!-- ==========================================
+             3. QUIZ COMBAT SCREEN
+        =========================================== -->
+        <div class="q-screen" id="screenCombat">
+             <div class="c-header">
+                 <div class="c-qnum">Question <span id="currentQNum">1</span> / <span id="totalQNum">10</span></div>
+                 <!-- ⭐ BOOKMARK BUTTON -->
+                 <button class="btn-icon hover-scale" id="btnStar" onclick="toggleStar()" style="background:rgba(251,191,36,0.15); border-color:var(--warn); color:var(--warn); font-size:18px; transition: 0.3s;" title="Save for Revision">☆</button>
+             </div>
+
+             <div class="prog-wrap">
+                 <div id="combatProgressBar" class="prog-fill" style="background: linear-gradient(90deg, #3b82f6, #8b5cf6);"></div>
+             </div>
+
+             <!-- QUESTION & OPTIONS -->
+             <div class="glass q-card question-box anim-zoom" id="questionText" style="border-color: rgba(59, 130, 246, 0.3);">Loading Question...</div>
+             <div id="optionsContainer" class="options-grid"></div>
+             
+             <!-- EXPLANATION/HINT BOX -->
+             <div id="explanationBox" class="glass explanation-box" style="border-left-color: #3b82f6;">
+                 <strong style="color:#fff;">💡 Fact Check:</strong> <span id="explanationText"></span>
+             </div>
+
+             <button id="btnNext" class="btn btn-grad next-btn hover-glow" style="background: linear-gradient(135deg, #3b82f6, #2563eb);" onclick="nextCAQuestion()">Next Question ➔</button>
+        </div>
+
+        <!-- ==========================================
+             4. RESULT SCREEN
+        =========================================== -->
+        <div class="q-screen" id="screenResult">
+            <div class="glass q-card result-card anim-zoom">
+                <div class="res-emoji anim-bounce" id="resultEmoji">🏆</div>
+                <h2 class="res-title" id="resultTitle">Quiz Completed!</h2>
+                <div class="res-acc">Accuracy: <span id="resultAccuracy">100%</span></div>
+
+                <div class="res-stats-grid">
+                    <div class="r-stat-box s-correct hover-scale">
+                        <div class="r-val" id="resCorrect">0</div>
+                        <div class="r-lbl">Correct</div>
+                    </div>
+                    <div class="r-stat-box s-wrong hover-scale">
+                        <div class="r-val" id="resWrong">0</div>
+                        <div class="r-lbl">Incorrect</div>
+                    </div>
+                </div>
+
+                <div class="xp-earned-box hover-glow" style="background: linear-gradient(135deg, #3b82f6, #2563eb);">+ <span id="resXpEarned">0</span> XP Earned! ⚡</div>
+
+                <div class="res-actions" style="display:flex; flex-direction:column; gap:10px;">
+                    <button class="btn btn-grad hover-scale" style="background:var(--warn); color:#000;" onclick="openVault()">Go to Revision Vault 🗂️</button>
+                    <button class="btn btn-glass hover-scale" onclick="location.reload()">Back to Forge Home 🏠</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==========================================
+             5. REVISION VAULT SCREEN (History & Bookmarks)
+        =========================================== -->
+        <div class="q-screen" id="screenVault">
+            <div class="glass q-card anim-slide-up" style="flex:1; display:flex; flex-direction:column; padding:15px; margin-bottom:0; min-height:85vh;">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
+                    <h2 class="card-heading" style="margin:0; color:var(--warn); font-size:20px;">🗂️ Revision Vault</h2>
+                    <button class="btn-icon" onclick="switchQScreen('screenSetup')" style="width:30px; height:30px; font-size:14px;">✕</button>
+                </div>
+
+                <div class="tab-switcher" style="background: rgba(0,0,0,0.3); border-radius: 12px; padding: 4px; display:flex; margin-bottom:15px;">
+                    <button class="tab-btn active" id="tabHistory" onclick="switchVaultTab('history')" style="flex:1; border:none; background:transparent; color:var(--textSub); padding:8px; border-radius:8px; font-weight:700; transition:0.3s;">📅 Past Quizzes</button>
+                    <button class="tab-btn" id="tabStarred" onclick="switchVaultTab('starred')" style="flex:1; border:none; background:transparent; color:var(--textSub); padding:8px; border-radius:8px; font-weight:700; transition:0.3s;">⭐ Starred Q's</button>
+                </div>
+
+                <div id="vaultHistoryContainer" class="scroll-hide" style="flex:1; overflow-y:auto; display:flex; flex-direction:column; gap:10px;">
+                    <!-- History list renders here -->
+                </div>
+
+                <div id="vaultStarredContainer" class="scroll-hide" style="flex:1; overflow-y:auto; display:none; flex-direction:column; gap:10px;">
+                    <!-- Starred questions render here -->
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- SCRIPT LOADING -->
+    <script src="app.js"></script> 
+    <!-- ⚠️ Yaha hum JS wali nayi file link karenge -->
+    <script src="ca-forge.js"></script>
+</body>
+</html>

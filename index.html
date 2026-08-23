@@ -8,16 +8,16 @@
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=Playfair+Display:wght@700;900&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <link rel="stylesheet" href="style.css">
-
-<link rel="manifest" href="manifest.json">
-
+  <link rel="stylesheet" href="sidebar.css">
+  <link rel="manifest" href="manifest.json">
 </head>
 <body>
 
+<!-- ██████ LOGIN SCREEN ██████ -->
 <div class="screen active" id="loginScreen">
   <div class="auth-container">
     <div class="auth-hero">
-      <div class="logo-ring"><div class="logo-inner">🚀</div></div>
+      <div class="logo-ring"><div class="logo-inner"><i class="fa-solid fa-rocket" style="color: #fff;"></i></div></div>
       <h1>AnRu Focus</h1>
       <p>Crush Your Backlog. Design Your Future.</p>
     </div>
@@ -29,64 +29,69 @@
       <div class="err-box" id="authErr"></div>
       
       <div class="form-panel active" id="panelLogin">
-        <div class="inp-wrap"><span class="ico">📧</span><input type="email" id="liEmail" placeholder="Email address" autocomplete="email"></div>
-        <div class="inp-wrap"><span class="ico">🔒</span><input type="password" id="liPass" placeholder="Password" autocomplete="current-password"></div>
+        <div class="inp-wrap"><span class="ico"><i class="fa-solid fa-envelope" style="color: #60a5fa;"></i></span><input type="email" id="liEmail" placeholder="Email address" autocomplete="email"></div>
+        <div class="inp-wrap"><span class="ico"><i class="fa-solid fa-lock" style="color: #f87171;"></i></span><input type="password" id="liPass" placeholder="Password" autocomplete="current-password"></div>
         
         <div style="text-align: right; margin-top: -6px; margin-bottom: 12px;">
           <a href="#" onclick="doForgotPassword(); return false;" style="color: var(--p1, #a855f7); font-size: 13px; text-decoration: none; font-weight: 600;">Forgot Password?</a>
         </div>
 
-        <button class="btn btn-grad" onclick="doLogin()">Login to Focus 🚀</button>
+        <button class="btn btn-grad" onclick="doLogin()">Login to Focus <i class="fa-solid fa-arrow-right-to-bracket" style="margin-left: 5px;"></i></button>
         <button class="btn btn-grad" style="background: #db4437; color: white; width: 100%; padding: 12px; border: none; border-radius: 8px; font-size: 16px; margin-bottom: 10px; cursor: pointer;margin-top: 8px" onclick="continueWithGoogle()">
-          🌐 Continue with Google
+          <i class="fa-brands fa-google" style="margin-right: 5px;"></i> Continue with Google
         </button>
 
         <div class="divider">or</div>
-        <button class="btn btn-glass" onclick="guestLogin()">👤 Continue as Guest</button>
+        <button class="btn btn-glass" onclick="guestLogin()"><i class="fa-solid fa-user-astronaut" style="color: #a855f7; margin-right: 5px;"></i> Continue as Guest</button>
       </div>
       
       <div class="form-panel" id="panelReg">
-        <div class="inp-wrap"><span class="ico">👤</span><input type="text" id="reName" placeholder="Your full name"></div>
-        <div class="inp-wrap"><span class="ico">📧</span><input type="email" id="reEmail" placeholder="Email address"></div>
-        <div class="inp-wrap"><span class="ico">🎓</span><input type="text" id="reCourse" placeholder="Course / College (optional)"></div>
-        <div class="inp-wrap"><span class="ico">🔒</span><input type="password" id="rePass" placeholder="Create password (min 4 chars)"></div>
-        <button class="btn btn-grad" onclick="doRegister()">Create Account ✨</button>
+        <div class="inp-wrap"><span class="ico"><i class="fa-solid fa-user" style="color: #a855f7;"></i></span><input type="text" id="reName" placeholder="Your full name"></div>
+        <div class="inp-wrap"><span class="ico"><i class="fa-solid fa-envelope" style="color: #60a5fa;"></i></span><input type="email" id="reEmail" placeholder="Email address"></div>
+        <div class="inp-wrap"><span class="ico"><i class="fa-solid fa-graduation-cap" style="color: #fbbf24;"></i></span><input type="text" id="reCourse" placeholder="Course / College (optional)"></div>
+        <div class="inp-wrap"><span class="ico"><i class="fa-solid fa-lock" style="color: #f87171;"></i></span><input type="password" id="rePass" placeholder="Create password (min 4 chars)"></div>
+        <button class="btn btn-grad" onclick="doRegister()">Create Account <i class="fa-solid fa-wand-magic-sparkles" style="margin-left: 5px;"></i></button>
       </div>
     </div>
   </div>
 </div>
 
+<!-- ██████ MAIN APP SCREEN ██████ -->
 <div class="screen" id="appScreen">
-  <div class="top-nav">
-    <div class="nav-brand">🚀 AnRu Focus</div>
+<div class="top-nav">
+  <div style="display:flex; align-items:center;">
+    <button class="menu-btn" onclick="openSidebar()"><i class="fa-solid fa-bars"></i></button>
+    <div class="nav-brand"><i class="fa-solid fa-rocket" style="color: #fbbf24;"></i> AnRu Focus</div>
+  </div>
+
     <div class="nav-right">
       <div class="nav-avatar" id="navAv" onclick="switchPage('profile')">?</div>
-      <button class="btn-logout" onclick="doLogout()">Logout</button>
+      <button class="btn-logout" onclick="doLogout()"><i class="fa-solid fa-power-off"></i></button>
     </div>
   </div>
 
   <div class="main-content">
     
-    <!-- DASHBOARD TAB (SUPER CLEAN) -->
+    <!-- === 1. DASHBOARD TAB === -->
     <div class="page active" id="page-dash">
       <div class="welcome-banner">
-        <h2 id="wMsg">Hey Champion! 👋</h2>
+        <h2 id="wMsg">Hey Champion! <i class="fa-solid fa-hand-sparkles" style="color: #fbbf24;"></i></h2>
         <p id="wSub">Ready to crush today?</p>
-        <div class="date-chip">📅 <span id="todayDate">—</span></div>
+        <div class="date-chip"><i class="fa-regular fa-calendar-days"></i> <span id="todayDate">—</span></div>
       </div>
       
       <div id="revisionAlertUI" class="glass" style="display:none; padding:12px 16px; margin-bottom:18px; border:1px solid var(--p4); background: linear-gradient(135deg, rgba(236,72,153,0.15), transparent); border-radius:12px; align-items:center; gap:12px; cursor:pointer;" onclick="switchPage('tasks')">
-        <div style="font-size:24px; animation:pulseNeon 2s infinite;">⏰</div>
+        <div style="font-size:24px; animation:pulseNeon 2s infinite;"><i class="fa-solid fa-stopwatch-20"></i></div>
         <div style="flex:1;">
           <div style="font-size:12px; font-weight:800; color:var(--p4); text-transform:uppercase;">Revision Due Today!</div>
           <div style="font-size:11px; color:var(--textSub);" id="revAlertText">You have tasks pending for revision.</div>
         </div>
-        <div style="color:var(--p4); font-size:20px;">›</div>
+        <div style="color:var(--p4); font-size:20px;"><i class="fa-solid fa-chevron-right"></i></div>
       </div>
 
       <div id="activeBuffUI" class="glass" style="display:none; padding:12px 16px; margin-bottom:18px; border:1px solid var(--p4); background: linear-gradient(135deg, rgba(236,72,153,0.15), transparent); border-radius:12px; align-items:center; justify-content:space-between;">
         <div style="display:flex; align-items:center; gap:10px;">
-          <span style="font-size:24px; animation:pulseNeon 2s infinite;">⚡</span>
+          <span style="font-size:24px; animation:pulseNeon 2s infinite;"><i class="fa-solid fa-bolt-lightning"></i></span>
           <div>
             <div style="font-size:12px; font-weight:800; color:var(--p4); text-transform:uppercase;">XP Multiplier Active</div>
             <div style="font-size:11px; color:var(--textSub);">+20 Extra XP per Task!</div>
@@ -96,12 +101,12 @@
       </div>
 
       <div class="glass" style="padding:14px; margin-bottom:18px; font-style:italic; text-align:center; font-size:13px; color:var(--textSub); border-left:4px solid var(--p1);">
-        🔥 <span id="dashQuote">लोड हो रहा है धाकड़ मोटिवेशन...</span>
+        <i class="fa-solid fa-fire" style="color: #f87171;"></i> <span id="dashQuote">लोड हो रहा है धाकड़ मोटिवेशन...</span>
       </div>
 
       <div class="glass" style="padding:16px; margin-bottom:18px; border:1px solid rgba(248,113,113,0.3);">
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
-          <div style="font-weight:700; font-size:14px;">🔥 Daily Lecture Target</div>
+          <div style="font-weight:700; font-size:14px;"><i class="fa-solid fa-bullseye" style="color: #f87171;"></i> Daily Lecture Target</div>
           <div style="font-size:12px; font-weight:800; color:var(--danger)" id="targetTextUI">0/2 Done</div>
         </div>
         <div style="height:6px; background:rgba(255,255,255,0.1); border-radius:3px; overflow:hidden;">
@@ -110,7 +115,7 @@
       </div>
 
       <div class="glass" id="aiSuggesterUI" style="padding:14px; margin-bottom:18px; border: 1px solid var(--p3); background: linear-gradient(135deg, rgba(168,85,247,0.15), transparent); border-radius:14px; display:flex; align-items:center; gap:12px;">
-        <div style="font-size:28px; animation: orbFloat 3s infinite;">🤖</div>
+        <div style="font-size:28px; animation: orbFloat 3s infinite;"><i class="fa-solid fa-robot" style="color: #a855f7;"></i></div>
         <div style="flex:1;">
           <div style="font-size:11px; font-weight:800; color:var(--p3); text-transform:uppercase; margin-bottom:2px;">Smart AI Suggester</div>
           <div style="font-size:12px; color:var(--textSub); line-height:1.3;">Bhai, aaj live classes kam hain. Chal ek Backlog nipta lein?</div>
@@ -120,20 +125,20 @@
 
       <div class="vault-banner" onclick="openBacklogVaultModal()">
         <div style="display:flex; align-items:center; gap:10px;">
-          <span style="font-size:24px">🗂️</span>
+          <span style="font-size:24px"><i class="fa-solid fa-box-archive" style="color: #fbbf24;"></i></span>
           <div>
             <div style="font-weight:700; font-size:14px;">Backlog Crusher Vault</div>
             <div style="font-size:11px; color:var(--textMuted);" id="backlogBannerDesc">0 backlogs pending</div>
           </div>
         </div>
-        <span style="font-size:18px; color:var(--danger)">➔</span>
+        <span style="font-size:18px; color:var(--danger)"><i class="fa-solid fa-arrow-right"></i></span>
       </div>
 
       <div class="stats-grid">
-        <div class="stat-card sc1"><div class="si">📚</div><div class="sn" id="dTotal">0</div><div class="sl">Total Tasks</div></div>
-        <div class="stat-card sc2"><div class="si">🔥</div><div class="sn" id="dPending">0</div><div class="sl">Pending</div></div>
-        <div class="stat-card sc3"><div class="si">🎯</div><div class="sn" id="dXP">0</div><div class="sl">Total XP Level</div></div>
-        <div class="stat-card sc4"><div class="si">⚡</div><div class="sn" id="dStreak">0</div><div class="sl" id="streakLabel">Day Streak</div></div>
+        <div class="stat-card sc1"><div class="si"><i class="fa-solid fa-book-open" style="color: #60a5fa;"></i></div><div class="sn" id="dTotal">0</div><div class="sl">Total Tasks</div></div>
+        <div class="stat-card sc2"><div class="si"><i class="fa-solid fa-fire" style="color: #f87171;"></i></div><div class="sn" id="dPending">0</div><div class="sl">Pending</div></div>
+        <div class="stat-card sc3"><div class="si"><i class="fa-solid fa-crosshairs" style="color: #a855f7;"></i></div><div class="sn" id="dXP">0</div><div class="sl">Total XP Level</div></div>
+        <div class="stat-card sc4"><div class="si"><i class="fa-solid fa-bolt" style="color: #fbbf24;"></i></div><div class="sn" id="dStreak">0</div><div class="sl" id="streakLabel">Day Streak</div></div>
       </div>
 
       <div class="prog-card glass">
@@ -146,85 +151,97 @@
           <div class="ring-text"><div class="ring-pct" id="pPct">0%</div><div class="ring-done" id="pDone">done</div></div>
         </div>
         <div class="prog-info">
-          <h4 id="ceoRankLabel">Rank: Rookie 🌟</h4>
+          <h4 id="ceoRankLabel">Rank: Rookie <i class="fa-solid fa-star" style="color: #fbbf24;"></i></h4>
           <p id="pDesc">Add tasks to start tracking your mission!</p>
           <div class="prog-bar"><div class="prog-bar-fill" id="pBar" style="width:0%"></div></div>
         </div>
       </div>
 
       <div class="sec-head">
-        <div class="sec-title">Recent Tasks</div><button class="see-all" onclick="switchPage('tasks')">See All →</button>
+        <div class="sec-title">Recent Tasks</div><button class="see-all" onclick="switchPage('tasks')">See All <i class="fa-solid fa-arrow-right"></i></button>
       </div>
       <div id="recentList"></div>
 
       <div class="sec-head" style="margin-top:24px;">
-        <div class="sec-title" style="color:var(--warn);">🕵️ Secret Missions</div>
+        <div class="sec-title" style="color:var(--warn);"><i class="fa-solid fa-user-secret" style="color: #a855f7;"></i> Secret Missions</div>
       </div>
       <div class="glass" id="secretMissionCard" style="padding:16px; margin-bottom:10px; border: 1px solid rgba(251,191,36,0.3); background: linear-gradient(135deg, rgba(251,191,36,0.05), rgba(0,0,0,0.2)); border-radius: 16px;">
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
           <div style="font-weight:700; font-size:13px; color:var(--textSub)">Complete to earn rewards!</div>
           <div style="display:flex; gap:6px; align-items:center;">
-            <button class="btn-icon" style="width:28px; height:28px; font-size:12px; background:var(--glass2); border:1px solid var(--glassBorder); color:#fff;" onclick="changeSecretMission()" title="Change Mission">🔁</button>
+            <button class="btn-icon" style="width:28px; height:28px; font-size:12px; background:var(--glass2); border:1px solid var(--glassBorder); color:#fff;" onclick="changeSecretMission()" title="Change Mission"><i class="fa-solid fa-rotate-right"></i></button>
             <div style="font-size:11px; background:var(--warn); color:#000; padding:3px 10px; border-radius:12px; font-weight:800; box-shadow: 0 0 10px rgba(251,191,36,0.3);">+50 XP</div>
           </div>
         </div>
-        <div id="smText" style="font-size:15px; color:#fff; margin-bottom:16px; font-weight:600; line-height:1.4;">Loading mission...</div>
-        <button id="smBtn" class="btn" style="width:100%; background:var(--grad); color:#fff; border-radius:12px; font-size:13px;" onclick="claimSecretMission()">Verify & Claim Reward 🎁</button>
+        <div id="smText" style="font-size:15px; color:#fff; margin-bottom:16px; font-weight:600; line-height:1.4;"><i class="fa-solid fa-spinner fa-spin"></i> Loading mission...</div>
+        <button id="smBtn" class="btn" style="width:100%; background:var(--grad); color:#fff; border-radius:12px; font-size:13px;" onclick="claimSecretMission()">Verify & Claim Reward <i class="fa-solid fa-gift"></i></button>
       </div>
     </div>
 
-    <!-- 🏫 HUB TAB -->
+    <!-- === 2. HUB TAB === -->
     <div class="page" id="page-hub">
-      
-      <!-- QUICK STUDY SECTION -->
       <div class="quick-study-pro-section" style="margin-top: 5px;">
           <div class="qs-pro-header">
-              <h3 class="qs-pro-title">Quick Study <span class="bolt-anim">⚡</span></h3>
+              <h3 class="qs-pro-title">Quick Study <span class="bolt-anim"><i class="fa-solid fa-bolt" style="color: #fbbf24;"></i></span></h3>
               <span class="qs-pro-badge">PRO</span>
           </div>
           <div class="qs-pro-cards">
-              <div class="qs-card-3d glass-panel" onclick="playQsClick('grammar.html')" onpointerdown="playQsHover()" onmouseenter="playQsHover()">
-                  <div class="qs-card-content">
-                      <div class="qs-icon-wrapper gradient-purple-glow"><i class="fa-solid fa-book-open-reader qs-floating-icon"></i><div class="qs-icon-ring"></div></div>
-                      <div class="qs-text-content"><h4 class="qs-card-title">Grammar Vault</h4><p class="qs-card-desc">Master Tense, Voice & Syntax</p></div>
-                      <div class="qs-arrow-btn"><i class="fa-solid fa-arrow-right-long"></i></div>
-                  </div>
-                  <div class="qs-shimmer"></div>
-              </div>
-              <div class="qs-card-3d glass-panel" onclick="playQsClick('vocab.html')" onpointerdown="playQsHover()" onmouseenter="playQsHover()">
-                  <div class="qs-card-content">
-                      <div class="qs-icon-wrapper gradient-blue-glow"><i class="fa-solid fa-user-ninja qs-floating-icon"></i><div class="qs-icon-ring"></div></div>
-                      <div class="qs-text-content"><h4 class="qs-card-title">Word Ninja Pro</h4><p class="qs-card-desc">Unlimited Vocab Builder</p></div>
-                      <div class="qs-arrow-btn"><i class="fa-solid fa-arrow-right-long"></i></div>
-                  </div>
-                  <div class="qs-shimmer"></div>
-              </div>
-              <div class="qs-card-3d glass-panel" onclick="playQsClick('quiz.html')" onpointerdown="playQsHover()" onmouseenter="playQsHover()">
-                  <div class="qs-card-content">
-                      <div class="qs-icon-wrapper gradient-orange-glow"><i class="fa-solid fa-shield-halved qs-floating-icon"></i><div class="qs-icon-ring"></div></div>
-                      <div class="qs-text-content"><h4 class="qs-card-title">Combat Quiz Mode</h4><p class="qs-card-desc">Test your 11th concepts in Arena</p></div>
-                      <div class="qs-arrow-btn"><i class="fa-solid fa-arrow-right-long"></i></div>
-                  </div>
-                  <div class="qs-shimmer"></div>
-              </div>
+            
+            <div class="qs-card-3d glass-panel" onclick="window.location.href='ca-forge.html'" onpointerdown="playQsHover()" onmouseenter="playQsHover()">
+                <div class="qs-card-content">
+                    <div class="qs-icon-wrapper gradient-purple-glow">
+                        <i class="fa-solid fa-newspaper qs-floating-icon"></i>
+                        <div class="qs-icon-ring"></div>
+                    </div>
+                    <div class="qs-text-content">
+                        <h4 class="qs-card-title">Daily Current Affairs</h4>
+                        <p class="qs-card-desc">AI generated live news MCQs & Briefs.</p>
+                    </div>
+                    <div class="qs-arrow-btn"><i class="fa-solid fa-arrow-right-long"></i></div>
+                </div>
+                <div class="qs-shimmer"></div>
+            </div>
+
+            <div class="qs-card-3d glass-panel" onclick="playQsClick('grammar.html')" onpointerdown="playQsHover()" onmouseenter="playQsHover()">
+                <div class="qs-card-content">
+                    <div class="qs-icon-wrapper gradient-purple-glow"><i class="fa-solid fa-book-open-reader qs-floating-icon"></i><div class="qs-icon-ring"></div></div>
+                    <div class="qs-text-content"><h4 class="qs-card-title">Grammar Vault</h4><p class="qs-card-desc">Master Tense, Voice & Syntax</p></div>
+                    <div class="qs-arrow-btn"><i class="fa-solid fa-arrow-right-long"></i></div>
+                </div>
+                <div class="qs-shimmer"></div>
+            </div>
+            
+            <div class="qs-card-3d glass-panel" onclick="playQsClick('vocab.html')" onpointerdown="playQsHover()" onmouseenter="playQsHover()">
+                <div class="qs-card-content">
+                    <div class="qs-icon-wrapper gradient-blue-glow"><i class="fa-solid fa-user-ninja qs-floating-icon"></i><div class="qs-icon-ring"></div></div>
+                    <div class="qs-text-content"><h4 class="qs-card-title">Word Ninja Pro</h4><p class="qs-card-desc">Unlimited Vocab Builder</p></div>
+                    <div class="qs-arrow-btn"><i class="fa-solid fa-arrow-right-long"></i></div>
+                </div>
+                <div class="qs-shimmer"></div>
+            </div>
+            
+            <div class="qs-card-3d glass-panel" onclick="playQsClick('quiz.html')" onpointerdown="playQsHover()" onmouseenter="playQsHover()">
+                <div class="qs-card-content">
+                    <div class="qs-icon-wrapper gradient-orange-glow"><i class="fa-solid fa-shield-halved qs-floating-icon"></i><div class="qs-icon-ring"></div></div>
+                    <div class="qs-text-content"><h4 class="qs-card-title">Combat Quiz Mode</h4><p class="qs-card-desc">Test your 11th concepts in Arena</p></div>
+                    <div class="qs-arrow-btn"><i class="fa-solid fa-arrow-right-long"></i></div>
+                </div>
+                <div class="qs-shimmer"></div>
+            </div>
           </div>
       </div>
 
-      <!-- 🏫 SCHOOL ACADEMIC HUB SECTION -->
       <div class="sec-head" style="margin-top:30px;">
-        <div class="sec-title" style="color:var(--p3);">🏫 School Academic Hub</div>
+        <div class="sec-title" style="color:var(--p3);"><i class="fa-solid fa-school"></i> School Academic Hub</div>
       </div>
       <p style="font-size:12px; color:var(--textMuted); margin-bottom:18px;">Official school tools, focus timers & study roadmaps.</p>
       
       <div class="qs-pro-cards">
-          
-          <div class="qs-card-3d glass-panel" onclick="switchPage('timer')" onpointerdown="playQsHover()" onmouseenter="playQsHover()">
+          <!-- 🔥 NEW: Link updated to focus.html -->
+          <div class="qs-card-3d glass-panel" onclick="window.location.href='focus.html'" onpointerdown="playQsHover()" onmouseenter="playQsHover()">
               <div class="qs-card-content">
                   <div class="qs-icon-wrapper gradient-yellow-glow"><i class="fa-solid fa-stopwatch qs-floating-icon"></i><div class="qs-icon-ring"></div></div>
-                  <div class="qs-text-content">
-                      <h4 class="qs-card-title">Focus Timer</h4>
-                      <p class="qs-card-desc">Deep work sessions & Pomodoro.</p>
-                  </div>
+                  <div class="qs-text-content"><h4 class="qs-card-title">Neon Focus Engine</h4><p class="qs-card-desc">Deep work sessions & Pomodoro.</p></div>
                   <div class="qs-arrow-btn"><i class="fa-solid fa-arrow-right-long"></i></div>
               </div>
               <div class="qs-shimmer"></div>
@@ -233,10 +250,7 @@
           <div class="qs-card-3d glass-panel" onclick="window.location.href='doubt-room.html'" onpointerdown="playQsHover()" onmouseenter="playQsHover()">
               <div class="qs-card-content">
                   <div class="qs-icon-wrapper gradient-pink-glow"><i class="fa-solid fa-satellite-dish qs-floating-icon"></i><div class="qs-icon-ring"></div></div>
-                  <div class="qs-text-content">
-                      <h4 class="qs-card-title">Live Doubt Room ⚡</h4>
-                      <p class="qs-card-desc">Discuss concepts & share notes securely.</p>
-                  </div>
+                  <div class="qs-text-content"><h4 class="qs-card-title">Live Doubt Room</h4><p class="qs-card-desc">Discuss concepts & share notes securely.</p></div>
                   <div class="qs-arrow-btn"><i class="fa-solid fa-arrow-right-long"></i></div>
               </div>
               <div class="qs-shimmer"></div>
@@ -245,10 +259,7 @@
           <div class="qs-card-3d glass-panel" onclick="window.location.href='notice-board.html'" onpointerdown="playQsHover()" onmouseenter="playQsHover()">
               <div class="qs-card-content">
                   <div class="qs-icon-wrapper gradient-blue-glow"><i class="fa-solid fa-clipboard-list qs-floating-icon"></i><div class="qs-icon-ring"></div></div>
-                  <div class="qs-text-content">
-                      <h4 class="qs-card-title">Digital Notice Board</h4>
-                      <p class="qs-card-desc">Official updates & homework from Teachers.</p>
-                  </div>
+                  <div class="qs-text-content"><h4 class="qs-card-title">Digital Notice Board</h4><p class="qs-card-desc">Official updates & homework from Teachers.</p></div>
                   <div class="qs-arrow-btn"><i class="fa-solid fa-arrow-right-long"></i></div>
               </div>
               <div class="qs-shimmer"></div>
@@ -257,10 +268,7 @@
           <div class="qs-card-3d glass-panel" onclick="window.location.href='ask-resolve.html'" onpointerdown="playQsHover()" onmouseenter="playQsHover()">
               <div class="qs-card-content">
                   <div class="qs-icon-wrapper gradient-red-glow"><i class="fa-solid fa-user-secret qs-floating-icon"></i><div class="qs-icon-ring"></div></div>
-                  <div class="qs-text-content">
-                      <h4 class="qs-card-title">Ask Anonymously</h4>
-                      <p class="qs-card-desc">100% safe & private doubt resolution.</p>
-                  </div>
+                  <div class="qs-text-content"><h4 class="qs-card-title">Ask Anonymously</h4><p class="qs-card-desc">100% safe & private doubt resolution.</p></div>
                   <div class="qs-arrow-btn"><i class="fa-solid fa-arrow-right-long"></i></div>
               </div>
               <div class="qs-shimmer"></div>
@@ -269,48 +277,49 @@
           <div class="qs-card-3d glass-panel" onclick="window.location.href='roadmap.html'" onpointerdown="playQsHover()" onmouseenter="playQsHover()">
               <div class="qs-card-content">
                   <div class="qs-icon-wrapper gradient-green-glow"><i class="fa-solid fa-map-location-dot qs-floating-icon"></i><div class="qs-icon-ring"></div></div>
-                  <div class="qs-text-content">
-                      <h4 class="qs-card-title">Syllabus Roadmap</h4>
-                      <p class="qs-card-desc">Track chapters & monitor your progress.</p>
-                  </div>
+                  <div class="qs-text-content"><h4 class="qs-card-title">Syllabus Roadmap</h4><p class="qs-card-desc">Track chapters & monitor your progress.</p></div>
                   <div class="qs-arrow-btn"><i class="fa-solid fa-arrow-right-long"></i></div>
               </div>
               <div class="qs-shimmer"></div>
           </div>
-
       </div>
     </div> 
 
-    <!-- TASKS TAB -->
+    <!-- === 3. TASKS TAB === -->
     <div class="page" id="page-tasks">
       <div class="add-card glass">
-        <h3>➕ Add New Task</h3>
-        <div class="inp-wrap"><span class="ico">📚</span><input type="text" id="tName" placeholder="Task name (e.g., Physics Chapter 5)"></div>
+        <h3><i class="fa-solid fa-plus" style="color:var(--success)"></i> Add New Task</h3>
+        <div class="inp-wrap"><span class="ico"><i class="fa-solid fa-book-bookmark" style="color: #60a5fa;"></i></span><input type="text" id="tName" placeholder="Task name (e.g., Physics Chapter 5)"></div>
         <div class="row2">
           <div class="inp-wrap" style="margin-bottom:0"><input type="date" id="tDate"></div>
           <div class="inp-wrap" style="margin-bottom:0"><select id="tSubj"><option value="">Subject</option></select></div>
         </div>
         <div style="margin-top:10px"></div>
         <div class="pri-group" id="priGroup">
-          <button class="pri-btn" id="pb-low" onclick="selPri('low')">🟢 Low</button>
-          <button class="pri-btn" id="pb-med" onclick="selPri('med')">🟡 Medium</button>
-          <button class="pri-btn" id="pb-high" onclick="selPri('high')">🔴 High</button>
+          <button class="pri-btn" id="pb-low" onclick="selPri('low')"><i class="fa-solid fa-circle" style="font-size:10px;"></i> Low</button>
+          <button class="pri-btn" id="pb-med" onclick="selPri('med')"><i class="fa-solid fa-circle" style="font-size:10px;"></i> Medium</button>
+          <button class="pri-btn" id="pb-high" onclick="selPri('high')"><i class="fa-solid fa-circle" style="font-size:10px;"></i> High</button>
         </div>
         
         <div style="margin-bottom:12px; font-size:13px; display:flex; align-items:center; gap:8px;">
           <input type="checkbox" id="tIsTwoStep" style="width:16px; height:16px; margin:0;" checked>
-          <label for="tIsTwoStep" style="color:var(--textSub); font-weight:600; cursor:pointer;">Use Lecture + Notes Split Mode (11th Master) 🎥✍️</label>
+          <label for="tIsTwoStep" style="color:var(--textSub); font-weight:600; cursor:pointer;">Lecture + Notes Mode <i class="fa-solid fa-video" style="color: #a855f7;"></i> <i class="fa-solid fa-pen" style="color: #fbbf24;"></i></label>
         </div>
 
-        <div class="inp-wrap area"><span class="ico">✍️</span><textarea id="tNote" rows="2" placeholder="Notes or reminders..."></textarea></div>
-        <button class="btn btn-grad" onclick="addTask()">Add to Mission List 🔥</button>
+        <div class="inp-wrap area"><span class="ico"><i class="fa-solid fa-pen-clip" style="color: #a855f7;"></i></span><textarea id="tNote" rows="2" placeholder="Notes or reminders..."></textarea></div>
+        <button class="btn btn-grad" onclick="addTask()">Add to Mission List <i class="fa-solid fa-fire-flame-curved"></i></button>
+
+        <button class="ai-scan-btn hover-glow anim-pulse" style="margin-top: 15px;" onclick="document.getElementById('aiVisionInput').click()">
+          <i class="fa-solid fa-camera-retro"></i> Scan to add Online Class (AI)
+        </button>
+        <input type="file" id="aiVisionInput" accept="image/*" style="display:none;" onchange="handleClassScan(event)">
       </div>
       
       <div class="chip-scroll" style="align-items: center;">
         <button class="fchip active" onclick="setFilter('all',this)">All</button>
-        <button class="fchip" onclick="setFilter('pending',this)">⏳ Pending</button>
-        <button class="fchip" onclick="setFilter('done',this)">✅ Done</button>
-        <button class="fchip" onclick="setFilter('high',this)">🔴 High</button>
+        <button class="fchip" onclick="setFilter('pending',this)"><i class="fa-solid fa-hourglass-half"></i> Pending</button>
+        <button class="fchip" onclick="setFilter('done',this)"><i class="fa-solid fa-check-double"></i> Done</button>
+        <button class="fchip" onclick="setFilter('high',this)"><i class="fa-solid fa-circle-exclamation"></i> High</button>
         
         <select id="subjFilterSelect" class="fchip" style="background: rgba(255,255,255,0.05); padding: 8px 12px; outline: none; color: var(--textMuted); cursor: pointer; border-radius: 20px; font-weight: 600;" onchange="setSubjFilter(this.value)">
           <option value="all">📁 All Subjects</option>
@@ -320,57 +329,9 @@
       <div id="taskList"></div>
     </div>
 
-    <!-- TIMER TAB -->
-    <div class="page timer-page" id="page-timer">
-      <div class="timer-mode-toggle" style="margin-top:4px">
-        <button class="tmode-btn active" id="tm-focus" onclick="setTimerMode('focus',this)">🎯 Focus</button>
-        <button class="tmode-btn" id="tm-short" onclick="setTimerMode('short',this)">☕ Short</button>
-        <button class="tmode-btn" id="tm-long" onclick="setTimerMode('long',this)">🌙 Long</button>
-        <button class="tmode-btn" id="tm-stopwatch" onclick="setTimerMode('stopwatch',this)">⏱️ Count-Up</button>
-      </div>
-      
-      <div class="timer-display">
-        <svg width="220" height="220" viewBox="0 0 220 220">
-          <circle cx="110" cy="110" r="100" fill="none" stroke="rgba(255,255,255,0.06)" stroke-width="12"/>
-          <circle id="timerCircle" cx="110" cy="110" r="100" fill="none" stroke-width="12" stroke-linecap="round" stroke-dasharray="628" stroke-dashoffset="0" stroke="url(#tg)" transform="rotate(-90 110 110)"/>
-          <defs>
-            <linearGradient id="tg" x1="0%" y1="0%" x2="100%" y2="100%">
-              <stop offset="0%" stop-color="var(--p1)"/><stop offset="50%" stop-color="var(--p2)"/><stop offset="100%" stop-color="var(--p4)"/>
-            </linearGradient>
-          </defs>
-        </svg>
-        <div class="timer-content">
-          <div class="timer-time" id="timerDisplay">25:00</div>
-          <div class="timer-label" id="timerLabel">Focus Session</div>
-          <div class="timer-session" id="timerSess">Session #1</div>
-        </div>
-      </div>
-      
-      <button class="btn-sm" id="zenBtn" style="margin-bottom:15px; display:none; background:rgba(255,255,255,0.1); border:1px solid rgba(255,255,255,0.2)" onclick="openZenMode()">🧘‍♂️ Enter Zen Mode</button>
-
-      <div class="timer-controls">
-        <button class="tbtn tbtn-sec" onclick="resetTimer()" title="Reset">🔄</button>
-        <button class="tbtn tbtn-main" id="timerPlayBtn" onclick="toggleTimer()">▶️</button>
-        <button class="tbtn tbtn-sec" onclick="skipTimer()" title="Skip / Log">⏭️</button>
-      </div>
-      
-      <div class="timer-presets" id="timerPresetsBox">
-        <button class="preset-btn active" onclick="setPreset(25,this)">25m</button>
-        <button class="preset-btn" onclick="setPreset(45,this)">45m</button>
-        <button class="preset-btn" onclick="setPreset(60,this)">60m</button>
-        <button class="preset-btn" onclick="setPreset(90,this)">90m</button>
-        <button class="preset-btn" onclick="customTimer(this)">✏️</button>
-      </div>
-      
-      <div class="sec-head" style="width:100%">
-        <div class="sec-title">Today's Sessions</div><span id="totalStudyTime" style="font-size:13px;color:var(--textMuted)">0h 0m total</span>
-      </div>
-      <div id="sessionLog" style="width:100%"></div>
-    </div>
-
-    <!-- SUBJECTS TAB -->
+    <!-- === 4. SUBJECTS TAB === -->
     <div class="page" id="page-subjects">
-      <div class="sec-head" style="margin-top:8px;"><div class="sec-title">📅 Academic Overview</div></div>
+      <div class="sec-head" style="margin-top:8px;"><div class="sec-title"><i class="fa-regular fa-calendar-check" style="color:#60a5fa;"></i> Academic Overview</div></div>
       <div style="display:grid; grid-template-columns: repeat(3, 1fr); gap:10px; margin-bottom:20px;">
          <div class="glass" style="padding:12px 10px; border-left: 3px solid var(--success); background: linear-gradient(135deg, rgba(74,222,128,0.1), transparent);">
             <div style="font-size:10px; color:var(--textMuted); font-weight:600; text-transform:uppercase;">Live</div>
@@ -386,13 +347,13 @@
          </div>
       </div>
 
-      <div class="sec-head"><div class="sec-title">🗺️ Syllabus Skill Tree</div></div>
+      <div class="sec-head"><div class="sec-title"><i class="fa-solid fa-diagram-project" style="color: #a855f7;"></i> Syllabus Skill Tree</div></div>
       <div class="glass" style="padding:16px; margin-bottom:20px; position:relative; max-height:200px; overflow-y:auto;">
         <div id="skillTreeContainer" style="display:flex; flex-direction:column; gap:12px;"></div>
       </div>
 
       <div class="add-card glass" style="margin-bottom:16px">
-        <h3>📁 Add Subject / Chapter</h3>
+        <h3><i class="fa-solid fa-folder-plus" style="color: #fbbf24;"></i> Add Subject / Chapter</h3>
         <div class="emoji-row" id="emojiRow"></div>
         <div style="display:flex;gap:8px; align-items:center;">
           <div class="inp-wrap" style="flex:1; margin-bottom:0;"><input type="text" id="sName" placeholder="Chapter name (e.g., Kinematics)"></div>
@@ -403,16 +364,11 @@
       <div class="subj-grid" id="subjGrid"></div>
     </div>
 
-    <!-- PROFILE & SHOP TAB -->
+    <!-- === 5. PROFILE & SHOP TAB === -->
     <div class="page" id="page-profile">
       
       <div class="sec-head" style="margin-bottom:0px; display:flex; justify-content:space-between; align-items:center;">
         <div class="sec-title">Holographic ID</div>
-        <select class="chart-select" id="chartFilter" onchange="renderWeeklyStudyChart()">
-          <option value="7">Last 7 Days</option>
-          <option value="30">Last 30 Days</option>
-          <option value="365">12 Months</option>
-        </select>
       </div>
       
       <div class="holo-scene" onclick="this.querySelector('.holo-card').classList.toggle('is-flipped')">
@@ -420,12 +376,12 @@
           <div class="holo-face holo-front">
             <input type="file" id="pfpInput" accept="image/*" style="display:none" onchange="handlePfpUpload(event)">
             <div class="pa-ring" onclick="event.stopPropagation(); document.getElementById('pfpInput').click()">
-              <div class="pa-inner" id="profAv">?</div><div class="pa-edit-badge">📷</div>
+              <div class="pa-inner" id="profAv">?</div><div class="pa-edit-badge"><i class="fa-solid fa-camera"></i></div>
             </div>
             <div class="profile-name" id="profName">Champion</div>
             <div class="profile-email" id="profEmail">—</div>
-            <div class="profile-badge" id="profBadge">Rank: Rookie 🌟</div>
-            <div style="font-size:10px; opacity:0.5; margin-top:20px; text-transform:uppercase; letter-spacing:1px;">Tap to view analytics ↺</div>
+            <div class="profile-badge" id="profBadge">Rank: Rookie <i class="fa-solid fa-star" style="color: #fbbf24;"></i></div>
+            <div style="font-size:10px; opacity:0.5; margin-top:20px; text-transform:uppercase; letter-spacing:1px;">Tap to view analytics <i class="fa-solid fa-rotate"></i></div>
           </div>
           <div class="holo-face holo-back">
             <div class="ps-grid">
@@ -434,88 +390,87 @@
               <div class="ps-box"><div class="ps-num" id="ps3">0</div><div class="ps-lbl">Subjects</div></div>
             </div>
             
-            <div class="chart-container" id="weeklyStudyChart" style="height:120px; background:transparent; border:none; padding:0; margin:0; position:relative;"></div>
-            <div id="chartTooltip" class="glass" style="display:none; position:absolute; z-index:1000; padding:8px 12px; font-size:11px; color:#fff; border-radius:8px; pointer-events:none; box-shadow:0 10px 20px rgba(0,0,0,0.5);"></div>
-            
-            <div style="font-size:11px; font-weight:700; margin-top:10px; color:var(--textSub);">Subject Focus Breakdown</div>
+            <!-- 🔥 NEW: Removed the Weekly Chart, keeping only Subject Focus Breakdown -->
+            <div style="font-size:11px; font-weight:700; margin-top:20px; color:var(--textSub);">Subject Focus Breakdown</div>
             <div id="subjectTimeGrid" style="display:flex; gap:2px; width:100%; height:8px; border-radius:4px; overflow:hidden; margin-top:4px; background:rgba(255,255,255,0.1);"></div>
             <div id="subjectTimeLabels" style="display:flex; flex-wrap:wrap; gap:6px; justify-content:center; margin-top:6px;"></div>
-            <div style="font-size:10px; opacity:0.5; text-align:center; margin-top:10px; text-transform:uppercase; letter-spacing:1px;">Tap to flip back ↺</div>
+            
+            <div style="font-size:10px; opacity:0.5; text-align:center; margin-top:20px; text-transform:uppercase; letter-spacing:1px;">Tap to flip back <i class="fa-solid fa-rotate"></i></div>
           </div>
         </div>
       </div>
 
       <!-- XP SHOP SECTION -->
-      <div class="sec-head" style="margin-top:10px;"><div class="sec-title">🛒 XP Theme & Perks Shop</div></div>
+      <div class="sec-head" style="margin-top:10px;"><div class="sec-title"><i class="fa-solid fa-cart-shopping" style="color: var(--p1);"></i> XP Theme & Perks Shop</div></div>
       <div class="glass settings-card" style="margin-bottom:20px; padding:10px;">
-        <div style="font-size:11px; font-weight:800; color:var(--textSub); margin:8px 0 8px 10px; text-transform:uppercase; letter-spacing:1px;">🚀 Power-Ups</div>
+        <div style="font-size:11px; font-weight:800; color:var(--textSub); margin:8px 0 8px 10px; text-transform:uppercase; letter-spacing:1px;"><i class="fa-solid fa-bolt" style="color: var(--warn);"></i> Power-Ups</div>
         
         <div class="shop-item" style="border-color: var(--p3); background: rgba(168, 85, 247, 0.1);">
-          <div class="shop-info"><div class="shop-icon">🎁</div><div><div class="shop-title" style="color: var(--p3);">Mystery Box</div><div class="shop-desc">Random Reward (Boost, Freeze, etc)</div></div></div>
+          <div class="shop-info"><div class="shop-icon"><i class="fa-solid fa-gift" style="color: #f472b6;"></i></div><div><div class="shop-title" style="color: var(--p3);">Mystery Box</div><div class="shop-desc">Random Reward (Boost, Freeze, etc)</div></div></div>
           <button class="btn-sm" onclick="buyMysteryBox()" style="background: var(--p3); color: #fff;">150 XP</button>
         </div>
         
         <div class="shop-item">
-          <div class="shop-info"><div class="shop-icon">🧪</div><div><div class="shop-title">2x XP Potion</div><div class="shop-desc">Double XP for the next 1 Hour.</div></div></div>
+          <div class="shop-info"><div class="shop-icon"><i class="fa-solid fa-flask" style="color: #4ade80;"></i></div><div><div class="shop-title">2x XP Potion</div><div class="shop-desc">Double XP for the next 1 Hour.</div></div></div>
           <button class="btn-sm" style="background:rgba(255,255,255,0.1); border:1px solid rgba(255,255,255,0.2);" onclick="buyShopItem('potion', 250)">250 XP</button>
         </div>
 
         <div class="shop-item">
-          <div class="shop-info"><div class="shop-icon">❄️</div><div><div class="shop-title">Streak Freeze</div><div class="shop-desc">Saves streak if missed tomorrow.</div></div></div>
+          <div class="shop-info"><div class="shop-icon"><i class="fa-solid fa-snowflake" style="color: #60a5fa;"></i></div><div><div class="shop-title">Streak Freeze</div><div class="shop-desc">Saves streak if missed tomorrow.</div></div></div>
           <button class="btn-sm" style="background:rgba(255,255,255,0.1); border:1px solid rgba(255,255,255,0.2);" onclick="buyShopItem('freeze', 200)">200 XP</button>
         </div>
 
         <div class="shop-item">
-          <div class="shop-info"><div class="shop-icon">⏳</div><div><div class="shop-title">Time Traveler</div><div class="shop-desc">Restore a recently broken streak.</div></div></div>
+          <div class="shop-info"><div class="shop-icon"><i class="fa-solid fa-hourglass-start" style="color: #fbbf24;"></i></div><div><div class="shop-title">Time Traveler</div><div class="shop-desc">Restore a recently broken streak.</div></div></div>
           <button class="btn-sm" style="background:rgba(255,255,255,0.1); border:1px solid rgba(255,255,255,0.2);" onclick="buyShopItem('timetravel', 1500)">1500 XP</button>
         </div>
 
-        <div style="font-size:11px; font-weight:800; color:var(--textSub); margin:20px 0 8px 10px; text-transform:uppercase; letter-spacing:1px;">🏅 Exclusive Titles</div>
+        <div style="font-size:11px; font-weight:800; color:var(--textSub); margin:20px 0 8px 10px; text-transform:uppercase; letter-spacing:1px;"><i class="fa-solid fa-medal" style="color: var(--warn);"></i> Exclusive Titles</div>
         
         <div class="shop-item">
-          <div class="shop-info"><div class="shop-icon">🥷</div><div><div class="shop-title">Ninja Badge</div><div class="shop-desc">Show off your silent focus.</div></div></div>
+          <div class="shop-info"><div class="shop-icon"><i class="fa-solid fa-user-ninja" style="color: #94a3b8;"></i></div><div><div class="shop-title">Ninja Badge</div><div class="shop-desc">Show off your silent focus.</div></div></div>
           <button class="btn-sm" id="btnBadgeNinja" style="background:rgba(255,255,255,0.1); border:1px solid rgba(255,255,255,0.2);" onclick="buyShopItem('badge_ninja', 300)">300 XP</button>
         </div>
 
         <div class="shop-item">
-          <div class="shop-info"><div class="shop-icon">🎓</div><div><div class="shop-title">Scholar Badge</div><div class="shop-desc">For the dedicated learner.</div></div></div>
+          <div class="shop-info"><div class="shop-icon"><i class="fa-solid fa-graduation-cap" style="color: #a855f7;"></i></div><div><div class="shop-title">Scholar Badge</div><div class="shop-desc">For the dedicated learner.</div></div></div>
           <button class="btn-sm" id="btnBadgeScholar" style="background:rgba(255,255,255,0.1); border:1px solid rgba(255,255,255,0.2);" onclick="buyShopItem('badge_scholar', 500)">500 XP</button>
         </div>
 
         <div class="shop-item">
-          <div class="shop-info"><div class="shop-icon">👑</div><div><div class="shop-title">Legend Badge</div><div class="shop-desc">Ultimate flex for top scorers.</div></div></div>
+          <div class="shop-info"><div class="shop-icon"><i class="fa-solid fa-crown" style="color: #fbbf24;"></i></div><div><div class="shop-title">Legend Badge</div><div class="shop-desc">Ultimate flex for top scorers.</div></div></div>
           <button class="btn-sm" id="btnBadgeLegend" style="background:rgba(255,255,255,0.1); border:1px solid rgba(255,255,255,0.2);" onclick="buyShopItem('badge_legend', 1000)">1000 XP</button>
         </div>
 
-        <div style="font-size:11px; font-weight:800; color:var(--textSub); margin:20px 0 8px 10px; text-transform:uppercase; letter-spacing:1px;">🎨 Premium Themes</div>
+        <div style="font-size:11px; font-weight:800; color:var(--textSub); margin:20px 0 8px 10px; text-transform:uppercase; letter-spacing:1px;"><i class="fa-solid fa-palette" style="color: var(--p1);"></i> Premium Themes</div>
         
         <div class="shop-item">
-          <div class="shop-info"><div class="shop-icon">🌌</div><div><div class="shop-title">AnRu Dark</div><div class="shop-desc">Original Premium Theme.</div></div></div>
+          <div class="shop-info"><div class="shop-icon"><i class="fa-solid fa-meteor" style="color: #818cf8;"></i></div><div><div class="shop-title">AnRu Dark</div><div class="shop-desc">Original Premium Theme.</div></div></div>
           <button class="btn-sm" id="btnThemeDefault" style="background:rgba(255,255,255,0.1); border:1px solid rgba(255,255,255,0.2);" onclick="buyShopItem('default', 0)">Use</button>
         </div>
 
         <div class="shop-item">
-          <div class="shop-info"><div class="shop-icon">🌅</div><div><div class="shop-title">Sunset Glow</div><div class="shop-desc">Warm orange & pink aesthetics.</div></div></div>
+          <div class="shop-info"><div class="shop-icon"><i class="fa-solid fa-sun" style="color: #f97316;"></i></div><div><div class="shop-title">Sunset Glow</div><div class="shop-desc">Warm orange & pink aesthetics.</div></div></div>
           <button class="btn-sm" id="btnThemeSunset" onclick="buyShopItem('sunset', 400)">400 XP</button>
         </div>
 
         <div class="shop-item">
-          <div class="shop-info"><div class="shop-icon">🟢</div><div><div class="shop-title">Matrix Hacker</div><div class="shop-desc">Neon green cyber theme.</div></div></div>
+          <div class="shop-info"><div class="shop-icon"><i class="fa-solid fa-terminal" style="color: #4ade80;"></i></div><div><div class="shop-title">Matrix Hacker</div><div class="shop-desc">Neon green cyber theme.</div></div></div>
           <button class="btn-sm" id="btnThemeMatrix" onclick="buyShopItem('matrix', 500)">500 XP</button>
         </div>
 
         <div class="shop-item">
-          <div class="shop-info"><div class="shop-icon">✨</div><div><div class="shop-title">Royal Gold</div><div class="shop-desc">Luxurious gold & black vibe.</div></div></div>
+          <div class="shop-info"><div class="shop-icon"><i class="fa-solid fa-sparkles" style="color: #fbbf24;"></i></div><div><div class="shop-title">Royal Gold</div><div class="shop-desc">Luxurious gold & black vibe.</div></div></div>
           <button class="btn-sm" id="btnThemeGold" onclick="buyShopItem('gold', 800)">800 XP</button>
         </div>
 
         <div class="shop-item">
-          <div class="shop-info"><div class="shop-icon">🔴</div><div><div class="shop-title">Cyberpunk Red</div><div class="shop-desc">Aggressive red & blue theme.</div></div></div>
+          <div class="shop-info"><div class="shop-icon"><i class="fa-solid fa-microchip" style="color: #f87171;"></i></div><div><div class="shop-title">Cyberpunk Red</div><div class="shop-desc">Aggressive red & blue theme.</div></div></div>
           <button class="btn-sm" id="btnThemeCyber" onclick="buyShopItem('cyber', 1000)">1000 XP</button>
         </div>
         
         <div class="shop-item">
-          <div class="shop-info"><div class="shop-icon">🌊</div><div><div class="shop-title">Ocean Blue</div><div class="shop-desc">Calm deep sea vibe.</div></div></div>
+          <div class="shop-info"><div class="shop-icon"><i class="fa-solid fa-water" style="color: #38bdf8;"></i></div><div><div class="shop-title">Ocean Blue</div><div class="shop-desc">Calm deep sea vibe.</div></div></div>
           <button class="btn-sm" id="btnThemeOcean" onclick="buyShopItem('ocean', 300)">300 XP</button>
         </div>
       </div>
@@ -523,45 +478,45 @@
       <div class="sec-head"><div class="sec-title">Settings & Cloud Controls</div></div>
       <div class="glass settings-card">
         <div class="sitem" onclick="openReportModal()">
-          <div class="sitem-l"><div class="sitem-ico">📊</div><div><div class="sitem-txt">Weekly Academic Report</div><div class="sitem-sub">Generate performance document</div></div></div>
-          <div class="sitem-r">›</div>
+          <div class="sitem-l"><div class="sitem-ico" style="color: #60a5fa;"><i class="fa-solid fa-chart-line"></i></div><div><div class="sitem-txt">Weekly Academic Report</div><div class="sitem-sub">Generate performance document</div></div></div>
+          <div class="sitem-r"><i class="fa-solid fa-chevron-right"></i></div>
         </div>
         <div class="sitem" onclick="openModal('editName')">
-          <div class="sitem-l"><div class="sitem-ico">✏️</div><div><div class="sitem-txt">Edit Name</div><div class="sitem-sub">Change your display name</div></div></div>
-          <div class="sitem-r">›</div>
+          <div class="sitem-l"><div class="sitem-ico" style="color: #fbbf24;"><i class="fa-solid fa-user-pen"></i></div><div><div class="sitem-txt">Edit Name</div><div class="sitem-sub">Change your display name</div></div></div>
+          <div class="sitem-r"><i class="fa-solid fa-chevron-right"></i></div>
         </div>
         <div class="sitem" onclick="openModal('editPass')">
-          <div class="sitem-l"><div class="sitem-ico">🔒</div><div><div class="sitem-txt">Change Password</div><div class="sitem-sub">Update security authorization</div></div></div>
-          <div class="sitem-r">›</div>
+          <div class="sitem-l"><div class="sitem-ico" style="color: #f87171;"><i class="fa-solid fa-lock"></i></div><div><div class="sitem-txt">Change Password</div><div class="sitem-sub">Update security authorization</div></div></div>
+          <div class="sitem-r"><i class="fa-solid fa-chevron-right"></i></div>
         </div>
         <div class="sitem" onclick="openModal('editCourse')">
-          <div class="sitem-l"><div class="sitem-ico">🎓</div><div><div class="sitem-txt">Edit Course/College</div><div class="sitem-sub" id="courseDisplay">—</div></div></div>
-          <div class="sitem-r">›</div>
+          <div class="sitem-l"><div class="sitem-ico" style="color: #a855f7;"><i class="fa-solid fa-graduation-cap"></i></div><div><div class="sitem-txt">Edit Course/College</div><div class="sitem-sub" id="courseDisplay">—</div></div></div>
+          <div class="sitem-r"><i class="fa-solid fa-chevron-right"></i></div>
         </div>
         <div class="sitem" onclick="toggleEyeStrain()">
-          <div class="sitem-l"><div class="sitem-ico">👁️</div><div><div class="sitem-txt">Eye-Strain Break</div><div class="sitem-sub">Auto-remind after 45 mins of class</div></div></div>
+          <div class="sitem-l"><div class="sitem-ico" style="color: #4ade80;"><i class="fa-solid fa-eye-low-vision"></i></div><div><div class="sitem-txt">Eye-Strain Break</div><div class="sitem-sub">Auto-remind after 45 mins of class</div></div></div>
           <div class="toggle-sw" id="eyeStrainSw"></div>
         </div>
         <div class="sitem" onclick="exportBackupData()">
-          <div class="sitem-l"><div class="sitem-ico">📥</div><div><div class="sitem-txt">Export Backup JSON</div><div class="sitem-sub">Download data file safely</div></div></div>
-          <div class="sitem-r">›</div>
+          <div class="sitem-l"><div class="sitem-ico" style="color: #60a5fa;"><i class="fa-solid fa-file-export"></i></div><div><div class="sitem-txt">Export Backup JSON</div><div class="sitem-sub">Download data file safely</div></div></div>
+          <div class="sitem-r"><i class="fa-solid fa-chevron-right"></i></div>
         </div>
         <div class="sitem" onclick="document.getElementById('importBackupInput').click()">
-          <div class="sitem-l"><div class="sitem-ico">📤</div><div><div class="sitem-txt">Import Backup File</div><div class="sitem-sub">Restore tasks configuration</div></div></div>
+          <div class="sitem-l"><div class="sitem-ico" style="color: #a855f7;"><i class="fa-solid fa-file-import"></i></div><div><div class="sitem-txt">Import Backup File</div><div class="sitem-sub">Restore tasks configuration</div></div></div>
           <input type="file" id="importBackupInput" accept=".json" style="display:none" onchange="importBackupData(event)">
-          <div class="sitem-r">›</div>
+          <div class="sitem-r"><i class="fa-solid fa-chevron-right"></i></div>
         </div>
         <div class="sitem" onclick="toggleNotif()">
-          <div class="sitem-l"><div class="sitem-ico">🔔</div><div><div class="sitem-txt">Notifications</div><div class="sitem-sub">Study reminders engine</div></div></div>
+          <div class="sitem-l"><div class="sitem-ico" style="color: #fbbf24;"><i class="fa-solid fa-bell"></i></div><div><div class="sitem-txt">Notifications</div><div class="sitem-sub">Study reminders engine</div></div></div>
           <div class="toggle-sw" id="notifSw"></div>
         </div>
         <div class="sitem" onclick="toggleSfx()">
-          <div class="sitem-l"><div class="sitem-ico">🔊</div><div><div class="sitem-txt">Sound Effects</div><div class="sitem-sub">Chimes, alarms & click sounds</div></div></div>
+          <div class="sitem-l"><div class="sitem-ico" style="color: #4ade80;"><i class="fa-solid fa-volume-high"></i></div><div><div class="sitem-txt">Sound Effects</div><div class="sitem-sub">Chimes, alarms & click sounds</div></div></div>
           <div class="toggle-sw" id="sfxSw"></div>
         </div>
         <div class="sitem" onclick="openModal('clearData')">
-          <div class="sitem-l"><div class="sitem-ico">🗑️</div><div><div class="sitem-txt">Clear All Data</div><div class="sitem-sub">Reset internal files limits</div></div></div>
-          <div class="sitem-r" style="color:var(--danger)">›</div>
+          <div class="sitem-l"><div class="sitem-ico" style="color:var(--danger);"><i class="fa-solid fa-trash-can"></i></div><div><div class="sitem-txt" style="color:var(--danger);">Clear All Data</div><div class="sitem-sub">Reset internal files limits</div></div></div>
+          <div class="sitem-r" style="color:var(--danger)"><i class="fa-solid fa-chevron-right"></i></div>
         </div>
       </div>
     </div>
@@ -569,126 +524,187 @@
 
   <!-- PERFECT 5-TAB BOTTOM NAVIGATION -->
   <div class="bottom-nav">
-    <button class="bnav-item active" id="bn-dash" onclick="switchPage('dash',this)"><span class="bni">🏠</span>Dashboard</button>
-    <button class="bnav-item" id="bn-hub" onclick="switchPage('hub',this)"><span class="bni">🏫</span>Hub</button>
-    <button class="bnav-item" id="bn-tasks" onclick="switchPage('tasks',this)"><span class="bni">📋</span>Tasks<span class="bnav-badge" id="pendingBadge" style="display:none">0</span></button>
-    <button class="bnav-item" id="bn-subjects" onclick="switchPage('subjects',this)"><span class="bni">📁</span>Subjects</button>
-    <button class="bnav-item" id="bn-profile" onclick="switchPage('profile',this)"><span class="bni">👤</span>Profile</button>
+    <button class="bnav-item active" id="bn-dash" onclick="switchPage('dash',this)"><span class="bni"><i class="fa-solid fa-house"></i></span>Dashboard</button>
+    <button class="bnav-item" id="bn-hub" onclick="switchPage('hub',this)"><span class="bni"><i class="fa-solid fa-layer-group"></i></span>Hub</button>
+    <button class="bnav-item" id="bn-tasks" onclick="switchPage('tasks',this)"><span class="bni"><i class="fa-solid fa-list-check"></i></span>Tasks<span class="bnav-badge" id="pendingBadge" style="display:none">0</span></button>
+    <button class="bnav-item" id="bn-subjects" onclick="switchPage('subjects',this)"><span class="bni"><i class="fa-solid fa-folder-open"></i></span>Subjects</button>
+    <button class="bnav-item" id="bn-profile" onclick="switchPage('profile',this)"><span class="bni"><i class="fa-solid fa-user-astronaut"></i></span>Profile</button>
   </div>
 </div>
 
-<div id="floatingNoteBtn" onclick="openTimestampModal()" style="position:fixed; bottom:85px; right:20px; width:50px; height:50px; background:var(--grad); border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:20px; color:#fff; box-shadow:0 5px 15px rgba(0,0,0,0.4); cursor:pointer; z-index:400; transition:transform 0.2s;">📝</div>
+<!-- ██████ FLOATING BUTTONS & MODALS ██████ -->
+<div id="floatingNoteBtn" onclick="openTimestampModal()" style="position:fixed; bottom:85px; right:20px; width:50px; height:50px; background:var(--grad); border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:20px; color:#fff; box-shadow:0 5px 15px rgba(0,0,0,0.4); cursor:pointer; z-index:400; transition:transform 0.2s;"><i class="fa-solid fa-pen-nib"></i></div>
 
 <div class="modal-overlay" id="modalOverlay">
   <div class="modal-box glass2">
-    <button class="modal-close" onclick="closeModal()">✕</button>
+    <button class="modal-close" onclick="closeModal()"><i class="fa-solid fa-xmark"></i></button>
     <div id="modalContent"></div>
   </div>
 </div>
 
 <div class="modal-overlay" id="timestampModal">
   <div class="modal-box glass2" style="max-width:320px;">
-    <button class="modal-close" onclick="document.getElementById('timestampModal').classList.remove('open')">✕</button>
-    <div class="modal-title" style="font-size:18px;">⏱️ Quick Timestamp Note</div>
+    <button class="modal-close" onclick="document.getElementById('timestampModal').classList.remove('open')"><i class="fa-solid fa-xmark"></i></button>
+    <div class="modal-title" style="font-size:18px;"><i class="fa-solid fa-stopwatch" style="color: #fbbf24;"></i> Quick Timestamp Note</div>
     <p style="font-size:12px; color:var(--textMuted); margin-bottom:12px;">Class ke beech me important point save karo!</p>
     <div class="inp-wrap area"><textarea id="tsNoteInput" rows="3" placeholder="Ex: 45:20 - Important derivation..."></textarea></div>
     <div class="inp-wrap"><select id="tsTaskSelect"><option value="">Select Active Task to attach...</option></select></div>
-    <button class="btn btn-grad" onclick="saveTimestampNote()">Save Note 📌</button>
+    <button class="btn btn-grad" onclick="saveTimestampNote()">Save Note <i class="fa-solid fa-thumbtack"></i></button>
   </div>
 </div>
 
 <div class="modal-overlay" id="reportModal">
   <div class="modal-box glass2" style="max-width:400px; padding:16px;">
-    <button class="modal-close" onclick="document.getElementById('reportModal').classList.remove('open')">✕</button>
-    <div class="modal-title" style="font-size:18px; margin-bottom:10px;">📊 Weekly Report</div>
+    <button class="modal-close" onclick="document.getElementById('reportModal').classList.remove('open')"><i class="fa-solid fa-xmark"></i></button>
+    <div class="modal-title" style="font-size:18px; margin-bottom:10px;"><i class="fa-solid fa-chart-simple" style="color: #60a5fa;"></i> Weekly Report</div>
     <div id="reportContent" style="background:#fff; color:#111; padding:20px; border-radius:12px; margin-bottom:16px; box-shadow:0 10px 25px rgba(0,0,0,0.3);">
       <div style="text-align:center; font-family:'Playfair Display', serif; font-weight:900; font-size:22px; margin-bottom:10px; color:#222;">AnRu Focus</div>
       <div style="text-align:center; font-size:12px; color:#666; margin-bottom:20px; border-bottom:1px solid #eee; padding-bottom:10px;">Weekly Academic Performance</div>
       <div style="font-size:14px; font-weight:600; margin-bottom:8px;" id="reportDateRange">Date: -- to --</div>
-      <div style="font-size:13px; margin-bottom:6px;">🧑‍🎓 Student: <span id="reportStudentName" style="font-weight:700;">--</span></div>
-      <div style="font-size:13px; margin-bottom:6px;">⏱️ Total Focus: <span id="reportTotalTime" style="font-weight:700;">0h 0m</span></div>
-      <div style="font-size:13px; margin-bottom:6px;">✅ Tasks Done: <span id="reportTasksDone" style="font-weight:700;">0</span></div>
-      <div style="font-size:13px; margin-bottom:20px;">🗂️ Backlogs Cleared: <span id="reportBacklogsCleared" style="font-weight:700;">0</span></div>
+      <div style="font-size:13px; margin-bottom:6px;"><i class="fa-solid fa-user-graduate" style="color: #a855f7;"></i> Student: <span id="reportStudentName" style="font-weight:700;">--</span></div>
+      <div style="font-size:13px; margin-bottom:6px;"><i class="fa-solid fa-clock" style="color: #fbbf24;"></i> Total Focus: <span id="reportTotalTime" style="font-weight:700;">0h 0m</span></div>
+      <div style="font-size:13px; margin-bottom:6px;"><i class="fa-solid fa-check" style="color: #4ade80;"></i> Tasks Done: <span id="reportTasksDone" style="font-weight:700;">0</span></div>
+      <div style="font-size:13px; margin-bottom:20px;"><i class="fa-solid fa-box-archive" style="color: #f87171;"></i> Backlogs Cleared: <span id="reportBacklogsCleared" style="font-weight:700;">0</span></div>
       <div style="text-align:center; font-size:11px; color:#888; font-style:italic; border-top:1px solid #eee; padding-top:10px;">"Consistency is the ultimate superpower."</div>
     </div>
-    <button class="btn btn-grad" onclick="printReport()">Download / Print Report 🖨️</button>
+    <button class="btn btn-grad" onclick="printReport()">Download / Print Report <i class="fa-solid fa-print"></i></button>
   </div>
 </div>
 
-<!-- 🔐 CUSTOM FORGOT PASSWORD MODAL -->
 <div class="modal-overlay" id="forgotPassModal">
   <div class="modal-box glass2" style="max-width:340px; text-align:center; padding:24px;">
-    <button class="modal-close" onclick="document.getElementById('forgotPassModal').classList.remove('open')">✕</button>
-    <div style="font-size:36px; margin-bottom:10px;">🔑</div>
+    <button class="modal-close" onclick="document.getElementById('forgotPassModal').classList.remove('open')"><i class="fa-solid fa-xmark"></i></button>
+    <div style="font-size:36px; margin-bottom:10px;"><i class="fa-solid fa-key" style="color:var(--warn)"></i></div>
     <div class="modal-title" style="font-size:20px; margin-bottom:6px;">Reset Password</div>
-    <p style="font-size:12px; color:var(--textSub); margin-bottom:18px;" id="fpSubText">
-      Enter your registered email address to verify your account.
-    </p>
-
-    <!-- Step 1: Email Input -->
+    <p style="font-size:12px; color:var(--textSub); margin-bottom:18px;" id="fpSubText">Enter your registered email address to verify your account.</p>
     <div id="fpStep1">
       <div class="inp-wrap" style="text-align:left; margin-bottom:16px;">
-        <span class="ico">📧</span>
-        <input type="email" id="fpEmail" placeholder="name@example.com" style="width:100%;">
+        <span class="ico"><i class="fa-solid fa-envelope" style="color: #60a5fa;"></i></span><input type="email" id="fpEmail" placeholder="name@example.com" style="width:100%;">
       </div>
-      <button class="btn btn-grad" style="width:100%; border-radius:12px; padding:12px;" onclick="fpVerifyEmail()">Verify Email 🚀</button>
+      <button class="btn btn-grad" style="width:100%; border-radius:12px; padding:12px;" onclick="fpVerifyEmail()">Verify Email <i class="fa-solid fa-paper-plane"></i></button>
     </div>
-
-    <!-- Step 2: New Password Input (Initially Hidden) -->
     <div id="fpStep2" style="display:none;">
       <div class="inp-wrap" style="text-align:left; margin-bottom:16px;">
-        <span class="ico">🔒</span>
-        <input type="password" id="fpNewPass" placeholder="New Password (min 4 chars)" style="width:100%;">
+        <span class="ico"><i class="fa-solid fa-lock" style="color: #f87171;"></i></span><input type="password" id="fpNewPass" placeholder="New Password (min 4 chars)" style="width:100%;">
       </div>
-      <button class="btn btn-grad" style="width:100%; border-radius:12px; padding:12px;" onclick="fpSaveNewPassword()">Update Password ✨</button>
+      <button class="btn btn-grad" style="width:100%; border-radius:12px; padding:12px;" onclick="fpSaveNewPassword()">Update Password <i class="fa-solid fa-wand-magic-sparkles"></i></button>
     </div>
   </div>
+</div>
+
+<!-- AI Approval Modal -->
+<div class="modal-overlay" id="aiScannerModal">
+  <div class="modal-box glass2" style="max-width:400px; padding: 20px;">
+    <button class="modal-close" onclick="closeAIModal()"><i class="fa-solid fa-xmark"></i></button>
+    <div class="modal-title" style="text-align: center; color: var(--success); font-size: 20px;"><i class="fa-solid fa-robot"></i> AI Found These!</div>
+    <p style="font-size: 12px; color: var(--textMuted); text-align: center; margin-bottom: 15px;">Uncheck classes you don't want (e.g., Biology).</p>
+    <div id="aiClassesList" class="scroll-hide" style="display: flex; flex-direction: column; gap: 10px; margin-bottom: 20px; max-height: 250px; overflow-y: auto;">
+    </div>
+    <button class="btn btn-grad" style="width: 100%; background: linear-gradient(135deg, #10b981, #059669);" onclick="approveAndAddClasses()">Approve & Add <i class="fa-solid fa-check-double"></i></button>
+  </div>
+</div>
+
+<!-- Scanning Loader -->
+<div id="aiScanLoader" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.85); z-index:999999; justify-content:center; align-items:center; flex-direction:column; backdrop-filter:blur(15px);">
+    <div style="font-size:60px; color:var(--success); animation:bounceIcon 1s infinite;"><i class="fa-solid fa-expand fa-spin"></i></div>
+    <h3 style="color:#4ade80; margin-top:20px; font-family:'Playfair Display', serif;">AI is Reading Screenshot...</h3>
+    <p style="color:#aaa; font-size:13px; margin-top:5px;">Extracting dates, subjects & chapters!</p>
 </div>
 
 <div class="toast" id="toast"></div>
 
-<div class="zen-overlay" id="zenOverlay" ondblclick="exitZenMode()">
-  <div class="zen-time" id="zenDisplay">25:00</div>
-  <div class="zen-quote" id="zenQuote">गहरी एकाग्रता ही 21वीं सदी की महाशक्ति है।</div>
-  <div class="zen-exit">Double tap anywhere to exit</div>
+<!-- ██████ SIDEBAR MODULE ██████ -->
+<div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>
+<div class="sidebar-menu" id="sidebarMenu">
+  <div class="sb-header">
+    <div class="sb-user-info">
+      <div class="sb-avatar" id="sbAv">?</div>
+      <div>
+        <div class="sb-name" id="sbName">Champion</div>
+        <div class="sb-rank" id="sbRank">Rank: Rookie <i class="fa-solid fa-star" style="color: #fbbf24;"></i></div>
+      </div>
+    </div>
+    <button class="sb-close" onclick="closeSidebar()"><i class="fa-solid fa-xmark"></i></button>
+  </div>
+  
+  <div class="sb-content">
+    <div class="sb-label">Connect With Us</div>
+    <a href="#" id="linkInsta" target="_blank" class="sb-item"><i class="fa-brands fa-instagram ico" style="color:#E1306C; font-size:22px;"></i> Instagram</a>
+    <a href="#" id="linkTele" target="_blank" class="sb-item"><i class="fa-brands fa-telegram ico" style="color:#0088cc; font-size:22px;"></i> Telegram</a>
+    <a href="#" id="linkYt" target="_blank" class="sb-item"><i class="fa-brands fa-youtube ico" style="color:#FF0000; font-size:22px;"></i> YouTube</a>
+    <a href="#" id="linkPort" target="_blank" class="sb-item"><i class="fa-solid fa-microchip ico" style="color:#4ade80; font-size:20px;"></i> AI Portfolio</a>
+
+    <div class="sb-label">Support & Actions</div>
+    <div class="sb-item" onclick="shareApp()"><i class="fa-solid fa-share-nodes ico" style="color:#a855f7;"></i> Share with Friends</div>
+    <div class="sb-item" onclick="openFeedbackModal()"><i class="fa-solid fa-bug ico" style="color:#f87171;"></i> Report Bug / Feedback</div>
+    <div class="sb-item" onclick="rateApp()"><i class="fa-solid fa-star ico" style="color:#fbbf24;"></i> Rate 5 Stars</div>
+    <div class="sb-item" onclick="showPrivacy()"><i class="fa-solid fa-shield-halved ico" style="color:#60a5fa;"></i> Privacy Policy</div>
+  </div>
+
+  <div class="sb-footer">
+    <div class="sb-version" id="sbVersionBtn" onclick="handleSecretTap()">AnRu Focus v2.0</div>
+  </div>
 </div>
 
+<!-- Secret Admin Password Modal -->
+<div class="modal-overlay" id="adminPassModal">
+  <div class="modal-box glass2" style="max-width:300px; text-align:center;">
+    <button class="modal-close" onclick="document.getElementById('adminPassModal').classList.remove('open')"><i class="fa-solid fa-xmark"></i></button>
+    <div style="font-size:30px; margin-bottom:10px;"><i class="fa-solid fa-user-secret" style="color:var(--textSub)"></i></div>
+    <div class="modal-title">Developer Access</div>
+    <div class="inp-wrap" style="text-align:left;">
+      <span class="ico"><i class="fa-solid fa-key" style="color: var(--warn);"></i></span>
+      <input type="password" id="adminPassInput" placeholder="Enter Secret Code">
+    </div>
+    <button class="btn btn-grad" style="background:var(--danger)" onclick="verifyAdmin()">Unlock System</button>
+  </div>
+</div>
+
+<!-- Admin Dashboard Modal -->
+<div class="modal-overlay" id="adminDashModal">
+  <div class="modal-box glass2" style="max-width:400px; max-height:80vh;">
+    <button class="modal-close" onclick="document.getElementById('adminDashModal').classList.remove('open')"><i class="fa-solid fa-xmark"></i></button>
+    <div class="modal-title" style="color:var(--warn)"><i class="fa-solid fa-crown"></i> Admin Command Center</div>
+    <div class="sb-label" style="margin-top:0">User Feedbacks & Bugs</div>
+    <div id="adminFeedbackList" class="scroll-hide" style="max-height: 50vh; overflow-y: auto;">
+      <div style="text-align:center; color:#888; font-size:12px; margin-top:20px;">Fetching logs from cloud... <i class="fa-solid fa-cloud"></i></div>
+    </div>
+  </div>
+</div>
+
+<!-- ██████ SCRIPTS ██████ -->
 <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
 
 <script src="app.js"></script>
 <script src="anru-ai.js"></script>
+<script src="ai-scanner.js"></script>
+<script src="sidebar.js"></script>
 
-<!-- 🚀 Quick Study Advanced Sound Script -->
+<!-- Quick Study Advanced Sound Script -->
 <script>
     const qsClickSound = new Audio('https://assets.mixkit.co/sfx/preview/mixkit-sci-fi-click-900.mp3');
     const qsHoverSound = new Audio('https://assets.mixkit.co/sfx/preview/mixkit-fast-small-sweep-transition-166.mp3');
-    
-    qsClickSound.load();
-    qsHoverSound.load();
-
+    qsClickSound.load(); qsHoverSound.load();
     function playQsHover() {
-        qsHoverSound.volume = 0.2;
-        qsHoverSound.currentTime = 0;
+        qsHoverSound.volume = 0.2; qsHoverSound.currentTime = 0;
         let playPromise = qsHoverSound.play();
         if (playPromise !== undefined) { playPromise.catch(e => { }); }
     }
-    
     function playQsClick(url) {
-        qsClickSound.volume = 1.0;
-        qsClickSound.currentTime = 0;
+        qsClickSound.volume = 1.0; qsClickSound.currentTime = 0;
         let playPromise = qsClickSound.play();
         if (playPromise !== undefined) { playPromise.catch(e => { console.log("Sound blocked by browser"); }); }
         if (navigator.vibrate) { navigator.vibrate(40); }
         setTimeout(() => { window.location.href = url; }, 300); 
     }
 </script>
+
 <script>
   if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('sw.js')
-      .then(() => console.log('Service Worker Registered'));
+    navigator.serviceWorker.register('sw.js').then(() => console.log('Service Worker Registered'));
   }
 </script>
 
