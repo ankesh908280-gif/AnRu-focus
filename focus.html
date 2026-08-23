@@ -5,55 +5,51 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>AnRu Focus Engine</title>
   
-  <!-- Premium Fonts & Icons -->
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <link rel="stylesheet" href="focus.css">
 </head>
 <body>
 
-  <!-- Ambient Background Glows -->
   <div class="ambient-light light-top-left"></div>
   <div class="ambient-light light-bottom-right"></div>
 
+  <!-- FIXED PREMIUM HEADER (Color matching body background) -->
+  <header class="f-header">
+    <div class="f-header-content">
+      <div class="f-header-left">
+        <a href="index.html" class="f-icon-btn f-back-btn"><i class="fa-solid fa-chevron-left"></i></a>
+        
+        <div class="f-brand">
+          <svg class="f-logo" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M12 2L2 22H6L12 10L18 22H22L12 2Z" fill="url(#logo-gradient)"/>
+            <defs>
+              <linearGradient id="logo-gradient" x1="0" y1="0" x2="24" y2="24">
+                <stop stop-color="#c084fc"/><stop offset="1" stop-color="#3b82f6"/>
+              </linearGradient>
+            </defs>
+          </svg>
+          <div class="f-brand-text">
+            <h1>AnRu <span>Focus</span></h1>
+            <p>Stay Focused • Achieve More</p>
+          </div>
+        </div>
+      </div>
+      
+      <div class="f-header-right">
+        <div class="f-user-avatar">
+          <img src="https://ui-avatars.com/api/?name=User&background=a855f7&color=fff" alt="User Avatar" id="user-avatar-img">
+          <div class="f-premium-crown"><i class="fa-solid fa-crown"></i></div>
+        </div>
+      </div>
+    </div>
+  </header>
+
   <div class="focus-layout">
     
-    <!-- ==========================================
-         LEFT COLUMN (MAIN TIMER) 
-    =========================================== -->
+    <!-- LEFT COLUMN (MAIN TIMER) -->
     <div class="focus-left">
       
-      <!-- 1. FIXED/STICKY HEADER -->
-      <header class="f-header">
-        <div class="f-header-left">
-          <!-- Back button to Main App Hub -->
-          <a href="index.html" class="f-icon-btn f-back-btn"><i class="fa-solid fa-chevron-left"></i></a>
-          
-          <div class="f-brand">
-            <svg class="f-logo" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M12 2L2 22H6L12 10L18 22H22L12 2Z" fill="url(#logo-gradient)"/>
-              <defs>
-                <linearGradient id="logo-gradient" x1="0" y1="0" x2="24" y2="24">
-                  <stop stop-color="#a855f7"/><stop offset="1" stop-color="#3b82f6"/>
-                </linearGradient>
-              </defs>
-            </svg>
-            <div class="f-brand-text">
-              <h1>AnRu <span>Focus</span></h1>
-              <p>Stay Focused • Achieve More</p>
-            </div>
-          </div>
-        </div>
-        
-        <div class="f-header-right">
-          <div class="f-user-avatar">
-            <img src="https://ui-avatars.com/api/?name=User&background=a855f7&color=fff" alt="User Avatar" id="user-avatar-img">
-            <div class="f-premium-crown"><i class="fa-solid fa-crown"></i></div>
-          </div>
-        </div>
-      </header>
-
-      <!-- 2. MODE TABS INSIDE A BOX -->
       <div class="f-mode-wrapper">
         <div class="f-mode-tabs">
           <button class="f-tab active" data-mode="focus" onclick="setMode('focus', this)">
@@ -71,24 +67,20 @@
         </div>
       </div>
 
-      <!-- 🌟 THE ULTIMATE NEON TIMER RING 🌟 -->
       <div class="f-timer-wrapper">
         
-        <!-- 4. BIGGER 3D GLOWING PLATFORM WITH RAISED CENTER -->
         <div class="f-timer-platform">
           <div class="f-platform-glow"></div>
           <div class="f-platform-ring r1"></div>
           <div class="f-platform-ring r2"></div>
-          <div class="f-platform-core"></div> <!-- Raised Center -->
+          <div class="f-platform-core"></div>
         </div>
 
-        <!-- Timer Ring System -->
         <div class="f-timer-ring-container">
           
-          <!-- Deep Background Glow -->
           <div class="f-ring-bg-glow"></div>
 
-          <!-- 3. CIRCULAR COMET LIGHT TRAILS (OPPOSITE DIRECTION) -->
+          <!-- FIXED CIRCULAR COMET LIGHT TRAILS -->
           <div class="f-orbits">
             <div class="f-comet-system orange-comet">
               <div class="comet-tail"></div>
@@ -100,7 +92,6 @@
             </div>
           </div>
 
-          <!-- Main SVG Progress Ring -->
           <svg class="f-ring-svg" viewBox="0 0 340 340">
             <defs>
               <linearGradient id="ring-neon-gradient" x1="0%" y1="100%" x2="100%" y2="0%">
@@ -114,13 +105,10 @@
             <circle class="f-svg-progress" id="main-timer-ring" cx="170" cy="170" r="150"></circle>
           </svg>
 
-          <!-- Center Timer Content -->
           <div class="f-timer-inner">
             <div class="f-timer-icon"><i class="fa-solid fa-brain"></i></div>
             <div class="f-timer-label">Focus Time</div>
-            <!-- Gradient Text -->
             <div class="f-timer-time text-gradient" id="main-time-display">25:00</div>
-            <!-- Small Start Button -->
             <button class="f-timer-btn" id="main-play-btn" onclick="toggleTimer()">
               <i class="fa-solid fa-play"></i> Start Focus
             </button>
@@ -129,7 +117,6 @@
         </div>
       </div>
 
-      <!-- 5. PRESETS MOVED DOWN (Margin handled in CSS) -->
       <div class="f-presets-row">
         <div class="f-preset-card active" onclick="setPreset(25, this, 'focus')">
           <div class="f-preset-icon icon-purple"><i class="fa-solid fa-bolt"></i></div>
@@ -157,7 +144,6 @@
         </div>
       </div>
 
-      <!-- 6. GLOWING PROGRESS BAR -->
       <div class="f-progress-card">
         <div class="f-prog-header">
           <div class="f-prog-title"><i class="fa-solid fa-chart-column"></i> Today's Progress</div>
@@ -168,15 +154,13 @@
         </div>
         <div class="f-prog-footer">
           <div class="f-prog-time" id="daily-time-text" style="display: none;"><i class="fa-regular fa-clock"></i> 0h 0m</div>
-          <div class="f-prog-pct" id="ui-sess-pct">0%</div>
+          <div class="f-prog-pct glow-pct" id="ui-sess-pct">0%</div>
         </div>
       </div>
 
     </div>
 
-    <!-- ==========================================
-         RIGHT COLUMN (ANALYTICS) 
-    =========================================== -->
+    <!-- RIGHT COLUMN (ANALYTICS) -->
     <div class="focus-right">
       
       <header class="f-right-header">
@@ -185,7 +169,6 @@
         <button class="f-icon-btn-transparent"><i class="fa-solid fa-gear"></i></button>
       </header>
 
-      <!-- Today's Focus Overview -->
       <div class="f-glass-card f-today-focus">
         <div class="f-tf-left">
           <div class="f-tf-icon"><i class="fa-regular fa-calendar-check"></i></div>
@@ -217,28 +200,30 @@
         </div>
       </div>
 
-      <!-- 7. GLOWING ANALYTICS CHART WITH MONTH/YEAR -->
       <div class="f-glass-card f-chart-card">
         <div class="f-chart-header">
           <div>
             <div class="f-chart-title"><i class="fa-solid fa-chart-simple"></i> Focus Analytics</div>
-            <!-- Month & Year Added -->
-            <div class="f-chart-date" id="ui-chart-date-range" style="font-size:11px; color:var(--textMuted); margin-top:2px;">Month Year</div>
+            <div class="f-chart-date" id="ui-chart-date-range" style="font-size:11px; color:var(--text-muted); margin-top:2px;">Month Year</div>
           </div>
-          <div class="f-chart-dropdown">This Week <i class="fa-solid fa-chevron-down"></i></div>
+          
+          <select id="chart-timeframe" class="f-chart-select" onchange="renderAnalytics()">
+            <option value="weekly">This Week</option>
+            <option value="monthly">This Month</option>
+            <option value="yearly">This Year</option>
+          </select>
         </div>
         
         <div class="f-chart-body">
-          <div class="f-chart-y-axis">
+          <div class="f-chart-y-axis" id="ui-chart-y-axis">
             <span>3h</span><span>2h</span><span>1h</span><span>0m</span>
           </div>
           <div class="f-chart-bars-area" id="ui-weekly-chart">
-            <!-- JS will inject glowing bars here -->
+            <!-- JS will inject dynamic glowing bars here -->
           </div>
         </div>
       </div>
 
-      <!-- 8. MINI STATS STRICTLY IN ONE LINE -->
       <div class="f-mini-stats-row">
         <div class="f-glass-card f-mini-stat">
           <div class="f-ms-icon ms-orange"><i class="fa-solid fa-fire"></i></div>
@@ -254,12 +239,11 @@
           <div class="f-ms-info">
             <div class="f-ms-head">Total Sessions <i class="fa-regular fa-calendar text-muted"></i></div>
             <div class="f-ms-val" id="ui-total-sess">0</div>
-            <div class="f-ms-sub">This Week</div>
+            <div class="f-ms-sub" id="ui-total-sess-sub">This Week</div>
           </div>
         </div>
       </div>
 
-      <!-- Session History -->
       <div class="f-history-section">
         <div class="f-history-header">
           <h3>Session History</h3>
