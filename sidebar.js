@@ -79,7 +79,7 @@ function shareApp() {
     const shareData = {
         title: 'AnRu Focus App',
         text: 'Bhai, main AnRu Focus app par padhai kar raha hu. Backlogs crush karne ka best AI tool hai! Tu bhi try kar 🚀',
-        url: LINK_PORTFOLIO 
+        url: "https://ankesh908280-gif.github.io/AnRu-focus/" 
     };
 
     if (navigator.share && navigator.canShare && navigator.canShare(shareData)) {
