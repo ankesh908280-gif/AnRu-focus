@@ -646,6 +646,23 @@
   </div>
 </div>
 
+  <!-- Feedback & Bug Report Modal -->
+<div class="modal-overlay" id="feedbackModal">
+  <div class="modal-box glass2" style="max-width:320px; text-align:center; padding:24px;">
+    <button class="modal-close" onclick="document.getElementById('feedbackModal').classList.remove('open')"><i class="fa-solid fa-xmark"></i></button>
+    <div style="font-size:36px; margin-bottom:10px;"><i class="fa-solid fa-bug" style="color:#f87171"></i></div>
+    <div class="modal-title" style="font-size:20px; margin-bottom:6px;">Report Bug / Feedback</div>
+    <p style="font-size:12px; color:var(--textSub); margin-bottom:15px;">App me koi problem hai ya naya feature chahiye? Yahan likho.</p>
+    
+    <div class="inp-wrap area" style="text-align:left; border: none; padding: 0;">
+      <textarea id="fbMessage" rows="4" placeholder="Describe the issue or feature request..." style="width:100%; border-radius:12px; padding:12px; background:rgba(0,0,0,0.3); color:#fff; border:1px solid rgba(255,255,255,0.1); outline:none; resize:none; font-family:'Outfit', sans-serif; font-size:13px;"></textarea>
+    </div>
+    
+    <button class="btn btn-grad" style="width:100%; border-radius:12px; padding:12px; margin-top:10px;" onclick="submitFeedback()">Send to Developer <i class="fa-solid fa-paper-plane"></i></button>
+  </div>
+</div>
+
+
 <!-- Secret Admin Password Modal -->
 <div class="modal-overlay" id="adminPassModal">
   <div class="modal-box glass2" style="max-width:300px; text-align:center;">
