@@ -1,18 +1,17 @@
 /* ████████████████████████████████████████████████████████████
-                  SIDEBAR & ADMIN SYSTEM (PRODUCTION BUILD)
+                  SIDEBAR & ADMIN SYSTEM (PURE FIREBASE)
 ████████████████████████████████████████████████████████████ */
 
-// ⚙️ 1. EASY CONFIGURATION (CHANGE LINKS & PASSWORD HERE)
+// ⚙️ 1. EASY CONFIGURATION 
 const ADMIN_PASSWORD = "Rukmani";
 const LINK_INSTA = "https://www.instagram.com/ankesh_2427?igsh=MWIzODMyeHl3bXRkMQ==";
 const LINK_TELEGRAM = "https://t.me/ankesh2427";
 const LINK_YOUTUBE = "https://youtube.com/@airaiderff?si=iBkDqki4TZpWeMMn";
 const LINK_PORTFOLIO = "https://anru-editz.netlify.app/";
 
-// 🔥 MAIN APP SHARE LINK (GitHub URL)
+// 🔥 MAIN APP SHARE LINK
 const LINK_APP_SHARE = "https://ankesh908280-gif.github.io/AnRu-focus/"; 
 
-// ⚙️ Set Links on Load
 document.addEventListener("DOMContentLoaded", () => {
     const iLink = document.getElementById('linkInsta'); if(iLink) iLink.href = LINK_INSTA;
     const tLink = document.getElementById('linkTele'); if(tLink) tLink.href = LINK_TELEGRAM;
@@ -81,7 +80,7 @@ function showPrivacy() {
 }
 
 // ==========================================
-// 3. IN-APP FEEDBACK SYSTEM (Firebase)
+// 3. PURE FIREBASE FEEDBACK SYSTEM
 // ==========================================
 function openFeedbackModal() {
     closeSidebar();
@@ -102,16 +101,17 @@ async function submitFeedback() {
         return;
     }
     
-    if(typeof showToast === 'function') showToast("Sending to Developer... 🚀");
+    if(typeof showToast === 'function') showToast("Sending to Cloud... 🚀");
     
     const userEmail = (typeof S !== 'undefined' && S.session && S.session.email) ? S.session.email : "Guest";
     const userName = (typeof S !== 'undefined' && S.session && S.session.name) ? S.session.name : "Guest User";
     
     try {
         if (typeof db === 'undefined' || typeof firebase === 'undefined') {
-            throw new Error("Firebase DB not initialized in app.js");
+            throw new Error("Firebase is not initialized in your app.js");
         }
 
+        // ORIGINAL FIREBASE PUSH
         await db.collection('feedbacks').add({
             name: userName,
             email: userEmail,
@@ -124,16 +124,18 @@ async function submitFeedback() {
         if(fbModal) fbModal.classList.remove('open');
         
         try { if(typeof playSfx === 'function') playSfx('success'); } catch(e){}
-        if(typeof showToast === 'function') showToast("Feedback Sent! Thank you 💖", "success");
+        if(typeof showToast === 'function') showToast("Report Sent Successfully! 💖", "success");
+
     } catch (error) {
-        console.error("Feedback Error:", error);
+        console.error("Firebase Error:", error);
         try { if(typeof playSfx === 'function') playSfx('error'); } catch(e){}
-        if(typeof showToast === 'function') showToast("Network Error! Ensure internet is on.", "error");
+        // 🔥 Now you will see the exact Firebase error on your screen
+        if(typeof showToast === 'function') showToast("Error: " + error.message, "error");
     }
 }
 
 // ==========================================
-// 4. SECRET ADMIN SYSTEM (JAMES BOND MODE)
+// 4. SECRET ADMIN SYSTEM 
 // ==========================================
 let tapCount = 0;
 let tapTimer = null;
@@ -207,7 +209,7 @@ async function openAdminDashboard() {
         listDiv.innerHTML = html;
         
     } catch(error) {
-        listDiv.innerHTML = '<div style="text-align:center; color:var(--danger); font-size:13px; margin-top:20px;">Error fetching data!</div>';
+        listDiv.innerHTML = `<div style="text-align:center; color:var(--danger); font-size:13px; margin-top:20px; line-height:1.4;">Error Fetching Data! <br><br> ${error.message}</div>`;
         console.error("Admin Fetch Error:", error);
     }
 }
