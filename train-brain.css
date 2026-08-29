@@ -1,0 +1,110 @@
+/* ████████████████████████████████████████████████████████████
+      TRAIN YOUR BRAIN - PREMIUM STYLES (ANRU FOCUS)
+████████████████████████████████████████████████████████████ */
+
+/* --- Layout & Navigation --- */
+.tb-body { margin: 0; overflow-x: hidden; display: flex; flex-direction: column; min-height: 100vh; }
+.tb-container { flex: 1; position: relative; overflow: hidden; display: flex; flex-direction: column; }
+.tb-nav { display: flex; align-items: center; justify-content: space-between; padding: 16px 20px; background: rgba(15,12,41,0.8); backdrop-filter: blur(20px); border-bottom: 1px solid var(--glassBorder); z-index: 100; position: sticky; top: 0; }
+.tb-back-btn { background: rgba(255,255,255,0.1); border: none; width: 36px; height: 36px; border-radius: 50%; color: #fff; font-size: 16px; cursor: pointer; transition: 0.3s; display: flex; justify-content: center; align-items: center; }
+.tb-back-btn:hover { background: var(--p1); transform: translateX(-3px); }
+.tb-nav-title { font-family: 'Playfair Display', serif; font-size: 18px; font-weight: 800; display: flex; align-items: center; gap: 8px; }
+.tb-stars-pill { background: rgba(251,191,36,0.15); border: 1px solid rgba(251,191,36,0.3); padding: 6px 14px; border-radius: 20px; font-weight: 800; color: #fbbf24; font-size: 14px; display: flex; align-items: center; gap: 6px; box-shadow: 0 0 10px rgba(251,191,36,0.2); }
+
+/* --- Screens Handling --- */
+.tb-screen { display: none; flex-direction: column; flex: 1; padding: 20px; max-width: 500px; margin: 0 auto; width: 100%; animation: screenIn 0.4s ease forwards; }
+.tb-screen.active { display: flex; }
+@keyframes screenIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+
+/* --- 1. LOADER SCREEN --- */
+#screen-loader { justify-content: center; align-items: center; text-align: center; }
+.tb-main-heading { font-family: 'Playfair Display', serif; font-size: 32px; background: var(--grad); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 5px; }
+.tb-sub-heading { color: var(--textMuted); font-size: 14px; margin-bottom: 40px; }
+
+.brain-radar-container { position: relative; width: 150px; height: 150px; display: flex; justify-content: center; align-items: center; margin-bottom: 40px; }
+.brain-center-icon { font-size: 50px; color: #f472b6; position: relative; z-index: 10; animation: brainPulse 2s infinite alternate; }
+.radar-ring { position: absolute; border-radius: 50%; border: 2px dashed rgba(168,85,247,0.5); box-sizing: border-box; top: 50%; left: 50%; transform: translate(-50%, -50%); animation: radarExpand 3s linear infinite; }
+.r1 { width: 60px; height: 60px; animation-delay: 0s; border-style: solid; border-color: rgba(96,165,250,0.6); }
+.r2 { width: 100px; height: 100px; animation-delay: 1s; }
+.r3 { width: 140px; height: 140px; animation-delay: 2s; border-color: rgba(248,113,113,0.3); }
+
+@keyframes brainPulse { 0% { transform: scale(0.95); filter: drop-shadow(0 0 10px rgba(244,114,182,0.4)); } 100% { transform: scale(1.05); filter: drop-shadow(0 0 25px rgba(244,114,182,0.8)); } }
+@keyframes radarExpand { 0% { width: 50px; height: 50px; opacity: 1; } 100% { width: 250px; height: 250px; opacity: 0; } }
+
+.sync-text { font-size: 16px; font-weight: 700; color: var(--p1); margin-bottom: 15px; animation: pulseText 1.5s infinite; }
+.tb-progress-container { width: 80%; background: rgba(255,255,255,0.1); height: 6px; border-radius: 6px; overflow: hidden; margin: 0 auto; }
+.tb-progress-bar { height: 100%; width: 0%; background: var(--grad); transition: width 0.3s; }
+
+/* --- 2. SETUP SCREEN & SHOP BUTTON --- */
+.setup-card { padding: 25px 20px; }
+.setup-header { text-align: center; margin-bottom: 24px; }
+.setup-header h3 { font-family: 'Playfair Display', serif; font-size: 22px; margin: 10px 0 5px; color: #fff; }
+.setup-header p { font-size: 12px; color: var(--textMuted); }
+
+.btn-magic-shop { width: 100%; background: linear-gradient(90deg, rgba(168,85,247,0.15), rgba(236,72,153,0.15)); border: 1px solid rgba(168,85,247,0.3); border-radius: 14px; padding: 14px 16px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; margin-bottom: 24px; color: #fff; font-family: 'Outfit'; font-weight: 700; transition: 0.3s; box-shadow: 0 5px 15px rgba(168,85,247,0.15); }
+.btn-magic-shop:hover { background: linear-gradient(90deg, rgba(168,85,247,0.25), rgba(236,72,153,0.25)); transform: translateY(-2px); }
+
+.setup-section { margin-bottom: 20px; }
+.sec-label { font-size: 11px; font-weight: 800; color: var(--textMuted); letter-spacing: 1px; margin-bottom: 10px; display: flex; align-items: center; gap: 6px; }
+.opt-group { display: flex; gap: 8px; background: rgba(0,0,0,0.2); padding: 6px; border-radius: 12px; border: 1px solid var(--glassBorder); }
+.opt-btn { flex: 1; padding: 10px 0; background: transparent; border: 1px solid transparent; color: var(--textSub); font-family: 'Outfit'; font-size: 13px; font-weight: 600; border-radius: 8px; cursor: pointer; transition: 0.3s; }
+.opt-btn.active { background: rgba(255,255,255,0.1); border-color: var(--p1); color: #fff; box-shadow: 0 4px 10px rgba(102,126,234,0.2); transform: scale(1.02); }
+.topic-group { flex-wrap: wrap; }
+.topic-btn { font-size: 16px; padding: 10px 0; min-width: 45px; }
+
+.start-btn { margin-top: 10px; padding: 16px; font-size: 16px; border-radius: 14px; }
+
+/* --- 3. ARENA SCREEN --- */
+.arena-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+.q-counter { background: rgba(255,255,255,0.1); padding: 6px 14px; border-radius: 20px; font-size: 13px; font-weight: 800; }
+.arena-stars { font-size: 16px; font-weight: 800; color: #fbbf24; }
+
+.question-board { padding: 40px 20px; text-align: center; margin-bottom: 20px; border-color: rgba(102,126,234,0.3); box-shadow: 0 10px 30px rgba(0,0,0,0.3); }
+.q-text { font-family: 'Playfair Display', serif; font-size: 42px; font-weight: 900; letter-spacing: 2px; }
+
+.options-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 25px; }
+.ans-btn { padding: 20px; font-size: 22px; font-weight: 800; color: #fff; background: rgba(255,255,255,0.05); border: 2px solid rgba(255,255,255,0.1); border-radius: 14px; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; justify-content: center; }
+.ans-btn:active { transform: scale(0.95); }
+
+/* Option States */
+.ans-btn.correct { background: rgba(74,222,128,0.2) !important; border-color: var(--success) !important; color: var(--success) !important; box-shadow: 0 0 20px rgba(74,222,128,0.4); }
+.ans-btn.wrong { background: rgba(248,113,113,0.2) !important; border-color: var(--danger) !important; color: var(--danger) !important; box-shadow: 0 0 20px rgba(248,113,113,0.4); animation: shake 0.4s; }
+
+@keyframes shake { 0%,100%{transform:translateX(0);} 25%{transform:translateX(-5px);} 50%{transform:translateX(5px);} 75%{transform:translateX(-5px);} }
+
+.timer-section { margin-bottom: 20px; }
+.timer-track { width: 100%; height: 8px; background: rgba(255,255,255,0.1); border-radius: 4px; overflow: hidden; }
+.timer-fill { height: 100%; width: 100%; background: linear-gradient(90deg, #4ade80, #3b82f6, #a855f7); transition: width 0.1s linear, background 0.5s ease; }
+.timer-fill.danger { background: var(--danger); box-shadow: 0 0 10px var(--danger); }
+
+/* In-game Inventory */
+.arena-inventory { padding: 12px; display: flex; gap: 10px; justify-content: center; border-radius: 14px; border: 1px dashed rgba(255,255,255,0.2); }
+.inv-item-btn { width: 45px; height: 45px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.2); background: rgba(0,0,0,0.4); color: #fff; font-size: 18px; cursor: pointer; position: relative; transition: 0.3s; display:flex; justify-content:center; align-items:center; }
+.inv-item-btn:hover { background: rgba(255,255,255,0.15); transform: translateY(-3px); border-color: var(--warn); }
+.inv-item-btn:active { transform: scale(0.9); }
+.inv-item-btn.used { opacity: 0.3; pointer-events: none; filter: grayscale(1); }
+.inv-badge { position: absolute; top: -5px; right: -5px; background: var(--p1); font-size: 9px; padding: 2px 5px; border-radius: 10px; font-weight: 800; border: 1px solid #000; }
+
+/* --- 4. RESULT & LEADERBOARD --- */
+.result-card { padding: 30px 20px; text-align: center; }
+.res-score { font-family: 'Playfair Display', serif; font-size: 50px; font-weight: 900; color: var(--p1); margin-bottom: 5px; text-shadow: 0 0 20px rgba(102,126,234,0.4); }
+
+.leaderboard-list { max-height: 250px; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; margin-bottom: 10px; text-align: left; }
+.lb-item { display: flex; align-items: center; padding: 12px 14px; background: rgba(0,0,0,0.2); border: 1px solid var(--glassBorder); border-radius: 12px; gap: 12px; }
+.lb-rank { width: 30px; height: 30px; border-radius: 50%; background: rgba(255,255,255,0.1); display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 800; flex-shrink: 0; }
+.lb-item.rank-1 { background: linear-gradient(135deg, rgba(251,191,36,0.15), transparent); border-color: rgba(251,191,36,0.4); }
+.lb-item.rank-1 .lb-rank { background: #fbbf24; color: #000; box-shadow: 0 0 10px rgba(251,191,36,0.5); }
+.lb-item.rank-2 { background: linear-gradient(135deg, rgba(148,163,184,0.15), transparent); border-color: rgba(148,163,184,0.4); }
+.lb-item.rank-2 .lb-rank { background: #94a3b8; color: #000; }
+.lb-item.rank-3 { background: linear-gradient(135deg, rgba(217,119,6,0.15), transparent); border-color: rgba(217,119,6,0.4); }
+.lb-item.rank-3 .lb-rank { background: #d97706; color: #fff; }
+
+.lb-name { flex: 1; font-size: 14px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.lb-score { font-size: 16px; font-weight: 800; color: #fbbf24; font-family: 'Outfit'; }
+
+/* Magic Shop Item Styles */
+.m-shop-item { display:flex; align-items:center; gap:12px; background:rgba(0,0,0,0.3); border:1px solid rgba(255,255,255,0.1); padding:12px; border-radius:12px; text-align:left;}
+.m-shop-icon { font-size:24px; width:40px; text-align:center; }
+.m-shop-details { flex:1; }
+.m-shop-title { font-size:14px; font-weight:700; color:#fff; margin-bottom:2px; }
+.m-shop-desc { font-size:11px; color:var(--textMuted); line-height:1.2; }

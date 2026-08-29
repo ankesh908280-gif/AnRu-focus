@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+  <title>Train Your Brain - AnRu Focus</title>
+  
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=Playfair+Display:wght@700;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+  <!-- तुम्हारी मेन CSS और इस गेम की स्पेशल CSS -->
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="train-brain.css">
+</head>
+<body class="tb-body">
+
+  <!-- 🟢 TOP NAVIGATION -->
+  <div class="tb-nav">
+    <button class="tb-back-btn" onclick="window.location.href='index.html'"><i class="fa-solid fa-arrow-left"></i></button>
+    <div class="tb-nav-title"><i class="fa-solid fa-brain" style="color: #f472b6;"></i> Train Your Brain</div>
+    <div class="tb-stars-pill"><i class="fa-solid fa-star" style="color: #fbbf24;"></i> <span id="tbGlobalStars">0</span></div>
+  </div>
+
+  <div class="tb-container">
+
+    <!-- 🟢 SCREEN 1: LOADER (Syncing Neurons) -->
+    <div id="screen-loader" class="tb-screen active">
+      <h2 class="tb-main-heading">Train Your Brain</h2>
+      <p class="tb-sub-heading">Get ready to sharpen your skills</p>
+      
+      <div class="brain-radar-container">
+        <div class="radar-ring r1"></div>
+        <div class="radar-ring r2"></div>
+        <div class="radar-ring r3"></div>
+        <i class="fa-solid fa-brain brain-center-icon"></i>
+      </div>
+      
+      <div class="sync-text">Syncing neurons...</div>
+      <div class="tb-progress-container"><div class="tb-progress-bar" id="loaderBar"></div></div>
+    </div>
+
+    <!-- 🟢 SCREEN 2: MISSION SETUP & MAGIC SHOP -->
+    <div id="screen-setup" class="tb-screen">
+      <div class="setup-card glass2">
+        <div class="setup-header">
+          <i class="fa-solid fa-gamepad" style="font-size:30px; color:var(--textSub);"></i>
+          <h3>Mission Setup</h3>
+          <p>Choose your challenge and get ready to train your brain!</p>
+        </div>
+
+        <!-- Magic Shop Button -->
+        <button class="btn-magic-shop" onclick="openMagicShop()">
+          <div style="display:flex; align-items:center; gap:8px;">
+            <i class="fa-solid fa-wand-magic-sparkles" style="color:#fbbf24;"></i>
+            <span>Magic Power-Ups</span>
+          </div>
+          <div style="font-size:11px; background:rgba(0,0,0,0.3); padding:4px 8px; border-radius:10px;">
+            <i class="fa-solid fa-bolt" style="color:#4ade80;"></i> <span id="userXpDisplay">0 XP</span>
+          </div>
+        </button>
+
+        <div class="setup-section">
+          <div class="sec-label"><i class="fa-solid fa-bolt" style="color:#fbbf24;"></i> DIFFICULTY</div>
+          <div class="opt-group" id="diffGroup">
+            <button class="opt-btn active" onclick="selectOpt('diff', 'Easy')">Easy</button>
+            <button class="opt-btn" onclick="selectOpt('diff', 'Medium')">Medium</button>
+            <button class="opt-btn" onclick="selectOpt('diff', 'Hard')">Hard</button>
+          </div>
+        </div>
+
+        <div class="setup-section">
+          <div class="sec-label"><i class="fa-solid fa-bullseye" style="color:#f87171;"></i> QUESTIONS</div>
+          <div class="opt-group" id="qGroup">
+            <button class="opt-btn active" onclick="selectOpt('qCount', 5)">5</button>
+            <button class="opt-btn" onclick="selectOpt('qCount', 10)">10</button>
+            <button class="opt-btn" onclick="selectOpt('qCount', 15)">15</button>
+            <button class="opt-btn" onclick="selectOpt('qCount', 20)">20</button>
+          </div>
+        </div>
+
+        <div class="setup-section">
+          <div class="sec-label"><i class="fa-solid fa-calculator" style="color:#60a5fa;"></i> TOPICS (Multi-select)</div>
+          <div class="opt-group topic-group" id="topicGroup">
+            <button class="opt-btn topic-btn active" onclick="toggleTopic('+')">+</button>
+            <button class="opt-btn topic-btn" onclick="toggleTopic('-')">-</button>
+            <button class="opt-btn topic-btn" onclick="toggleTopic('*')">×</button>
+            <button class="opt-btn topic-btn" onclick="toggleTopic('/')">÷</button>
+          </div>
+        </div>
+
+        <button class="btn btn-grad start-btn" onclick="startTraining()">
+          <i class="fa-solid fa-rocket"></i> Start Training
+        </button>
+      </div>
+    </div>
+
+    <!-- 🟢 SCREEN 3: ACTIVE ARENA (Quiz) -->
+    <div id="screen-arena" class="tb-screen">
+      <div class="arena-header">
+        <div class="q-counter" id="qCounter">1 / 5</div>
+        <div class="arena-stars"><i class="fa-solid fa-star" style="color:#fbbf24;"></i> <span id="currentRunStars">0</span></div>
+      </div>
+
+      <div class="question-board glass2">
+        <div class="q-text" id="questionText">-- + -- = ?</div>
+      </div>
+
+      <div class="options-grid" id="optionsGrid">
+        <button class="ans-btn glass" onclick="checkAnswer(0)" id="opt0">--</button>
+        <button class="ans-btn glass" onclick="checkAnswer(1)" id="opt1">--</button>
+        <button class="ans-btn glass" onclick="checkAnswer(2)" id="opt2">--</button>
+        <button class="ans-btn glass" onclick="checkAnswer(3)" id="opt3">--</button>
+      </div>
+
+      <div class="timer-section">
+        <div style="display:flex; justify-content:space-between; font-size:11px; font-weight:800; color:var(--textMuted); margin-bottom:8px; text-transform:uppercase;">
+          <span>Time Left</span> <span id="timeText">5.0s</span>
+        </div>
+        <div class="timer-track"><div class="timer-fill" id="timerBar"></div></div>
+      </div>
+
+      <!-- Inventory for Active Match -->
+      <div class="arena-inventory glass" id="arenaInventory">
+        <!-- Magic Items will load here dynamically -->
+      </div>
+    </div>
+
+    <!-- 🟢 SCREEN 4: RESULT & LEADERBOARD -->
+    <div id="screen-result" class="tb-screen">
+      <div class="result-card glass2">
+        <div style="font-size:40px; margin-bottom:10px;">🏁</div>
+        <div class="res-score" id="resScore">5 / 5</div>
+        <div style="font-size:14px; font-weight:700; color:var(--textMuted); letter-spacing:2px; text-transform:uppercase; margin-bottom:20px;">Training Complete</div>
+        
+        <button class="btn btn-grad" style="margin-bottom:30px; border-radius:30px; font-size:16px;" onclick="goToSetup()">
+          Train <i class="fa-solid fa-brain"></i> Again
+        </button>
+
+        <div style="display:flex; align-items:center; justify-content:center; gap:10px; margin-bottom:15px; font-family:'Playfair Display',serif; font-size:22px; font-weight:900;">
+          <i class="fa-solid fa-trophy" style="color:#fbbf24;"></i> Leaderboard
+        </div>
+
+        <div class="leaderboard-list scroll-hide" id="leaderboardList">
+          <div style="text-align:center; padding:20px; color:var(--textMuted); font-size:13px;">
+            <i class="fa-solid fa-circle-notch fa-spin"></i> Fetching Ranks...
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- 🟢 MAGIC SHOP MODAL -->
+  <div class="modal-overlay" id="magicShopModal">
+    <div class="modal-box glass2" style="max-width:380px;">
+      <button class="modal-close" onclick="document.getElementById('magicShopModal').classList.remove('open')"><i class="fa-solid fa-xmark"></i></button>
+      <div class="modal-title" style="color:var(--p3);"><i class="fa-solid fa-store"></i> Magic Power-Ups</div>
+      <p style="font-size:12px; color:var(--textMuted); margin-bottom:16px;">Apne Main App ke XP (<i class="fa-solid fa-bolt" style="color:#4ade80;"></i>) use karke game me power kharido!</p>
+      
+      <div id="shopList" style="display:flex; flex-direction:column; gap:10px;">
+        <!-- Items Injected via JS -->
+      </div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <!-- Firebase Scripts -->
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+  
+  <script src="train-brain.js"></script>
+</body>
+</html>
