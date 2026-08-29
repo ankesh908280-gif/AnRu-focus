@@ -28,7 +28,6 @@ const S={
 
 const EMOJIS=['fa-book', 'fa-microscope', 'fa-calculator', 'fa-ruler-combined', 'fa-globe', 'fa-laptop-code', 'fa-palette', 'fa-book-open', 'fa-dna', 'fa-flask', 'fa-file-signature', 'fa-music', 'fa-dumbbell', 'fa-network-wired', 'fa-telescope'];
 
-// 🔥 SMART MAPPING (Fixes Dropdowns & Legacy Data)
 const FA_TO_EMOJI = {'fa-book':'📚', 'fa-microscope':'🔬', 'fa-calculator':'🧮', 'fa-ruler-combined':'📐', 'fa-globe':'🌍', 'fa-laptop-code':'💻', 'fa-palette':'🎨', 'fa-book-open':'📖', 'fa-dna':'🧬', 'fa-flask':'⚗️', 'fa-file-signature':'📝', 'fa-music':'🎵', 'fa-dumbbell':'🏋️', 'fa-network-wired':'🌐', 'fa-telescope':'🔭', 'fa-folder':'📁'};
 const EMOJI_TO_FA = {'📚':'fa-book', '🔬':'fa-microscope', '🧮':'fa-calculator', '📐':'fa-ruler-combined', '🌍':'fa-globe', '💻':'fa-laptop-code', '🎨':'fa-palette', '📖':'fa-book-open', '🧬':'fa-dna', '⚗️':'fa-flask', '📝':'fa-file-signature', '🎵':'fa-music', '🏋️':'fa-dumbbell', '🌐':'fa-network-wired', '🔭':'fa-telescope', '📁':'fa-folder'};
 
@@ -139,7 +138,7 @@ window.onload = async () => {
             const doc = await db.collection('users').doc(S.session.email).get();
             if(doc.exists) {
                 loadDataFromObj(doc.data());
-                migrateLegacyData(); // 🔥 FIXED LEGACY ICONS HERE
+                migrateLegacyData(); 
                 renderAll(); updateShopUI();
             }
         } catch(e) { console.log("Network delay: Using local offline data."); }
@@ -157,7 +156,7 @@ function loadDataFromObj(data) {
     S.freezeDate = data.freezeDate || null; S.lastDrainDate = data.lastDrainDate || null; S.lastMissionDate = data.lastMissionDate || null;
     S.eyeStrain = data.eyeStrain || false; S.activeBuff = data.activeBuff || null;
     S.notif=JSON.parse(localStorage.getItem('mceo_notif')||'false'); S.sfx=JSON.parse(localStorage.getItem('mceo_sfx')||'true');
-    migrateLegacyData(); // 🔥 FIX APPLIED
+    migrateLegacyData();
 }
 
 function loadDataLocal(){
@@ -172,7 +171,7 @@ function loadDataLocal(){
   S.freezeDate=localStorage.getItem(key('freeze'))||null; S.lastDrainDate=localStorage.getItem(key('drain'))||null;
   S.lastMissionDate=localStorage.getItem(key('lastMissionDate'))||null;
   S.notif=JSON.parse(localStorage.getItem('mceo_notif')||'false'); S.sfx=JSON.parse(localStorage.getItem('mceo_sfx')||'true');
-  migrateLegacyData(); // 🔥 FIX APPLIED
+  migrateLegacyData();
 }
 
 async function saveToCloud() {
@@ -302,10 +301,16 @@ function guestLogin(){
    playSfx('success'); showToast('<i class="fa-solid fa-user-astronaut"></i> Guest mode mein ho! Data Cloud me save nahi hoga.','success');
 }
 
+// 🔥 BUG FIX: Safely stop timer & UI cleanup without crashing
 function doLogout(){
   if(!confirm('Logout karna chahte ho?'))return;
-  saveData(); S.session=null; localStorage.removeItem('mceo_sess'); stopTimer(); playSfx('click');
-  document.body.className = ''; document.getElementById('appScreen').classList.remove('active'); document.getElementById('loginScreen').classList.add('active'); showToast('<i class="fa-solid fa-hand-sparkles"></i> Phir milenge!');
+  saveData(); S.session=null; localStorage.removeItem('mceo_sess'); 
+  stopTimer(); // Safe version running below
+  playSfx('click');
+  document.body.className = ''; 
+  const appSc = document.getElementById('appScreen'); if(appSc) appSc.classList.remove('active'); 
+  const logSc = document.getElementById('loginScreen'); if(logSc) logSc.classList.add('active'); 
+  showToast('<i class="fa-solid fa-hand-sparkles"></i> Phir milenge!');
 }
 
 /* ████████████████████████████████████████████████████████████
@@ -591,7 +596,6 @@ function openEditTask(id){
   const t=S.tasks.find(x=>x.id===id); if(!t) return;
   modalEditingSubtasks = t.subtasks ? JSON.parse(JSON.stringify(t.subtasks)) : [];
   
-  // 🔥 FIX FOR DROPDOWN EMOJIS IN EDIT MODAL
   const opts=S.subjects.map(s=>{
       let emj = FA_TO_EMOJI[s.emoji] || '📁';
       return `<option value="${s.name}" ${s.name===t.subj?'selected':''}>${emj} ${s.name}</option>`;
@@ -664,7 +668,6 @@ function taskCard(t,mini=false){
   }
   let restoreBtn = mini ? `<button class="btn-sm" style="margin-top:10px; width:100%; background: rgba(74,222,128,0.2); color:var(--success); border:1px solid var(--success);" onclick="toggleBacklogVault(${t.id})"><i class="fa-solid fa-rotate-left"></i> Move back to Live</button>` : '';
 
-  // 🔥 FIX TASK CARD ICON (Get Subject's FA Class)
   let subIconClass = 'fa-folder';
   if(t.subj) {
       const matchedSubj = S.subjects.find(s => s.name === t.subj);
@@ -693,7 +696,6 @@ function renderTasks(){
   if(badge){badge.style.display=pending?'flex':'none'; badge.textContent=pending;}
 }
 
-// 🔥 FIX NATIVE DROPDOWN COMPATIBILITY
 function populateSubjDropdown(){
   const sel = document.getElementById('tSubj'); 
   if(sel) {
@@ -715,37 +717,49 @@ function populateSubjDropdown(){
 }
 
 /* ████████████████████████████████████████████████████████████
-                  9. TIMER, ZEN MODE & EYE STRAIN 
+                  9. TIMER, ZEN MODE & EYE STRAIN (CRASH FIXES)
 ████████████████████████████████████████████████████████████ */
 const MODES={focus:25*60, short:5*60, long:15*60, stopwatch:0};
 const MODE_NAMES={focus:'Focus Session', short:'Short Break', long:'Long Break', stopwatch:'Count-Up Tracking'};
 
 function setTimerMode(m,el){
   if(S.timer.running)return; S.timer.mode=m;
-  document.querySelectorAll('.tmode-btn').forEach(b=>b.classList.remove('active')); el.classList.add('active');
+  document.querySelectorAll('.tmode-btn').forEach(b=>b.classList.remove('active')); if(el) el.classList.add('active');
   const presetsBox=document.getElementById('timerPresetsBox');
-  if(m==='stopwatch'){ S.timer.elapsed=0; presetsBox.style.display='none'; }
-  else { S.timer.total=MODES[m]; S.timer.left=MODES[m]; presetsBox.style.display='grid'; document.querySelectorAll('.preset-btn').forEach(b=>b.classList.remove('active')); if(m==='focus') document.querySelectorAll('.preset-btn')[0].classList.add('active'); }
+  if(presetsBox) {
+      if(m==='stopwatch'){ S.timer.elapsed=0; presetsBox.style.display='none'; }
+      else { S.timer.total=MODES[m]; S.timer.left=MODES[m]; presetsBox.style.display='grid'; document.querySelectorAll('.preset-btn').forEach(b=>b.classList.remove('active')); if(m==='focus') document.querySelectorAll('.preset-btn')[0].classList.add('active'); }
+  }
   updateTimerDisplay();
 }
 function setPreset(mins,el){
   if(S.timer.running || S.timer.mode==='stopwatch')return;
-  S.timer.total=mins*60; S.timer.left=mins*60; document.querySelectorAll('.preset-btn').forEach(b=>b.classList.remove('active')); el.classList.add('active'); updateTimerDisplay();
+  S.timer.total=mins*60; S.timer.left=mins*60; document.querySelectorAll('.preset-btn').forEach(b=>b.classList.remove('active')); if(el) el.classList.add('active'); updateTimerDisplay();
 }
 function customTimer(el){
   if(S.timer.running || S.timer.mode==='stopwatch')return;
   let customMins = prompt("Enter personalized focus minutes (e.g. 20):", "20"); customMins = parseInt(customMins);
-  if(!isNaN(customMins) && customMins > 0){ S.timer.total = customMins * 60; S.timer.left = customMins * 60; document.querySelectorAll('.preset-btn').forEach(b=>b.classList.remove('active')); el.classList.add('active'); updateTimerDisplay(); }
+  if(!isNaN(customMins) && customMins > 0){ S.timer.total = customMins * 60; S.timer.left = customMins * 60; document.querySelectorAll('.preset-btn').forEach(b=>b.classList.remove('active')); if(el) el.classList.add('active'); updateTimerDisplay(); }
 }
 
 let isZenMode = false;
-function openZenMode() { isZenMode = true; document.getElementById('zenOverlay').classList.add('active'); document.getElementById('zenQuote').innerHTML = QUOTES[Math.floor(Math.random()*QUOTES.length)]; }
-function exitZenMode() { isZenMode = false; document.getElementById('zenOverlay').classList.remove('active'); }
+function openZenMode() { 
+    isZenMode = true; 
+    let zo = document.getElementById('zenOverlay'); if(zo) zo.classList.add('active'); 
+    let zq = document.getElementById('zenQuote'); if(zq) zq.innerHTML = QUOTES[Math.floor(Math.random()*QUOTES.length)]; 
+}
+function exitZenMode() { 
+    isZenMode = false; 
+    let zo = document.getElementById('zenOverlay'); if(zo) zo.classList.remove('active'); 
+}
 
 function toggleTimer(){ S.timer.running ? pauseTimer() : startTimer(); }
 function startTimer(){
   if(S.timer.mode!=='stopwatch' && S.timer.left<=0) resetTimer();
-  S.timer.running=true; document.getElementById('timerPlayBtn').innerHTML='<i class="fa-solid fa-pause"></i>'; document.getElementById('zenBtn').style.display = 'block';
+  S.timer.running=true; 
+  let tpb = document.getElementById('timerPlayBtn'); if(tpb) tpb.innerHTML='<i class="fa-solid fa-pause"></i>'; 
+  let zb = document.getElementById('zenBtn'); if(zb) zb.style.display = 'block';
+  
   if(S.timer.mode==='stopwatch') S.timer.startTime = Date.now() - (S.timer.elapsed * 1000);
   else S.timer.targetTime = Date.now() + (S.timer.left * 1000);
 
@@ -760,7 +774,10 @@ function startTimer(){
       if(S.eyeStrain && runTime > 0 && runTime % (45 * 60) === 0) triggerEyeStrainAlert();
 
       if(S.timer.left<=0){
-        clearInterval(S.timer.interval); S.timer.running=false; document.getElementById('timerPlayBtn').innerHTML='<i class="fa-solid fa-play"></i>'; document.getElementById('zenBtn').style.display = 'none'; exitZenMode(); logSession(); playSfx('timer_complete'); showToast('🎉 Session complete! XP awarded!','success');
+        clearInterval(S.timer.interval); S.timer.running=false; 
+        let tpb2 = document.getElementById('timerPlayBtn'); if(tpb2) tpb2.innerHTML='<i class="fa-solid fa-play"></i>'; 
+        let zb2 = document.getElementById('zenBtn'); if(zb2) zb2.style.display = 'none'; 
+        exitZenMode(); logSession(); playSfx('timer_complete'); showToast('🎉 Session complete! XP awarded!','success');
         if(S.notif&&'Notification' in window&&Notification.permission==='granted'){ new Notification('AnRu Focus',{body:MODE_NAMES[S.timer.mode]+' complete! 🏆 Take a break.'}); }
       }
     }
@@ -772,13 +789,31 @@ function triggerEyeStrainAlert() {
   if(S.notif && 'Notification' in window && Notification.permission==='granted') { new Notification('AnRu Focus', {body: 'Rest your eyes! Look 20 feet away for 20 seconds. 👁️'}); }
 }
 
-function pauseTimer(){ clearInterval(S.timer.interval); S.timer.running=false; document.getElementById('timerPlayBtn').innerHTML='<i class="fa-solid fa-play"></i>'; document.getElementById('zenBtn').style.display = 'none'; exitZenMode(); }
-function stopTimer(){ clearInterval(S.timer.interval); S.timer.running=false; document.getElementById('zenBtn').style.display = 'none'; exitZenMode();}
-function resetTimer(){ pauseTimer(); S.timer.left=S.timer.total; S.timer.elapsed=0; updateTimerDisplay(); }
-function skipTimer(){
-  if(S.timer.running){ clearInterval(S.timer.interval); S.timer.running=false; document.getElementById('timerPlayBtn').innerHTML='<i class="fa-solid fa-play"></i>'; document.getElementById('zenBtn').style.display = 'none'; exitZenMode(); }
-  logSession(); if(S.timer.mode==='focus'||S.timer.mode==='stopwatch'){ document.getElementById('tm-short').click(); } else { document.getElementById('tm-focus').click(); S.timer.session++; }
+function pauseTimer(){ 
+  clearInterval(S.timer.interval); S.timer.running=false; 
+  let tpb = document.getElementById('timerPlayBtn'); if(tpb) tpb.innerHTML='<i class="fa-solid fa-play"></i>'; 
+  let zb = document.getElementById('zenBtn'); if(zb) zb.style.display = 'none'; 
+  exitZenMode(); 
 }
+function stopTimer(){ 
+  clearInterval(S.timer.interval); S.timer.running=false; 
+  let zb = document.getElementById('zenBtn'); if(zb) zb.style.display = 'none'; 
+  exitZenMode();
+}
+function resetTimer(){ pauseTimer(); S.timer.left=S.timer.total; S.timer.elapsed=0; updateTimerDisplay(); }
+
+function skipTimer(){
+  if(S.timer.running){ 
+    clearInterval(S.timer.interval); S.timer.running=false; 
+    let tpb = document.getElementById('timerPlayBtn'); if(tpb) tpb.innerHTML='<i class="fa-solid fa-play"></i>'; 
+    let zb = document.getElementById('zenBtn'); if(zb) zb.style.display = 'none'; 
+    exitZenMode(); 
+  }
+  logSession(); 
+  let tms = document.getElementById('tm-short'); if(tms) tms.click(); 
+  else { let tmf = document.getElementById('tm-focus'); if(tmf) tmf.click(); S.timer.session++; }
+}
+
 function logSession(){
   if(S.timer.mode!=='focus' && S.timer.mode!=='stopwatch') return;
   let durationMins = S.timer.mode==='stopwatch' ? Math.floor(S.timer.elapsed/60) : Math.floor((S.timer.total - S.timer.left)/60);
@@ -787,20 +822,33 @@ function logSession(){
   S.timer.logs.unshift(log); if(S.timer.logs.length>100) S.timer.logs.pop(); 
   S.xp += (durationMins * 8); S.timer.session++; saveData(); renderTimerLog(); updateNavUser();
 }
+
 function updateTimerDisplay(){
   let m=0, s=0, pct=0;
   if(S.timer.mode==='stopwatch'){ m=Math.floor(S.timer.elapsed/60); s=S.timer.elapsed%60; pct=(s/60); }
   else { m=Math.floor(S.timer.left/60); s=S.timer.left%60; pct=S.timer.total?(S.timer.left/S.timer.total):0; }
   const timeStr = `${m.toString().padStart(2,'0')}:${s.toString().padStart(2,'0')}`;
-  document.getElementById('timerDisplay').textContent=timeStr; document.getElementById('zenDisplay').textContent=timeStr;
-  document.getElementById('timerLabel').textContent=MODE_NAMES[S.timer.mode]; document.getElementById('timerSess').textContent=`Session #${S.timer.session}`;
+  
+  let td = document.getElementById('timerDisplay'); if(td) td.textContent=timeStr; 
+  let zd = document.getElementById('zenDisplay'); if(zd) zd.textContent=timeStr;
+  let tl = document.getElementById('timerLabel'); if(tl) tl.textContent=MODE_NAMES[S.timer.mode]; 
+  let ts = document.getElementById('timerSess'); if(ts) ts.textContent=`Session #${S.timer.session}`;
+  
   const circ=document.getElementById('timerCircle'); if(circ) circ.style.strokeDashoffset=(628*(1-pct)).toFixed(1);
 }
+
 function renderTimerLog(){
   const el=document.getElementById('sessionLog');
-  if(!S.timer.logs.length){ el.innerHTML=`<div class="empty"><div class="ei"><i class="fa-solid fa-stopwatch" style="font-size:40px; color:var(--textMuted)"></i></div><p>No sessions recorded.</p></div>`; document.getElementById('totalStudyTime').textContent='0h 0m total'; return; }
+  if(!el) return; // Prevent crash if element is on another page
+  if(!S.timer.logs.length){ 
+    el.innerHTML=`<div class="empty"><div class="ei"><i class="fa-solid fa-stopwatch" style="font-size:40px; color:var(--textMuted)"></i></div><p>No sessions recorded.</p></div>`; 
+    let tst = document.getElementById('totalStudyTime'); if(tst) tst.textContent='0h 0m total'; 
+    return; 
+  }
   const todayStr = getTodayStr();
-  const totalMins=S.timer.logs.filter(l=>l.dateStr===todayStr).reduce((a,l)=>a+l.duration,0); document.getElementById('totalStudyTime').textContent=`${Math.floor(totalMins/60)}h ${totalMins%60}m today`;
+  const totalMins=S.timer.logs.filter(l=>l.dateStr===todayStr).reduce((a,l)=>a+l.duration,0); 
+  let tst = document.getElementById('totalStudyTime'); if(tst) tst.textContent=`${Math.floor(totalMins/60)}h ${totalMins%60}m today`;
+  
   const todayLogs = S.timer.logs.filter(l=>l.dateStr===todayStr).slice(0,10);
   const colors={focus:'var(--p1)',short:'var(--success)',long:'var(--p3)',stopwatch:'var(--warn)'};
   el.innerHTML=todayLogs.map(l=>`<div class="session-entry"><div class="se-dot" style="background:${colors[l.mode]};box-shadow:0 0 6px ${colors[l.mode]}"></div><div class="se-info"><div class="se-time">Session #${l.session}</div><div class="se-label">${l.time}</div></div><div class="se-dur"><i class="fa-solid fa-stopwatch"></i> ${l.duration} min</div></div>`).join('');
@@ -871,7 +919,7 @@ function addFlashcard(subName) {
 function deleteFlashcard(subName, id) { const subj = S.subjects.find(s=>s.name===subName); if(!subj) return; subj.flashcards = subj.flashcards.filter(fc => fc.id !== id); saveData(); renderSubjects(); openFlashcards(subName); playSfx('delete'); }
 
 /* ████████████████████████████████████████████████████████████
-                  12. LIVE GRID & SKILL TREE RENDERING 
+                  12. LIVE GRID & SKILL TREE RENDERING (REVISION FIX)
 ████████████████████████████████████████████████████████████ */
 function renderSubjects(){
   const todayStr = getTodayStr();
@@ -880,7 +928,8 @@ function renderSubjects(){
   const backlogCountUI = document.getElementById('backlogCountUI');
   
   if(liveCountUI) liveCountUI.textContent = S.tasks.filter(t => !t.isBacklog && !t.isRevision && !t.isDone && t.date <= todayStr).length;
-  if(revisionCountUI) revisionCountUI.textContent = S.tasks.filter(t => !t.isDone && t.isRevision && t.date <= todayStr).length;
+  // 🔥 FIX: Show ALL pending revisions, not just today's (which might be in the future)
+  if(revisionCountUI) revisionCountUI.textContent = S.tasks.filter(t => !t.isDone && t.isRevision).length;
   if(backlogCountUI) backlogCountUI.textContent = S.tasks.filter(t => t.isBacklog && !t.isDone).length;
 
   const stCont = document.getElementById('skillTreeContainer');

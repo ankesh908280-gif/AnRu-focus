@@ -309,10 +309,6 @@
         <div class="inp-wrap area"><span class="ico"><i class="fa-solid fa-pen-clip" style="color: #a855f7;"></i></span><textarea id="tNote" rows="2" placeholder="Notes or reminders..."></textarea></div>
         <button class="btn btn-grad" onclick="addTask()">Add to Mission List <i class="fa-solid fa-fire-flame-curved"></i></button>
 
-        <button class="ai-scan-btn hover-glow anim-pulse" style="margin-top: 15px;" onclick="document.getElementById('aiVisionInput').click()">
-          <i class="fa-solid fa-camera-retro"></i> Scan to add Online Class (AI)
-        </button>
-        <input type="file" id="aiVisionInput" accept="image/*" style="display:none;" onchange="handleClassScan(event)">
       </div>
       
       <div class="chip-scroll" style="align-items: center;">
@@ -390,7 +386,6 @@
               <div class="ps-box"><div class="ps-num" id="ps3">0</div><div class="ps-lbl">Subjects</div></div>
             </div>
             
-            <!-- 🔥 NEW: Removed the Weekly Chart, keeping only Subject Focus Breakdown -->
             <div style="font-size:11px; font-weight:700; margin-top:20px; color:var(--textSub);">Subject Focus Breakdown</div>
             <div id="subjectTimeGrid" style="display:flex; gap:2px; width:100%; height:8px; border-radius:4px; overflow:hidden; margin-top:4px; background:rgba(255,255,255,0.1);"></div>
             <div id="subjectTimeLabels" style="display:flex; flex-wrap:wrap; gap:6px; justify-content:center; margin-top:6px;"></div>
@@ -592,25 +587,6 @@
   </div>
 </div>
 
-<!-- AI Approval Modal -->
-<div class="modal-overlay" id="aiScannerModal">
-  <div class="modal-box glass2" style="max-width:400px; padding: 20px;">
-    <button class="modal-close" onclick="closeAIModal()"><i class="fa-solid fa-xmark"></i></button>
-    <div class="modal-title" style="text-align: center; color: var(--success); font-size: 20px;"><i class="fa-solid fa-robot"></i> AI Found These!</div>
-    <p style="font-size: 12px; color: var(--textMuted); text-align: center; margin-bottom: 15px;">Uncheck classes you don't want (e.g., Biology).</p>
-    <div id="aiClassesList" class="scroll-hide" style="display: flex; flex-direction: column; gap: 10px; margin-bottom: 20px; max-height: 250px; overflow-y: auto;">
-    </div>
-    <button class="btn btn-grad" style="width: 100%; background: linear-gradient(135deg, #10b981, #059669);" onclick="approveAndAddClasses()">Approve & Add <i class="fa-solid fa-check-double"></i></button>
-  </div>
-</div>
-
-<!-- Scanning Loader -->
-<div id="aiScanLoader" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.85); z-index:999999; justify-content:center; align-items:center; flex-direction:column; backdrop-filter:blur(15px);">
-    <div style="font-size:60px; color:var(--success); animation:bounceIcon 1s infinite;"><i class="fa-solid fa-expand fa-spin"></i></div>
-    <h3 style="color:#4ade80; margin-top:20px; font-family:'Playfair Display', serif;">AI is Reading Screenshot...</h3>
-    <p style="color:#aaa; font-size:13px; margin-top:5px;">Extracting dates, subjects & chapters!</p>
-</div>
-
 <div class="toast" id="toast"></div>
 
 <!-- ██████ SIDEBAR MODULE ██████ -->
@@ -646,7 +622,7 @@
   </div>
 </div>
 
-  <!-- Feedback & Bug Report Modal -->
+<!-- Feedback & Bug Report Modal -->
 <div class="modal-overlay" id="feedbackModal">
   <div class="modal-box glass2" style="max-width:320px; text-align:center; padding:24px;">
     <button class="modal-close" onclick="document.getElementById('feedbackModal').classList.remove('open')"><i class="fa-solid fa-xmark"></i></button>
@@ -661,7 +637,6 @@
     <button class="btn btn-grad" style="width:100%; border-radius:12px; padding:12px; margin-top:10px;" onclick="submitFeedback()">Send to Developer <i class="fa-solid fa-paper-plane"></i></button>
   </div>
 </div>
-
 
 <!-- Secret Admin Password Modal -->
 <div class="modal-overlay" id="adminPassModal">
@@ -697,7 +672,6 @@
 
 <script src="app.js"></script>
 <script src="anru-ai.js"></script>
-<script src="ai-scanner.js"></script>
 <script src="sidebar.js"></script>
 
 <!-- Quick Study Advanced Sound Script -->
