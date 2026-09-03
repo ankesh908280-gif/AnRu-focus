@@ -15,8 +15,8 @@
     document.documentElement.style.webkitUserSelect = 'none';
 
     // 🛑 2. NEW API CREDENTIALS (Split into 2 parts for security)
-    const ai_part1 = "AQ.Ab8RN6IlUONYn6ITf-";
-    const ai_part2 = "JrcNkOXAD1VAtBa5KYH1f_-RxAtuIO4w";
+    const ai_part1 = "AQ.Ab8RN6KuKcj8foRey";
+    const ai_part2 = "IdR0rgV8hs_2ILnQnMFkg7S181-UUXDaw";
     const AI_GEMINI_KEY = ai_part1 + ai_part2;
     
     let pendingScannedClasses = [];
