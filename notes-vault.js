@@ -15,7 +15,7 @@ const NOTES_DATA = {
             { id: "11_phy_3", title: "Ch 3: Motion in a Straight Line", desc: "Kinematics equations & graphs.", driveId: "YOUR_DRIVE_FOLDER_ID_3" }
         ],
         "Chemistry": [
-            { id: "11_chem_1", title: "Ch 1: Some Basic Concepts", desc: "Mole concept & stoichiometry.", driveId: "YOUR_DRIVE_FOLDER_ID_4", isFree: true }, // 👈 FREE
+            { id: "11_chem_1", title: "Ch 1: "रसायन विज्ञान की कुछ मूल अवधारणाएँ" ", desc: "Mole concept & stoichiometry.", driveId: "1wGhIaF-qD8NZXEOnVynUhUktx4hrO6uT", isFree: true }, // 👈 FREE
             { id: "11_chem_2", title: "Ch 2: Structure of Atom", desc: "Quantum models & configurations.", driveId: "YOUR_DRIVE_FOLDER_ID_5" }
         ],
 "Maths": [
