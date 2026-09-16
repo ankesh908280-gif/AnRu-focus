@@ -23,6 +23,7 @@ const xpKey = `mceo_${uid}_xp`;
 const elTime = document.getElementById('main-time-display');
 const elRing = document.getElementById('main-timer-ring');
 const elPlayBtn = document.getElementById('main-play-btn');
+const elSaveBtn = document.getElementById('main-save-btn');
 const elBrain = document.querySelector('.f-timer-icon');
 
 // Circle Math: SVG Radius is 150 -> 2 * Math.PI * 150 ≈ 942.48
@@ -31,16 +32,11 @@ const RING_CIRCUMFERENCE = 942.48;
 // ================= INITIALIZATION =================
 
 document.addEventListener("DOMContentLoaded", () => {
-    // 1. Sync Avatar from Main App
     if (userSession && userSession.pfp) {
         const avImg = document.getElementById('user-avatar-img');
         if (avImg) avImg.src = userSession.pfp;
     }
-    
-    // 2. Disable CSS transition on SVG to enable 120FPS JS smoothness
     if (elRing) elRing.style.transition = 'none'; 
-    
-    // 3. 🔥 APP-LIKE FEEL: Disable Text Selection via JS (No CSS change needed)
     document.body.style.userSelect = 'none';
     document.body.style.webkitUserSelect = 'none';
     document.body.style.msUserSelect = 'none';
@@ -49,7 +45,6 @@ document.addEventListener("DOMContentLoaded", () => {
     renderAnalytics();
 });
 
-// Helper: Get Local Date String (YYYY-MM-DD)
 function getIndiaDate(d = new Date()) {
     const l = new Date(d);
     l.setMinutes(l.getMinutes() - l.getTimezoneOffset());
@@ -76,7 +71,6 @@ function updateDisplay(exactLeft = leftSecs) {
     elRing.style.strokeDashoffset = offset;
 }
 
-// Ultra-smooth loop using performance.now()
 function timerLoop() {
     if (!isRun) return;
     
@@ -88,8 +82,6 @@ function timerLoop() {
         leftSecs = exactLeft;
     } else {
         exactLeft = (endTime - now) / 1000;
-        
-        // 🔥 BUG FIX: Prevent negative values causing ring glitches at 120fps
         exactLeft = Math.max(0, exactLeft); 
         leftSecs = exactLeft;
         
@@ -98,10 +90,10 @@ function timerLoop() {
             leftSecs = 0;
             updateDisplay(0);
             
-            // Reset UI
             elPlayBtn.innerHTML = '<i class="fa-solid fa-play"></i> Start Focus';
-            elPlayBtn.classList.add('paused');
+            elPlayBtn.classList.remove('paused');
             if (elBrain) elBrain.classList.remove('pulse-anim');
+            if (elSaveBtn) elSaveBtn.style.display = 'none';
             
             finishSession();
             return;
@@ -117,7 +109,7 @@ function toggleTimer() {
         // Pause
         isRun = false;
         cancelAnimationFrame(rafId);
-        elPlayBtn.innerHTML = '<i class="fa-solid fa-play"></i> Resume Focus';
+        elPlayBtn.innerHTML = '<i class="fa-solid fa-play"></i> Resume';
         elPlayBtn.classList.add('paused');
         if (elBrain) elBrain.classList.remove('pulse-anim');
     } else {
@@ -127,13 +119,15 @@ function toggleTimer() {
         }
         isRun = true;
         
+        if (elSaveBtn) elSaveBtn.style.display = 'flex'; // 🔥 Show Save Button
+        
         if (cMode === 'stopwatch') {
             startTime = performance.now() - (leftSecs * 1000);
         } else {
             endTime = performance.now() + (leftSecs * 1000);
         }
         
-        elPlayBtn.innerHTML = '<i class="fa-solid fa-pause"></i> Pause Timer';
+        elPlayBtn.innerHTML = '<i class="fa-solid fa-pause"></i> Pause';
         elPlayBtn.classList.remove('paused');
         if (elBrain) elBrain.classList.add('pulse-anim');
         
@@ -141,11 +135,36 @@ function toggleTimer() {
     }
 }
 
+// 🔥 NEW: Early Manual Finish Logic (Saves exact studied time)
+function manualFinish() {
+    let studiedSecs = cMode === 'stopwatch' ? leftSecs : (durationSecs - leftSecs);
+    
+    if (studiedSecs < 60) {
+        alert("Study for at least 1 minute to save this session!");
+        return;
+    }
+    
+    if (!confirm("Are you sure you want to Save & Finish this session now?")) return;
+    
+    isRun = false;
+    cancelAnimationFrame(rafId);
+    
+    elPlayBtn.innerHTML = '<i class="fa-solid fa-play"></i> Start Focus';
+    elPlayBtn.classList.remove('paused');
+    if (elBrain) elBrain.classList.remove('pulse-anim');
+    if (elSaveBtn) elSaveBtn.style.display = 'none';
+    
+    finishSession(); 
+}
+
 // ================= MODES & PRESETS =================
+
+function hideSaveBtn() { if (elSaveBtn) elSaveBtn.style.display = 'none'; }
 
 function setMode(mode, el) {
     if (isRun) toggleTimer(); 
     cMode = mode;
+    hideSaveBtn();
     
     document.querySelectorAll('.f-tab').forEach(b => b.classList.remove('active'));
     el.classList.add('active');
@@ -167,6 +186,7 @@ function setMode(mode, el) {
 function setPreset(m, el, type) {
     if (isRun) toggleTimer();
     cMode = type || 'focus';
+    hideSaveBtn();
     
     document.querySelectorAll('.f-preset-card').forEach(b => b.classList.remove('active'));
     el.classList.add('active');
@@ -186,6 +206,7 @@ function customTimer(el) {
     let m = parseInt(val, 10);
     if (!isNaN(m) && m > 0) {
         cMode = 'custom';
+        hideSaveBtn();
         document.querySelectorAll('.f-preset-card').forEach(b => b.classList.remove('active'));
         el.classList.add('active');
         
@@ -202,8 +223,11 @@ function customTimer(el) {
 // ================= DATA SYNC & FINISH =================
 
 function finishSession() {
-    let dMins = cMode === 'stopwatch' ? Math.floor(leftSecs / 60) : Math.floor(durationSecs / 60);
-    if (dMins < 1) return;
+    // 🔥 BUG FIX: Calculate EXACT minutes studied (No more fake 60 mins!)
+    let studiedSecs = cMode === 'stopwatch' ? leftSecs : (durationSecs - leftSecs);
+    let dMins = Math.floor(studiedSecs / 60);
+    
+    if (dMins < 1) return; // Silent abort if under 1 minute
 
     let logs = JSON.parse(localStorage.getItem(logsKey) || '[]');
     let todayStr = getIndiaDate();
@@ -219,8 +243,6 @@ function finishSession() {
     };
     
     logs.unshift(log); 
-    
-    // Prevent bloated storage (cap at 2000 sessions)
     if (logs.length > 2000) logs.pop(); 
     localStorage.setItem(logsKey, JSON.stringify(logs));
     
@@ -230,7 +252,14 @@ function finishSession() {
     
     alert(`🎉 MISSION COMPLETE! +${dMins * 8} XP ADDED TO PROFILE.`);
     
-    leftSecs = durationSecs;
+    // Reset Timer values after save
+    if (cMode === 'stopwatch') {
+        leftSecs = 0;
+        durationSecs = 0;
+    } else {
+        leftSecs = durationSecs; // Reset Pomodoro back to original
+    }
+    
     updateDisplay();
     renderAnalytics();
 }
@@ -252,14 +281,12 @@ function renderAnalytics() {
     let todayMins = todayLogs.reduce((a, curr) => a + curr.duration, 0);
     let yestMins = yestLogs.reduce((a, curr) => a + curr.duration, 0);
 
-    // 1. Bottom Left Progress (Target: 6 Sessions)
     let sessCount = todayLogs.length;
     document.getElementById('ui-sess-count').textContent = `${sessCount} / 6 Sessions`;
     let bpct = Math.min(100, Math.round((sessCount / 6) * 100));
     document.getElementById('ui-sess-fill').style.width = bpct + '%';
     document.getElementById('ui-sess-pct').textContent = bpct + '%';
 
-    // 2. Today's Focus Card
     document.getElementById('ui-today-time').textContent = `${Math.floor(todayMins / 60)}h ${todayMins % 60}m`;
     
     let diffUI = document.getElementById('ui-today-diff');
@@ -276,14 +303,10 @@ function renderAnalytics() {
         }
     }
 
-    // Goal Ring (Target: 4 hours = 240 mins)
     let goalPct = Math.min(100, Math.round((todayMins / 240) * 100));
     document.getElementById('ui-goal-pct').textContent = goalPct + '%';
     document.getElementById('ui-goal-ring').style.strokeDashoffset = 213 - (213 * goalPct / 100);
 
-    // ==========================================
-    // 3. 🔥 WEEKLY / MONTHLY / YEARLY CHART LOGIC FIX
-    // ==========================================
     const timeframeSelect = document.getElementById('chart-timeframe');
     const timeframe = timeframeSelect ? timeframeSelect.value : 'weekly'; 
     
@@ -335,14 +358,12 @@ function renderAnalytics() {
         }
     }
 
-    // Dynamic Y-Axis Adjustment
     if (maxMins < 60) maxMins = 60; 
     let ySteps = [maxMins, maxMins*0.66, maxMins*0.33, 0];
     if(yAxisEl) {
         yAxisEl.innerHTML = ySteps.map(m => `<span>${m >= 60 ? Math.floor(m/60)+'h' : Math.floor(m)+'m'}</span>`).join('');
     }
 
-    // Generate Chart Bars
     let chartHtml = '';
     let formatTime = (mins) => mins >= 60 ? `${Math.floor(mins/60)}h ${Math.floor(mins%60)}m` : `${Math.floor(mins)}m`;
 
@@ -363,7 +384,6 @@ function renderAnalytics() {
     const weeklyChartEl = document.getElementById('ui-weekly-chart');
     if(weeklyChartEl) weeklyChartEl.innerHTML = chartHtml;
 
-    // 4. Update Mini Stats based on Dropdown Timeframe 
     let periodLogs = logs.filter(l => {
         let ld = new Date(l.dateStr);
         return (now - ld) / (1000 * 60 * 60 * 24) <= daysToLookBack;
@@ -385,7 +405,6 @@ function renderAnalytics() {
     const subTextEl = document.getElementById('ui-total-sess-sub');
     if(subTextEl) subTextEl.textContent = uiSubText;
 
-    // 5. Smart Session History List (Fixed Icons)
     let histHtml = '';
     let displayLogs = todayLogs.slice(0, 5); 
     

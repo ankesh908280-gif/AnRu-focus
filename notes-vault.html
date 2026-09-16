@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+  <title>Premium Notes Vault - AnRu Focus</title>
+  
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=Playfair+Display:wght@700;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="style.css">
+
+  <style>
+    body { display: flex; flex-direction: column; height: 100dvh; overflow: hidden; background: var(--bgGrad); }
+    
+    /* Header & XP Badge */
+    .chat-header { display: flex; align-items: center; justify-content: space-between; padding: 15px 20px; background: rgba(15,12,41,0.85); backdrop-filter: blur(20px); border-bottom: 1px solid var(--glassBorder); z-index: 100; box-shadow: 0 4px 30px rgba(0,0,0,0.3); }
+    .chat-title { font-family: 'Playfair Display', serif; font-size: 20px; font-weight: 800; background: var(--grad); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+    .xp-badge { background: rgba(251,191,36,0.15); border: 1px solid var(--warn); color: var(--warn); padding: 6px 14px; border-radius: 20px; font-size: 14px; font-weight: 800; display: flex; align-items: center; gap: 8px; box-shadow: 0 0 15px rgba(251,191,36,0.3); }
+
+    /* Selectors */
+    .selector-container { padding: 15px 20px 5px; background: rgba(0,0,0,0.2); border-bottom: 1px solid var(--glassBorder); }
+    .scroll-row { display: flex; gap: 10px; overflow-x: auto; padding-bottom: 10px; scrollbar-width: none; }
+    .scroll-row::-webkit-scrollbar { display: none; }
+    
+    .pill-btn { padding: 8px 16px; border-radius: 20px; background: rgba(255,255,255,0.05); border: 1px solid var(--glassBorder); color: var(--textMuted); font-family: 'Outfit'; font-size: 13px; font-weight: 600; white-space: nowrap; cursor: pointer; transition: 0.3s; }
+    .pill-btn.active { background: var(--grad); color: #fff; border-color: transparent; box-shadow: var(--shadowSm); transform: scale(1.05); }
+
+    /* Notes Grid */
+    .notes-area { flex: 1; padding: 20px; overflow-y: auto; scroll-behavior: smooth; display: grid; grid-template-columns: 1fr; gap: 20px; padding-bottom: 40px; }
+    .notes-area::-webkit-scrollbar { display: none; }
+
+    /* 3D Note Card Design */
+    .note-card { background: rgba(255,255,255,0.05); border: 1px solid var(--glassBorder); border-radius: 20px; padding: 20px; position: relative; overflow: visible; backdrop-filter: blur(10px); transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); cursor: pointer; }
+    .note-card:hover { transform: translateY(-5px) scale(1.02); box-shadow: 0 15px 30px rgba(0,0,0,0.4); border-color: rgba(255,255,255,0.3); }
+    
+    .note-icon { width: 50px; height: 50px; border-radius: 14px; background: linear-gradient(135deg, #667eea, #764ba2); display: flex; align-items: center; justify-content: center; font-size: 24px; color: #fff; margin-bottom: 12px; box-shadow: 0 5px 15px rgba(102,126,234,0.4); }
+    .note-title { font-size: 16px; font-weight: 700; color: #fff; margin-bottom: 5px; }
+    .note-desc { font-size: 12px; color: var(--textMuted); line-height: 1.4; }
+
+    /* Tags & Badges */
+    .free-badge { position: absolute; top: -10px; right: 15px; background: linear-gradient(135deg, #4ade80, #16a34a); color: #000; padding: 4px 12px; border-radius: 12px; font-size: 11px; font-weight: 900; text-transform: uppercase; box-shadow: 0 5px 15px rgba(74,222,128,0.5); z-index: 15; animation: pulseBadge 2s infinite; }
+    
+    /* Locked Overlay */
+    .locked-overlay { position: absolute; inset: 0; background: rgba(15,12,41,0.9); backdrop-filter: blur(8px); display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 10; opacity: 1; transition: 0.4s; border-radius: 20px; }
+    .note-card.unlocked .locked-overlay { opacity: 0; pointer-events: none; }
+    
+    .lock-icon { font-size: 32px; color: var(--warn); margin-bottom: 10px; filter: drop-shadow(0 0 10px rgba(251,191,36,0.5)); animation: floatLock 3s ease-in-out infinite; }
+    .unlock-btn { margin-top: 10px; background: linear-gradient(135deg, #f59e0b, #d97706); color: #fff; border: none; padding: 10px 20px; border-radius: 14px; font-weight: 800; font-size: 13px; cursor: pointer; box-shadow: 0 5px 20px rgba(245, 158, 11, 0.4); transition: 0.2s; display: flex; align-items: center; gap: 6px; }
+    .unlock-btn:hover { transform: scale(1.08); }
+    .unlock-btn:active { transform: scale(0.95); }
+
+    /* Fullscreen Drive Viewer */
+    #driveViewer { display: none; position: fixed; inset: 0; background: #000; z-index: 9999; flex-direction: column; }
+    #driveViewer.open { display: flex; animation: fadeIn 0.3s ease; }
+    .dv-header { padding: 15px 20px; background: #111; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #333; }
+    .dv-close { background: rgba(248,113,113,0.2); color: var(--danger); border: 1px solid var(--danger); width: 36px; height: 36px; border-radius: 50%; font-size: 16px; cursor: pointer; transition: 0.2s; display: flex; align-items: center; justify-content: center; }
+    .dv-close:hover { background: var(--danger); color: #fff; transform: rotate(90deg); }
+    
+    @keyframes floatLock { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-5px); } }
+    @keyframes pulseBadge { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.1) rotate(3deg); } }
+    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+  </style>
+</head>
+<body>
+
+  <!-- Header -->
+  <div class="chat-header">
+    <div class="chat-header-info">
+      <button class="btn-icon" onclick="window.location.href='index.html'">
+        <i class="fa-solid fa-arrow-left"></i>
+      </button>
+      <div>
+        <div class="chat-title">Topper's Vault</div>
+        <div style="font-size:11px; color:var(--textMuted); margin-top:2px;">Premium Handwritten Notes 📚</div>
+      </div>
+    </div>
+    <!-- Main App XP will be synced here -->
+    <div class="xp-badge"><i class="fa-solid fa-bolt"></i> <span id="vaultXpDisplay">Loading...</span></div>
+  </div>
+
+  <!-- Class & Subject Selectors -->
+  <div class="selector-container">
+    <div style="font-size:11px; color:var(--textMuted); margin-bottom:8px; font-weight:700; text-transform:uppercase;">Select Class</div>
+    <div class="scroll-row" id="classSelector">
+      <!-- Classes injected by JS -->
+    </div>
+    
+    <div style="font-size:11px; color:var(--textMuted); margin:12px 0 8px; font-weight:700; text-transform:uppercase;">Select Subject</div>
+    <div class="scroll-row" id="subjectSelector">
+      <!-- Subjects injected by JS -->
+    </div>
+  </div>
+
+  <!-- Notes Grid -->
+  <div class="notes-area" id="notesArea">
+      <div style="text-align:center; margin-top:50px;">
+        <i class="fa-solid fa-spinner fa-spin" style="font-size:30px; color:var(--p1);"></i>
+        <p style="margin-top:10px; font-size:12px; color:var(--textMuted);">Syncing your data...</p>
+      </div>
+  </div>
+
+  <!-- Google Drive Viewer Modal -->
+  <div id="driveViewer">
+      <div class="dv-header">
+          <div style="color:#fff; font-weight:700; font-family:'Playfair Display'; font-size:18px;" id="dvTitle">Loading Notes...</div>
+          <button class="dv-close" onclick="closeNotes()"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <!-- Built-in Iframe to show Google Drive Folder without leaving App -->
+      <iframe id="driveIframe" src="" style="width:100%; flex:1; border:none; background:#000;" allowfullscreen="allowfullscreen"></iframe>
+  </div>
+
+  <!-- Audio & Toasts -->
+  <div class="toast" id="toast"></div>
+  <audio id="sfxClick" src="https://assets.mixkit.co/sfx/preview/mixkit-sci-fi-click-900.mp3"></audio>
+  <audio id="sfxCoin" src="https://assets.mixkit.co/sfx/preview/mixkit-arcade-game-jump-coin-216.mp3"></audio>
+  <audio id="sfxError" src="https://assets.mixkit.co/sfx/preview/mixkit-click-error-1110.mp3"></audio>
+
+  <!-- Firebase & Scripts -->
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+  
+  <!-- IMPORTANT: Make sure app.js loads first so we can sync XP -->
+  <script src="app.js"></script>
+  <script src="notes-vault.js"></script>
+
+</body>
+</html>

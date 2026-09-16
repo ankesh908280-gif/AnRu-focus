@@ -109,9 +109,17 @@
             <div class="f-timer-icon"><i class="fa-solid fa-brain"></i></div>
             <div class="f-timer-label">Focus Time</div>
             <div class="f-timer-time text-gradient" id="main-time-display">25:00</div>
-            <button class="f-timer-btn" id="main-play-btn" onclick="toggleTimer()">
-              <i class="fa-solid fa-play"></i> Start Focus
-            </button>
+            
+            <!-- 🔥 NEW: Save Button Wrapper -->
+            <div style="display: flex; gap: 8px; align-items: center; justify-content: center; width: 100%;">
+                <button class="f-timer-btn" id="main-play-btn" onclick="toggleTimer()">
+                  <i class="fa-solid fa-play"></i> Start Focus
+                </button>
+                <button class="f-timer-btn" id="main-save-btn" onclick="manualFinish()" style="display: none; padding: 0; width: 44px; height: 44px; background: linear-gradient(135deg, #10b981, #059669); box-shadow: 0 5px 20px rgba(16, 185, 129, 0.4); justify-content: center;" title="Save & Finish Session">
+                  <i class="fa-solid fa-check-double" style="margin:0; font-size:16px;"></i>
+                </button>
+            </div>
+
           </div>
 
         </div>
