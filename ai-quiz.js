@@ -203,7 +203,7 @@ window.startAIMatch = async function() {
 };
 
 async function fetchAIQuestions(userClass, subject, topic, level, count) {
-    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${AI_GEMINI_KEY}`;
+    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.6-flash:generateContent?key=${AI_GEMINI_KEY}`;
     
     // 🔥 UP Board Hindi Medium Prompt
     const systemPrompt = `You are an expert exam creator for UP Board (Hindi Medium) students. 

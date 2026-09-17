@@ -86,7 +86,7 @@ window.generateCA = async function() {
 
 async function fetchLiveNewsAPI(category, count, dateStr) {
     // User requested 3.6-flash, we try that first.
-    let aiModel = "gemini-1.5-flash"; 
+    let aiModel = "gemini-3.6-flash"; 
     let url = `https://generativelanguage.googleapis.com/v1beta/models/${aiModel}:generateContent?key=${AI_GEMINI_KEY}`;
     
     const systemPrompt = `आज तारीख है: ${dateStr}।
