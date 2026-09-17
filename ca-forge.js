@@ -129,8 +129,6 @@ async function fetchLiveNewsAPI(category, count, dateStr) {
     if (!response.ok) {
         const tempCheck = await response.clone().json();
         if(tempCheck.error && tempCheck.error.code === 404) {
-            console.warn("Gemini 3.6 Server Busy/Not Found. Switching to Gemini 1.5 Flash... ⚡");
-            aiModel = "gemini-1.5-flash";
             url = `https://generativelanguage.googleapis.com/v1beta/models/${aiModel}:generateContent?key=${AI_GEMINI_KEY}`;
             response = await fetch(url, {
                 method: "POST",
