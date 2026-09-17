@@ -168,7 +168,11 @@
                 parsedData = JSON.parse(rawText);
             } catch(err) { throw new Error("AI ka format galat tha. Dubara scan karo."); }
             
-            pendingScannedClasses = parsedData.classes || [];
+            pendingScannedClasses = (parsedData.classes || []).map(cls => ({
+                taskName: (cls.taskName || cls.name || cls.title || cls.lecture || "Online Class").trim(),
+                subject: (cls.subject || "Other").trim(),
+                date: (cls.date && cls.date.trim()) ? cls.date.trim() : (typeof getTodayStr === 'function' ? getTodayStr() : new Date().toISOString().split('T')[0])
+            }));
             
             if(pendingScannedClasses.length === 0) {
                 throw new Error("Is photo mein koi class nahi mili!");
@@ -210,7 +214,7 @@
             if(modal) modal.classList.remove('open');
         },
 
-        approve: function() {
+        approve: async function() {
             if(typeof S === 'undefined' || !S.tasks) { alert("App state not found! Wait for app to load."); return; }
 
             let selectedClasses = [];
@@ -224,24 +228,49 @@
                 return;
             }
 
+            const todayStr = (typeof getTodayStr === 'function') ? getTodayStr() : new Date().toISOString().split('T')[0];
+
             selectedClasses.forEach(cls => {
+                const taskName = (cls.taskName || cls.name || cls.title || cls.lecture || "Online Class").trim();
+                const taskDate = (cls.date && cls.date.trim()) ? cls.date.trim() : todayStr;
+                const taskSubj = (cls.subject && cls.subject !== "Other") ? cls.subject.trim() : "";
+
                 S.tasks.unshift({
                     id: Date.now() + Math.floor(Math.random() * 1000),
-                    name: cls.taskName,
-                    date: cls.date,
+                    name: taskName,
+                    date: taskDate,
                     note: "🤖 Auto-added via AI Scanner",
-                    subj: cls.subject === "Other" ? "" : cls.subject,
-                    priority: "high", isDone: false, isTwoStep: true, watched: false, notesMade: false, subtasks: [], repScheduled: false, isRevision: false, isBacklog: false
+                    subj: taskSubj,
+                    priority: "high",
+                    isDone: false,
+                    isTwoStep: true,
+                    watched: false,
+                    notesMade: false,
+                    subtasks: [],
+                    repScheduled: false,
+                    isRevision: false,
+                    isBacklog: false
                 });
                 S.xp += 15; 
             });
 
+            // 1. Save to LocalStorage immediately
             if(typeof saveData === 'function') saveData();
+            
+            // 2. Immediately sync to Cloud Firestore
+            if(typeof saveToCloud === 'function') {
+                try {
+                    await saveToCloud();
+                } catch(e) { console.warn("Cloud save in progress", e); }
+            } else if (window.AnRuSync && typeof window.AnRuSync.saveUserData === 'function') {
+                window.AnRuSync.saveUserData({ tasks: S.tasks, xp: S.xp });
+            }
+
             if(typeof renderAll === 'function') renderAll();
             
             window.aiPlugin.closeModal();
             try { if(typeof playSfx === 'function') playSfx('task_complete'); } catch(e){}
-            if(typeof showToast === 'function') showToast(`🔥 Success! ${selectedClasses.length} tasks synced!`, "success");
+            if(typeof showToast === 'function') showToast(`🔥 Success! ${selectedClasses.length} class tasks saved & synced to Cloud!`, 'success');
         }
     };
 })();

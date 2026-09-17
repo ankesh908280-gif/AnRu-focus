@@ -126,6 +126,155 @@ function updateNotifToggle(){const sw=document.getElementById('notifSw'); if(sw)
 /* ████████████████████████████████████████████████████████████
                   3. CLOUD SYNC & DATA MANAGEMENT ☁️
 ████████████████████████████████████████████████████████████ */
+/* =========================================================
+   🚀 AUTOMATIC FULL-PHONE LOCALSTORAGE TO CLOUD MIGRATION
+   ========================================================= */
+async function autoMigrateLocalStorageToCloud() {
+    if (!S.session || S.session.isGuest || !S.session.email || typeof db === 'undefined') return;
+    const email = S.session.email.toLowerCase();
+    
+    try {
+        const userDocRef = db.collection('users').doc(email);
+        const doc = await userDocRef.get();
+        const cloudData = doc.exists ? doc.data() : {};
+        
+        // 1. XP (Take highest value)
+        const localXp = parseInt(localStorage.getItem(key('xp')) || '0', 10);
+        const finalXp = Math.max(localXp, cloudData.xp || 0);
+        S.xp = finalXp;
+        localStorage.setItem(key('xp'), finalXp.toString());
+        
+        // 2. Tasks Merge (Smart deduplication by ID)
+        const localTasks = JSON.parse(localStorage.getItem(key('tasks')) || '[]');
+        const cloudTasks = cloudData.tasks || [];
+        const taskMap = new Map();
+        cloudTasks.forEach(t => { if(t && t.id) taskMap.set(t.id, t); });
+        localTasks.forEach(t => { if(t && t.id) taskMap.set(t.id, t); });
+        const finalTasks = Array.from(taskMap.values()).sort((a,b) => (b.id || 0) - (a.id || 0));
+        S.tasks = finalTasks;
+        localStorage.setItem(key('tasks'), JSON.stringify(finalTasks));
+        
+        // 3. Subjects Merge
+        const localSubj = JSON.parse(localStorage.getItem(key('subj')) || '[]');
+        const cloudSubj = cloudData.subjects || [];
+        const subjMap = new Map();
+        cloudSubj.forEach(s => { if(s && s.name) subjMap.set(s.name.toLowerCase(), s); });
+        localSubj.forEach(s => { if(s && s.name) subjMap.set(s.name.toLowerCase(), s); });
+        const finalSubj = Array.from(subjMap.values());
+        if (finalSubj.length > 0) {
+            S.subjects = finalSubj;
+            localStorage.setItem(key('subj'), JSON.stringify(finalSubj));
+        }
+
+        // 4. Timer Logs Merge
+        const localLogs = JSON.parse(localStorage.getItem(key('logs')) || '[]');
+        const cloudLogs = cloudData.logs || [];
+        const logMap = new Map();
+        cloudLogs.forEach(l => { if(l && l.id) logMap.set(l.id, l); });
+        localLogs.forEach(l => { if(l && l.id) logMap.set(l.id, l); });
+        const finalLogs = Array.from(logMap.values()).sort((a,b) => (b.id || 0) - (a.id || 0)).slice(0, 500);
+        S.timer.logs = finalLogs;
+        localStorage.setItem(key('logs'), JSON.stringify(finalLogs));
+
+        // 5. Unlocks & Badges
+        const localUnlocks = JSON.parse(localStorage.getItem(key('unlocks')) || '{}');
+        const cloudUnlocks = cloudData.unlocks || {};
+        const finalUnlocks = { ...cloudUnlocks, ...localUnlocks };
+        S.unlocks = finalUnlocks;
+        localStorage.setItem(key('unlocks'), JSON.stringify(finalUnlocks));
+
+        // 6. Word Ninja (Vocab)
+        const localVocabScore = parseInt(localStorage.getItem('anru_vocab_score') || '0', 10);
+        const localVocabMastered = JSON.parse(localStorage.getItem('anru_vocab_mastered') || '[]');
+        const localVocabWrong = JSON.parse(localStorage.getItem('anru_vocab_wrong') || '[]');
+        const cloudVocab = cloudData.vocab || {};
+        const finalVocab = {
+            score: Math.max(localVocabScore, cloudVocab.score || 0),
+            mastered: Array.from(new Set([...(cloudVocab.mastered || []), ...localVocabMastered])),
+            wrong: Array.from(new Set([...(cloudVocab.wrong || []), ...localVocabWrong]))
+        };
+        localStorage.setItem('anru_vocab_score', finalVocab.score);
+        localStorage.setItem('anru_vocab_mastered', JSON.stringify(finalVocab.mastered));
+        localStorage.setItem('anru_vocab_wrong', JSON.stringify(finalVocab.wrong));
+
+        // 7. CA Forge (Current Affairs History & Starred)
+        const localCaStarred = JSON.parse(localStorage.getItem('ca_starred') || '[]');
+        const localCaHistory = JSON.parse(localStorage.getItem('ca_history') || '[]');
+        const cloudCA = cloudData.caForge || {};
+        const finalCA = {
+            starred: [...(cloudCA.starred || []), ...localCaStarred.filter(item => !(cloudCA.starred || []).some(c => c.q === item.q))],
+            history: [...(cloudCA.history || []), ...localCaHistory.filter(item => !(cloudCA.history || []).some(c => c.date === item.date && c.topic === item.topic))]
+        };
+        localStorage.setItem('ca_starred', JSON.stringify(finalCA.starred));
+        localStorage.setItem('ca_history', JSON.stringify(finalCA.history));
+
+        // 8. Combat Quiz Inventory
+        const localCombatInv = JSON.parse(localStorage.getItem('ai_combat_inventory') || '{}');
+        const cloudCombatInv = cloudData.combatInventory || {};
+        const finalCombatInv = {};
+        ['5050', 'freeze', 'hint', 'skip', 'revive'].forEach(item => {
+            finalCombatInv[item] = Math.max(localCombatInv[item] || 0, cloudCombatInv[item] || 0);
+        });
+        localStorage.setItem('ai_combat_inventory', JSON.stringify(finalCombatInv));
+
+        // 9. Train Brain Inventory & Stats
+        const localBrainInv = JSON.parse(localStorage.getItem('mceo_tb_inv') || '{}');
+        const cloudBrainInv = cloudData.brainInventory || {};
+        const finalBrainInv = {};
+        ['time_freeze', 'fifty_fifty', 'second_chance', 'skip_master', 'multiplier'].forEach(item => {
+            finalBrainInv[item] = Math.max(localBrainInv[item] || 0, cloudBrainInv[item] || 0);
+        });
+        localStorage.setItem('mceo_tb_inv', JSON.stringify(finalBrainInv));
+
+        // 10. Unlocked Notes
+        const localNotes = JSON.parse(localStorage.getItem('mceo_unlocked_notes_' + email) || '[]');
+        const cloudNotes = cloudData.unlockedNotes || [];
+        const finalNotes = Array.from(new Set([...cloudNotes, ...localNotes]));
+        localStorage.setItem('mceo_unlocked_notes_' + email, JSON.stringify(finalNotes));
+
+        // 11. Roadmap Progress
+        const localRoadmap = JSON.parse(localStorage.getItem('mceo_roadmap_' + email) || '{}');
+        const cloudRoadmap = cloudData.roadmapProgress || {};
+        const finalRoadmap = { ...cloudRoadmap, ...localRoadmap };
+        localStorage.setItem('mceo_roadmap_' + email, JSON.stringify(finalRoadmap));
+
+        // 12. PUSH THE COMPLETE BUNDLE TO FIRESTORE CLOUD
+        const cloudPayload = {
+            profile: S.session,
+            xp: finalXp,
+            tasks: finalTasks,
+            subjects: S.subjects,
+            logs: finalLogs,
+            theme: S.theme || 'default',
+            unlocks: finalUnlocks,
+            freezeDate: S.freezeDate || null,
+            lastDrainDate: S.lastDrainDate || null,
+            lastMissionDate: S.lastMissionDate || null,
+            eyeStrain: S.eyeStrain || false,
+            activeBuff: S.activeBuff || null,
+            vocab: finalVocab,
+            caForge: finalCA,
+            combatInventory: finalCombatInv,
+            brainInventory: finalBrainInv,
+            unlockedNotes: finalNotes,
+            roadmapProgress: finalRoadmap,
+            lastCloudSync: new Date().toISOString()
+        };
+
+        await userDocRef.set(cloudPayload, { merge: true });
+
+        // First-time friendly confirmation
+        if(!localStorage.getItem('anru_cloud_migrated_' + email)) {
+            localStorage.setItem('anru_cloud_migrated_' + email, 'true');
+            if(typeof showToast === 'function') {
+                showToast('<i class="fa-solid fa-cloud-arrow-up"></i> Phone ka saara puraana data Cloud par safe ho gaya!', 'success');
+            }
+        }
+    } catch(err) {
+        console.warn("Auto Cloud Migration offline or delayed:", err);
+    }
+}
+
 window.onload = async () => {
   S.session = JSON.parse(localStorage.getItem('mceo_sess') || 'null');
   if(typeof updateTodayDate === 'function') updateTodayDate();
@@ -135,26 +284,13 @@ window.onload = async () => {
      loadDataLocal();
      bootApp();
      if(!S.session.isGuest) {
-        try {
-            const doc = await db.collection('users').doc(S.session.email).get();
-            if(doc.exists) {
-                const cloudData = doc.data();
-                // Merge cloud data with higher local XP to prevent data loss
-                const localXp = parseInt(localStorage.getItem(key('xp')) || '0', 10);
-                if(localXp > (cloudData.xp || 0)) {
-                    cloudData.xp = localXp;
-                    db.collection('users').doc(S.session.email).set({ xp: localXp }, { merge: true }).catch(console.error);
-                }
-                loadDataFromObj(cloudData);
-                migrateLegacyData(); 
-                if(document.getElementById('taskList') && typeof renderAll === 'function') {
-                    renderAll();
-                }
-                if(document.getElementById('shopGrid') && typeof updateShopUI === 'function') {
-                    updateShopUI();
-                }
-            }
-        } catch(e) { console.log("Network delay: Using local offline data."); }
+        await autoMigrateLocalStorageToCloud();
+        if(document.getElementById('taskList') && typeof renderAll === 'function') {
+           renderAll();
+        }
+        if(document.getElementById('shopGrid') && typeof updateShopUI === 'function') {
+           updateShopUI();
+        }
      }
   }
 };
@@ -363,7 +499,31 @@ async function syncAndLogin(email, name, course, pfp, pass) {
   const userRef = db.collection('users').doc(email); const doc = await userRef.get();
   if(doc.exists) {
     const data = doc.data(); S.session = data.profile;
-    if(pfp && !S.session.pfp) S.session.pfp = pfp; loadDataFromObj(data);
+    if(pfp && !S.session.pfp) S.session.pfp = pfp; 
+    loadDataFromObj(data);
+    
+    // Cross-Device Full Restore (Phone change hone par saara data wapas lana)
+    if(data.vocab) {
+        if(data.vocab.score !== undefined) localStorage.setItem('anru_vocab_score', data.vocab.score);
+        if(data.vocab.mastered) localStorage.setItem('anru_vocab_mastered', JSON.stringify(data.vocab.mastered));
+        if(data.vocab.wrong) localStorage.setItem('anru_vocab_wrong', JSON.stringify(data.vocab.wrong));
+    }
+    if(data.caForge) {
+        if(data.caForge.starred) localStorage.setItem('ca_starred', JSON.stringify(data.caForge.starred));
+        if(data.caForge.history) localStorage.setItem('ca_history', JSON.stringify(data.caForge.history));
+    }
+    if(data.combatInventory) {
+        localStorage.setItem('ai_combat_inventory', JSON.stringify(data.combatInventory));
+    }
+    if(data.brainInventory) {
+        localStorage.setItem('mceo_tb_inv', JSON.stringify(data.brainInventory));
+    }
+    if(data.unlockedNotes) {
+        localStorage.setItem('mceo_unlocked_notes_' + email, JSON.stringify(data.unlockedNotes));
+    }
+    if(data.roadmapProgress) {
+        localStorage.setItem('mceo_roadmap_' + email, JSON.stringify(data.roadmapProgress));
+    }
   } else {
     S.session = { name, email, course: course||'', pass, pfp, isGuest:false };
     S.tasks=[]; S.subjects=[{name:'Physics',emoji:'fa-microscope',flashcards:[]},{name:'Maths',emoji:'fa-calculator',flashcards:[]},{name:'Computer Science',emoji:'fa-laptop-code',flashcards:[]}];
