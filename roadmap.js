@@ -58,24 +58,22 @@ function playClickSound() { const sfx = document.getElementById('sfxClick'); if(
 function playSuccessSound() { const sfx = document.getElementById('sfxSuccess'); if(sfx) { sfx.currentTime = 0; sfx.volume = 0.6; sfx.play().catch(e=>{}); } if(navigator.vibrate) navigator.vibrate([30, 50, 30]); }
 
 setTimeout(async () => {
-    S.session = JSON.parse(localStorage.getItem('mceo_sess') || 'null');
-    if (!S.session || S.session.isGuest) {
-        alert("🔒 Please login to save your syllabus progress!");
-        window.location.href = "index.html";
-        return;
-    }
+    S.session = (window.AnRuSync ? window.AnRuSync.getSession() : null) || JSON.parse(localStorage.getItem('mceo_sess') || 'null');
+    const userEmail = (S.session && !S.session.isGuest && S.session.email) ? S.session.email : 'guest';
 
     // Load Local Progress
-    roadmapProgress = JSON.parse(localStorage.getItem('mceo_roadmap_' + S.session.email)) || {};
+    roadmapProgress = JSON.parse(localStorage.getItem('mceo_roadmap_' + userEmail)) || {};
     
-    // Fetch from Firebase for cross-device sync
-    try {
-        const doc = await roadmapRef.doc(S.session.email).get();
-        if(doc.exists) {
-            roadmapProgress = doc.data().progress || {};
-            localStorage.setItem('mceo_roadmap_' + S.session.email, JSON.stringify(roadmapProgress));
-        }
-    } catch(e) { console.log("Offline mode active."); }
+    // Fetch from Firebase for cross-device sync if logged in
+    if (userEmail !== 'guest') {
+        try {
+            const doc = await roadmapRef.doc(userEmail).get();
+            if(doc.exists) {
+                roadmapProgress = doc.data().progress || {};
+                localStorage.setItem('mceo_roadmap_' + userEmail, JSON.stringify(roadmapProgress));
+            }
+        } catch(e) { console.log("Offline mode active."); }
+    }
 
     initSelectors();
 }, 500);
@@ -161,7 +159,7 @@ window.toggleChapter = async function(chId) {
     }
 
     // Save locally
-    localStorage.setItem('mceo_roadmap_' + S.session.email, JSON.stringify(roadmapProgress));
+    const uKey = (S.session && !S.session.isGuest && S.session.email) ? S.session.email : 'guest'; localStorage.setItem('mceo_roadmap_' + uKey, JSON.stringify(roadmapProgress));
     
     // Re-render UI to show animation
     renderChapters();

@@ -1146,7 +1146,11 @@ function calcStreak(){
   const doneDates=[...new Set(S.tasks.filter(t=>t.isDone).map(t=>t.date))].sort().reverse(); 
   let streak=0,cur=new Date(); const todayStr = getTodayStr();
   let hasFreeze = S.freezeDate && S.freezeDate >= todayStr;
-  if(hasFreeze) document.getElementById('streakLabel').innerHTML = 'Day Streak <i class="fa-solid fa-snowflake" style="color:var(--p1)"></i>'; else document.getElementById('streakLabel').innerHTML = 'Day Streak';
+  const streakEl = document.getElementById('streakLabel');
+  if(streakEl) {
+    if(hasFreeze) streakEl.innerHTML = 'Day Streak <i class="fa-solid fa-snowflake" style="color:var(--p1)"></i>';
+    else streakEl.innerHTML = 'Day Streak';
+  }
   if(!doneDates.length) return 0;
   for(const d of doneDates){
     const dd=new Date(d); const diff=Math.round((cur-dd)/86400000);
@@ -1155,7 +1159,10 @@ function calcStreak(){
 }
 
 function renderProfile(){
-  updateNavUser(); document.getElementById('ps1').textContent=S.tasks.length; document.getElementById('ps2').textContent=S.tasks.filter(t=>t.isDone).length; document.getElementById('ps3').textContent=S.subjects.length;
+  updateNavUser();
+  const ps1 = document.getElementById('ps1'); if(ps1) ps1.textContent = S.tasks.length;
+  const ps2 = document.getElementById('ps2'); if(ps2) ps2.textContent = S.tasks.filter(t=>t.isDone).length;
+  const ps3 = document.getElementById('ps3'); if(ps3) ps3.textContent = S.subjects.length;
   const completedTasks = S.tasks.filter(t => t.isDone && t.subj); const subjCounts = {}; let totalSubjTasks = 0; completedTasks.forEach(t => { subjCounts[t.subj] = (subjCounts[t.subj] || 0) + 1; totalSubjTasks++; });
   const grid = document.getElementById('subjectTimeGrid'); const labels = document.getElementById('subjectTimeLabels');
   if(grid && labels) {

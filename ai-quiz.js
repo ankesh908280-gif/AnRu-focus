@@ -237,8 +237,15 @@ async function fetchAIQuestions(userClass, subject, topic, level, count) {
     });
 
     const data = await response.json();
+    if (!data.candidates || !data.candidates.length) throw new Error("AI did not return content.");
     let rawText = data.candidates[0].content.parts[0].text;
     rawText = rawText.replace(/```json/gi, '').replace(/```/g, '').trim();
+    
+    const startIdx = rawText.indexOf('[');
+    const endIdx = rawText.lastIndexOf(']');
+    if (startIdx !== -1 && endIdx !== -1) {
+        rawText = rawText.substring(startIdx, endIdx + 1);
+    }
     
     return JSON.parse(rawText); 
 }

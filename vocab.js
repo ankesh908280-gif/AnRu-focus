@@ -40,10 +40,10 @@ const gameTitle = document.getElementById("game-mode-title");
 const wordCounter = document.getElementById("word-counter");
 
 // 🟢 Load Data on App Start
-window.onload = () => {
+document.addEventListener('DOMContentLoaded', () => {
     loadData();
     updateDashboard();
-};
+});
 
 async function loadData() {
     if(localStorage.getItem("anru_vocab_score")) score = parseInt(localStorage.getItem("anru_vocab_score"));
