@@ -3,8 +3,8 @@
       🔥 ADVANCED MATH ENGINE & REAL-TIME LEADERBOARD 🔥
 ████████████████████████████████████████████████████████████ */
 
-// --- 🔥 FIREBASE CONNECTION (BUG FIX) ---
-const firebaseConfig = {
+// --- 🔥 FIREBASE CONNECTION (CLASH-PROOF FIX) ---
+var tbFbConfig = (typeof window.firebaseConfig !== 'undefined') ? window.firebaseConfig : {
     apiKey: "AlzaSyBPqJ7LIFBS5UV4r2BpUTfqH7coE4huG2c",
     authDomain: "anru-foucs.firebaseapp.com",
     projectId: "anru-foucs",
@@ -13,11 +13,12 @@ const firebaseConfig = {
     appId: "1:503432672889:web:193c620deec4b8906646a8"
 };
 
-// Initialize Firebase only if it hasn't been initialized yet
-if (!firebase.apps.length) {
-    firebase.initializeApp(firebaseConfig);
+if (typeof firebase !== 'undefined' && !firebase.apps.length) {
+    try {
+        firebase.initializeApp(tbFbConfig);
+    } catch(e) { console.warn("Firebase already initialized", e); }
 }
-const db = firebase.firestore();
+var brainDb = (typeof db !== 'undefined' && db) ? db : ((typeof firebase !== 'undefined') ? firebase.firestore() : null);
 
 // --- STATE MANAGEMENT ---
 let tbSetup = { diff: 'Easy', qCount: 5, topics: ['+'] };
@@ -51,11 +52,36 @@ const sfxWrong = new Audio('https://assets.mixkit.co/sfx/preview/mixkit-wrong-an
 const sfxMagic = new Audio('https://assets.mixkit.co/sfx/preview/mixkit-magical-coin-win-1936.mp3');
 function playS(aud) { try { aud.currentTime = 0; aud.volume = 0.5; aud.play().catch(e=>{}); } catch(e){} }
 
-// --- INIT ---
-window.addEventListener('load', () => {
-    document.getElementById('tbGlobalStars').textContent = localStats.stars;
-    setTimeout(() => { switchTbScreen('screen-setup'); }, 2000);
-});
+// --- INIT & SCREEN TRANSITION (FAIL-SAFE) ---
+let isTbReady = false;
+function initTrainBrain() {
+    if (isTbReady) return;
+    isTbReady = true;
+    
+    const starsEl = document.getElementById('tbGlobalStars');
+    if (starsEl && typeof localStats !== 'undefined') {
+        starsEl.textContent = localStats.stars;
+    }
+    
+    setTimeout(() => {
+        switchTbScreen('screen-setup');
+    }, 1200);
+}
+
+if (document.readyState === 'complete' || document.readyState === 'interactive') {
+    initTrainBrain();
+} else {
+    document.addEventListener('DOMContentLoaded', initTrainBrain);
+    window.addEventListener('load', initTrainBrain);
+}
+
+// Absolute failsafe timer: forces switch to screen-setup after 2 seconds no matter what
+setTimeout(() => {
+    const loader = document.getElementById('screen-loader');
+    if (loader && loader.classList.contains('active')) {
+        switchTbScreen('screen-setup');
+    }
+}, 2000);
 
 function switchTbScreen(id) {
     document.querySelectorAll('.tb-screen').forEach(s => s.classList.remove('active'));
@@ -352,7 +378,7 @@ async function syncFirebaseLeaderboard(newStars, qAnswered) {
 
     try {
         const email = sess.email; const name = sess.name;
-        const ref = db.collection('brain_players').doc(email);
+        const ref = (brainDb || firebase.firestore()).collection('brain_players').doc(email);
         const doc = await ref.get();
         
         if(doc.exists) {
@@ -365,7 +391,7 @@ async function syncFirebaseLeaderboard(newStars, qAnswered) {
             await ref.set({ stars: localStats.stars, questions: localStats.questions, name: name, email: email });
         }
 
-        const snapshot = await db.collection('brain_players').orderBy('stars', 'desc').limit(20).get();
+        const snapshot = await (brainDb || firebase.firestore()).collection('brain_players').orderBy('stars', 'desc').limit(20).get();
         let html = ''; let rank = 1;
         
         snapshot.forEach(player => {
