@@ -1,7 +1,23 @@
 /* ████████████████████████████████████████████████████████████
       TRAIN YOUR BRAIN - CORE LOGIC (ANRU FOCUS)
-      🔥 ADVANCED MATH ENGINE & DYNAMIC TIMERS 🔥
+      🔥 ADVANCED MATH ENGINE & REAL-TIME LEADERBOARD 🔥
 ████████████████████████████████████████████████████████████ */
+
+// --- 🔥 FIREBASE CONNECTION (BUG FIX) ---
+const firebaseConfig = {
+    apiKey: "AlzaSyBPqJ7LIFBS5UV4r2BpUTfqH7coE4huG2c",
+    authDomain: "anru-foucs.firebaseapp.com",
+    projectId: "anru-foucs",
+    storageBucket: "anru-foucs.firebasestorage.app",
+    messagingSenderId: "503432672889",
+    appId: "1:503432672889:web:193c620deec4b8906646a8"
+};
+
+// Initialize Firebase only if it hasn't been initialized yet
+if (!firebase.apps.length) {
+    firebase.initializeApp(firebaseConfig);
+}
+const db = firebase.firestore();
 
 // --- STATE MANAGEMENT ---
 let tbSetup = { diff: 'Easy', qCount: 5, topics: ['+'] };
@@ -92,18 +108,40 @@ function renderShopItems() {
     `).join('');
 }
 function buyMagicItem(id) {
-    const item = MAGIC_ITEMS[id]; let xp = getMainXp();
-    if(xp < item.cost) return showToast(`Not enough XP! Need ${item.cost} XP`, "error");
+    const item = MAGIC_ITEMS[id]; 
+    const currentXp = window.AnRuSync ? window.AnRuSync.getXP() : getMainXp();
+    if(currentXp < item.cost) return showToast(`Not enough XP! Need ${item.cost} XP`, "error");
     
-    setMainXp(xp - item.cost);
     inventory[id]++;
     localStorage.setItem('mceo_tb_inv', JSON.stringify(inventory));
     
+    if (window.AnRuSync && typeof window.AnRuSync.deductXP === 'function') {
+        window.AnRuSync.deductXP(item.cost);
+        window.AnRuSync.saveUserData({ brainInventory: inventory });
+    } else {
+        setMainXp(currentXp - item.cost);
+    }
+    
     playS(sfxMagic);
-    document.getElementById('userXpDisplay').textContent = `${getMainXp()} XP`;
+    const disp = document.getElementById('userXpDisplay');
+    if(disp) disp.textContent = `${window.AnRuSync ? window.AnRuSync.getXP() : getMainXp()} XP`;
     renderShopItems();
     showToast(`<i class="fa-solid ${item.icon}"></i> ${item.name} Purchased!`, "success");
 }
+
+// Cloud Restore for Train Brain Inventory
+(async () => {
+    try {
+        const sess = window.AnRuSync ? window.AnRuSync.getSession() : JSON.parse(localStorage.getItem('mceo_sess') || 'null');
+        if (sess && !sess.isGuest && sess.email && typeof db !== 'undefined') {
+            const doc = await db.collection('users').doc(sess.email).get();
+            if (doc.exists && doc.data().brainInventory) {
+                inventory = { ...inventory, ...doc.data().brainInventory };
+                localStorage.setItem('mceo_tb_inv', JSON.stringify(inventory));
+            }
+        }
+    } catch(e) {}
+})();
 
 // --- GAME LOGIC ---
 function startTraining() {
@@ -166,7 +204,7 @@ function loadNextQuestion(isSkip = false) {
         btn.style.visibility = 'visible';
     }
 
-    // 🔥 SMART MATH ENGINE (Strict Digit & Time Rules)
+    // 🔥 SMART MATH ENGINE
     let minNum, maxNum;
     if (tbSetup.diff === 'Easy') {
         minNum = 10; maxNum = 99; // 2 Digits
@@ -189,7 +227,6 @@ function loadNextQuestion(isSkip = false) {
         n1 = rnd(minNum, maxNum); n2 = rnd(10, n1); ans = n1 - n2; 
     }
     else if(op === '*') { 
-        // Multiplication kept slightly reasonable so it can be solved in 5-6s
         let multMax = tbSetup.diff === 'Easy' ? 9 : (tbSetup.diff === 'Medium' ? 15 : 25);
         n1 = rnd(minNum, maxNum); n2 = rnd(2, multMax); ans = n1 * n2; 
     }
@@ -206,10 +243,10 @@ function loadNextQuestion(isSkip = false) {
     let opSign = op; if(op==='*') opSign='×'; if(op==='/') opSign='÷'; if(op==='%') opSign='% of';
     document.getElementById('questionText').textContent = `${op==='%' ? n2 : n1} ${opSign} ${op==='%' ? n1 : n2} = ?`;
 
-    // 🔥 SMART OPTIONS GENERATOR (Creates confusing fake options)
+    // 🔥 SMART OPTIONS GENERATOR
     tbGame.correctIdx = Math.floor(Math.random() * 4);
     let options = [];
-    let variance = Math.max(5, Math.floor(ans * 0.15)); // Fake options will be ~15% close to real answer
+    let variance = Math.max(5, Math.floor(ans * 0.15)); 
     
     for(let i=0; i<4; i++) {
         if(i === tbGame.correctIdx) { options[i] = ans; } 
@@ -239,7 +276,6 @@ function updateTimer() {
     
     document.getElementById('timeText').textContent = tbGame.timeLeft.toFixed(1) + 's';
     
-    // Smooth Timer Bar Calculation
     let maxT = Math.max(tbGame.baseTime, tbGame.timeLeft);
     const pct = Math.max(0, (tbGame.timeLeft / maxT) * 100);
     
@@ -257,8 +293,8 @@ function checkAnswer(idx) {
         playS(sfxWrong);
         document.getElementById(`opt${idx}`).classList.add('wrong');
         showToast("🛡️ Second Chance saved you! Try again.", "success");
-        tbGame.secondChanceActive = false; // consume it
-        tbGame.timeLeft = tbGame.baseTime; // reset timer
+        tbGame.secondChanceActive = false; 
+        tbGame.timeLeft = tbGame.baseTime; 
         tbGame.timerInterval = setInterval(updateTimer, 50);
         return;
     }
@@ -307,7 +343,9 @@ async function syncFirebaseLeaderboard(newStars, qAnswered) {
     listDiv.innerHTML = '<div style="text-align:center; padding:20px; color:var(--textMuted);"><i class="fa-solid fa-circle-notch fa-spin"></i> Fetching Global Ranks...</div>';
 
     const sess = JSON.parse(localStorage.getItem('mceo_sess'));
-    if(!sess || sess.isGuest || typeof db === 'undefined') {
+    
+    // Check if user is logged in
+    if(!sess || sess.isGuest) {
         listDiv.innerHTML = '<div style="text-align:center; padding:20px; color:var(--warn); font-size:12px;">Login with Cloud Account to compete on the Global Leaderboard!</div>';
         return;
     }

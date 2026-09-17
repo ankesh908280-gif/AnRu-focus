@@ -33,7 +33,25 @@ if(savedInv) {
 // 🔥 FIX 2: आइटम्स को परमानेंट फोन में सेव करने का फंक्शन
 function saveInventory() {
     localStorage.setItem('ai_combat_inventory', JSON.stringify(ai_Inventory));
+    if (window.AnRuSync && typeof window.AnRuSync.saveUserData === 'function') {
+        window.AnRuSync.saveUserData({ combatInventory: ai_Inventory });
+    }
 }
+
+// Cloud Restore for Combat Inventory
+(async () => {
+    try {
+        const sess = window.AnRuSync ? window.AnRuSync.getSession() : JSON.parse(localStorage.getItem('mceo_sess') || 'null');
+        if (sess && !sess.isGuest && sess.email && typeof db !== 'undefined') {
+            const doc = await db.collection('users').doc(sess.email).get();
+            if (doc.exists && doc.data().combatInventory) {
+                ai_Inventory = { ...ai_Inventory, ...doc.data().combatInventory };
+                localStorage.setItem('ai_combat_inventory', JSON.stringify(ai_Inventory));
+                updateInventoryUI();
+            }
+        }
+    } catch(e) {}
+})();
 
 // ==========================================
 // 1. LEADERBOARD & XP SYNC
@@ -87,15 +105,16 @@ async function fetchLeaderboard() {
 }
 
 function syncXpToMainApp(amount) {
-    if(typeof S === 'undefined' || !S.session || S.session.isGuest) return;
-    
-    S.xp += amount; // Main App के डेटाबेस में XP जोड़ो/घटाओ
-    
-    if(typeof saveData === 'function') saveData(); // Cloud (Firebase) पर सेव करो
-    
-    updateArenaXP(); // हेडर तुरंत अपडेट करो
+    if (window.AnRuSync) {
+        if (amount > 0) window.AnRuSync.addXP(amount);
+        else window.AnRuSync.deductXP(Math.abs(amount));
+    } else {
+        if(typeof S === 'undefined' || !S.session || S.session.isGuest) return;
+        S.xp += amount;
+        if(typeof saveData === 'function') saveData();
+    }
+    updateArenaXP();
     if(typeof renderDashboard === 'function') renderDashboard();
-    
     fetchLeaderboard(); 
 }
 
@@ -184,7 +203,7 @@ window.startAIMatch = async function() {
 };
 
 async function fetchAIQuestions(userClass, subject, topic, level, count) {
-    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.6-flash:generateContent?key=${AI_GEMINI_KEY}`;
+    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${AI_GEMINI_KEY}`;
     
     // 🔥 UP Board Hindi Medium Prompt
     const systemPrompt = `You are an expert exam creator for UP Board (Hindi Medium) students. 

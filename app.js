@@ -128,7 +128,8 @@ function updateNotifToggle(){const sw=document.getElementById('notifSw'); if(sw)
 ████████████████████████████████████████████████████████████ */
 window.onload = async () => {
   S.session = JSON.parse(localStorage.getItem('mceo_sess') || 'null');
-  updateTodayDate(); loadQuotesEngine();
+  if(typeof updateTodayDate === 'function') updateTodayDate();
+  if(typeof loadQuotesEngine === 'function') loadQuotesEngine();
   
   if(S.session) {
      loadDataLocal();
@@ -137,9 +138,21 @@ window.onload = async () => {
         try {
             const doc = await db.collection('users').doc(S.session.email).get();
             if(doc.exists) {
-                loadDataFromObj(doc.data());
+                const cloudData = doc.data();
+                // Merge cloud data with higher local XP to prevent data loss
+                const localXp = parseInt(localStorage.getItem(key('xp')) || '0', 10);
+                if(localXp > (cloudData.xp || 0)) {
+                    cloudData.xp = localXp;
+                    db.collection('users').doc(S.session.email).set({ xp: localXp }, { merge: true }).catch(console.error);
+                }
+                loadDataFromObj(cloudData);
                 migrateLegacyData(); 
-                renderAll(); updateShopUI();
+                if(document.getElementById('taskList') && typeof renderAll === 'function') {
+                    renderAll();
+                }
+                if(document.getElementById('shopGrid') && typeof updateShopUI === 'function') {
+                    updateShopUI();
+                }
             }
         } catch(e) { console.log("Network delay: Using local offline data."); }
      }
@@ -180,7 +193,7 @@ async function saveToCloud() {
     await db.collection('users').doc(S.session.email).set({
       profile: S.session, tasks: S.tasks, subjects: S.subjects, logs: S.timer.logs, xp: S.xp, theme: S.theme, unlocks: S.unlocks,
       freezeDate: S.freezeDate, lastDrainDate: S.lastDrainDate, lastMissionDate: S.lastMissionDate, eyeStrain: S.eyeStrain, activeBuff: S.activeBuff
-    });
+    }, { merge: true });
   } catch(e) { console.error("Cloud Save Failed", e); }
 }
 
@@ -197,13 +210,108 @@ function saveData(){
 
 let buffInterval = null; 
 function bootApp(){
-  document.getElementById('loginScreen').classList.remove('active'); document.getElementById('appScreen').classList.add('active');
-  applyTheme(S.theme); checkAccountabilityDrain(); updateNavUser(); initEmojiPicker(); updateNotifToggle(); updateSfxToggle(); updateEyeStrainToggle(); loadSecretMission(); 
+  const loginScr = document.getElementById('loginScreen');
+  const appScr = document.getElementById('appScreen');
+  if(loginScr) loginScr.classList.remove('active');
+  if(appScr) appScr.classList.add('active');
+  
+  if(document.body && S.theme) {
+    document.body.className = S.theme === 'default' ? '' : `theme-${S.theme}`;
+  }
+  
+  if(typeof checkAccountabilityDrain === 'function' && document.getElementById('taskList')) checkAccountabilityDrain();
+  if(typeof updateNavUser === 'function') updateNavUser();
+  if(document.getElementById('emojiRow') && typeof initEmojiPicker === 'function') initEmojiPicker();
+  if(typeof updateNotifToggle === 'function') updateNotifToggle();
+  if(typeof updateSfxToggle === 'function') updateSfxToggle();
+  if(typeof updateEyeStrainToggle === 'function') updateEyeStrainToggle();
+  if(document.getElementById('smText') && typeof loadSecretMission === 'function') loadSecretMission(); 
+  
   if(buffInterval) clearInterval(buffInterval);
-  buffInterval = setInterval(checkBuffState, 1000); 
-  renderAll(); updateShopUI();
+  if(document.getElementById('activeBuffUI')) {
+    buffInterval = setInterval(checkBuffState, 1000);
+  }
+  if(document.getElementById('taskList') && typeof renderAll === 'function') {
+    renderAll();
+  }
+  if(document.getElementById('shopGrid') && typeof updateShopUI === 'function') {
+    updateShopUI();
+  }
 }
 
+/* =========================================================
+   🌟 GLOBAL UNIFIED CLOUD & XP SYNC ENGINE (Safe for ALL Sub-Pages)
+   ========================================================= */
+window.AnRuSync = {
+  getSession: function() {
+    return (typeof S !== 'undefined' && S.session) ? S.session : JSON.parse(localStorage.getItem('mceo_sess') || 'null');
+  },
+  getXP: function() {
+    if(typeof S !== 'undefined' && S.xp !== undefined && !isNaN(S.xp)) return S.xp;
+    const sess = this.getSession();
+    const uid = sess?.isGuest ? 'guest' : (sess?.email || 'guest');
+    return parseInt(localStorage.getItem(`mceo_${uid}_xp`) || '0', 10);
+  },
+  addXP: async function(amount) {
+    if(!amount || isNaN(amount) || amount <= 0) return this.getXP();
+    const sess = this.getSession();
+    const uid = sess?.isGuest ? 'guest' : (sess?.email || 'guest');
+    let current = this.getXP() + amount;
+    
+    if(typeof S !== 'undefined') S.xp = current;
+    localStorage.setItem(`mceo_${uid}_xp`, current.toString());
+    
+    if(sess && !sess.isGuest && sess.email && typeof db !== 'undefined') {
+      try {
+        await db.collection('users').doc(sess.email).set({ xp: current }, { merge: true });
+      } catch(e) { console.error('Cloud XP sync failed:', e); }
+    }
+    
+    this.updatePageXPDisplays(current);
+    return current;
+  },
+  deductXP: async function(amount) {
+    if(!amount || isNaN(amount) || amount <= 0) return this.getXP();
+    const sess = this.getSession();
+    const uid = sess?.isGuest ? 'guest' : (sess?.email || 'guest');
+    let current = Math.max(0, this.getXP() - amount);
+    
+    if(typeof S !== 'undefined') S.xp = current;
+    localStorage.setItem(`mceo_${uid}_xp`, current.toString());
+    
+    if(sess && !sess.isGuest && sess.email && typeof db !== 'undefined') {
+      try {
+        await db.collection('users').doc(sess.email).set({ xp: current }, { merge: true });
+      } catch(e) { console.error('Cloud XP sync failed:', e); }
+    }
+    
+    this.updatePageXPDisplays(current);
+    return current;
+  },
+  saveUserData: async function(fieldsObj) {
+    const sess = this.getSession();
+    if(sess && !sess.isGuest && sess.email && typeof db !== 'undefined') {
+      try {
+        await db.collection('users').doc(sess.email).set(fieldsObj, { merge: true });
+      } catch(e) { console.error('Cloud field save failed:', e); }
+    }
+  },
+  updatePageXPDisplays: function(val) {
+    const ids = ['userXpDisplay', 'arenaXP', 'userXP', 'navXp', 'profXp', 'dCurrentXp', 'dashXp'];
+    ids.forEach(id => {
+      const el = document.getElementById(id);
+      if(el) {
+        if(id === 'arenaXP' || id === 'userXpDisplay' || id === 'dashXp' || id === 'navXp') el.textContent = `${val} XP`;
+        else el.textContent = val;
+      }
+    });
+    if(typeof updateArenaXP === 'function') try { updateArenaXP(); } catch(e){}
+    if(typeof renderDashboard === 'function') try { renderDashboard(); } catch(e){}
+  }
+};
+
+window.addXP = function(amt) { return window.AnRuSync.addXP(amt); };
+window.deductXP = function(amt) { return window.AnRuSync.deductXP(amt); };
 /* ████████████████████████████████████████████████████████████
                   4. CLOUD AUTHENTICATION 
 ████████████████████████████████████████████████████████████ */
@@ -490,19 +598,26 @@ function switchPage(page,navEl){
 
 function updateNavUser(){
   const u=S.session; if(!u)return;
-  const init=u.name.charAt(0).toUpperCase(); const nAv=document.getElementById('navAv'); const pAv=document.getElementById('profAv');
-  if(u.pfp){ nAv.textContent=''; pAv.textContent=''; nAv.style.backgroundImage=`url(${u.pfp})`; pAv.style.backgroundImage=`url(${u.pfp})`; } 
-  else { nAv.textContent=init; pAv.textContent=init; nAv.style.backgroundImage=''; pAv.style.backgroundImage=''; }
-  document.getElementById('profName').textContent=u.name; document.getElementById('profEmail').textContent=u.email;
+  const init=u.name ? u.name.charAt(0).toUpperCase() : 'U';
+  const nAv=document.getElementById('navAv'); const pAv=document.getElementById('profAv');
+  if(u.pfp){ 
+    if(nAv){ nAv.textContent=''; nAv.style.backgroundImage=`url(${u.pfp})`; }
+    if(pAv){ pAv.textContent=''; pAv.style.backgroundImage=`url(${u.pfp})`; }
+  } else { 
+    if(nAv){ nAv.textContent=init; nAv.style.backgroundImage=''; }
+    if(pAv){ pAv.textContent=init; pAv.style.backgroundImage=''; }
+  }
+  const pName = document.getElementById('profName'); if(pName) pName.textContent=u.name;
+  const pEmail = document.getElementById('profEmail'); if(pEmail) pEmail.textContent=u.email;
   
   let rLabel = getRank(S.xp);
   if (S.unlocks?.badge_legend) rLabel = `<i class="fa-solid fa-crown" style="color:#fbbf24"></i> Legend Focus CEO`;
   else if (S.unlocks?.badge_scholar) rLabel = `<i class="fa-solid fa-graduation-cap" style="color:#a855f7"></i> Elite Scholar`;
   else if (S.unlocks?.badge_ninja) rLabel = `<i class="fa-solid fa-user-ninja" style="color:#94a3b8"></i> Silent Ninja`;
   
-  document.getElementById('profBadge').innerHTML=`Rank: ${rLabel}`;
+  const pBadge = document.getElementById('profBadge'); if(pBadge) pBadge.innerHTML=`Rank: ${rLabel}`;
   const labelEl = document.getElementById('ceoRankLabel'); if(labelEl) labelEl.innerHTML = `${rLabel}`;
-  document.getElementById('wMsg').innerHTML=`Hey, ${u.name.split(' ')[0]}! <i class="fa-solid fa-hand-sparkles" style="color:#fbbf24"></i>`;
+  const wMsg = document.getElementById('wMsg'); if(wMsg) wMsg.innerHTML=`Hey, ${u.name.split(' ')[0]}! <i class="fa-solid fa-hand-sparkles" style="color:#fbbf24"></i>`;
   const cd=document.getElementById('courseDisplay'); if(cd)cd.textContent=u.course||'Not set';
 }
 

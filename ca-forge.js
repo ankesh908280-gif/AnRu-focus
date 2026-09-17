@@ -36,9 +36,13 @@ window.updateArenaXP = function() {
 };
 
 function syncXpToMainApp(amount) {
-    if(typeof S === 'undefined' || !S.session || S.session.isGuest) return;
-    S.xp += amount;
-    if(typeof saveData === 'function') saveData();
+    if (window.AnRuSync && typeof window.AnRuSync.addXP === 'function') {
+        window.AnRuSync.addXP(amount);
+    } else {
+        if(typeof S === 'undefined' || !S.session || S.session.isGuest) return;
+        S.xp += amount;
+        if(typeof saveData === 'function') saveData();
+    }
     updateArenaXP(); 
     if(typeof renderDashboard === 'function') renderDashboard();
 }
@@ -82,7 +86,7 @@ window.generateCA = async function() {
 
 async function fetchLiveNewsAPI(category, count, dateStr) {
     // User requested 3.6-flash, we try that first.
-    let aiModel = "gemini-3.6-flash"; 
+    let aiModel = "gemini-1.5-flash"; 
     let url = `https://generativelanguage.googleapis.com/v1beta/models/${aiModel}:generateContent?key=${AI_GEMINI_KEY}`;
     
     const systemPrompt = `आज तारीख है: ${dateStr}।
@@ -288,6 +292,9 @@ window.toggleStar = function() {
     }
     
     localStorage.setItem('ca_starred', JSON.stringify(ca_Starred));
+    if (window.AnRuSync && typeof window.AnRuSync.saveUserData === 'function') {
+        window.AnRuSync.saveUserData({ caForge: { starred: ca_Starred, history: ca_History } });
+    }
 };
 
 function saveToHistory(totalQs) {
@@ -301,6 +308,9 @@ function saveToHistory(totalQs) {
     ca_History.unshift(record);
     if(ca_History.length > 50) ca_History.pop(); 
     localStorage.setItem('ca_history', JSON.stringify(ca_History));
+    if (window.AnRuSync && typeof window.AnRuSync.saveUserData === 'function') {
+        window.AnRuSync.saveUserData({ caForge: { starred: ca_Starred, history: ca_History } });
+    }
 }
 
 window.openVault = function() {
@@ -365,3 +375,24 @@ function renderVaultStarred() {
     });
     container.innerHTML = html;
 }
+
+// Cloud Restore for CA Forge
+document.addEventListener("DOMContentLoaded", async () => {
+    try {
+        const sess = window.AnRuSync ? window.AnRuSync.getSession() : JSON.parse(localStorage.getItem('mceo_sess') || 'null');
+        if (sess && !sess.isGuest && sess.email && typeof db !== 'undefined') {
+            const doc = await db.collection('users').doc(sess.email).get();
+            if (doc.exists && doc.data().caForge) {
+                const cloudCA = doc.data().caForge;
+                if (Array.isArray(cloudCA.starred) && cloudCA.starred.length > 0) {
+                    ca_Starred = cloudCA.starred;
+                    localStorage.setItem('ca_starred', JSON.stringify(ca_Starred));
+                }
+                if (Array.isArray(cloudCA.history) && cloudCA.history.length > 0) {
+                    ca_History = cloudCA.history;
+                    localStorage.setItem('ca_history', JSON.stringify(ca_History));
+                }
+            }
+        }
+    } catch(e) { console.log("CA Forge offline restore", e); }
+});

@@ -270,7 +270,7 @@ function hideAITyping() {
 // 🧠 5. THE AI ENGINE (WITH ADMIN PROMPT LAYERING)
 async function fetchGeminiResponse(userMessage, imgBase64) {
     // 🔴 BUG FIXED HERE: URL now correctly uses AI_GEMINI_KEY instead of GEMINI_API_KEY
-    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.6-flash:generateContent?key=${AI_GEMINI_KEY}`;
+    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${AI_GEMINI_KEY}`;
     
     // Base Prompt: Ye sabhi normal students ke liye apply hoga
     let systemPrompt = `You are AnRu AI, a highly advanced, smart study mentor for 11th/12th students (JEE/NEET/Boards). 

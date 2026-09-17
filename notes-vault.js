@@ -190,20 +190,17 @@ window.buyNote = async function(noteId) {
     }
 
     if(confirm(`Spend ${UNLOCK_COST} XP to permanently unlock this chapter?`)) {
-        // 💰 Deduct XP
-        userXp -= UNLOCK_COST;
-        
-        // Update global S variable if it exists
-        if(typeof S !== 'undefined') S.xp = userXp; 
+        // 💰 Deduct XP via Unified Cloud Sync
+        if (window.AnRuSync && typeof window.AnRuSync.deductXP === 'function') {
+            await window.AnRuSync.deductXP(UNLOCK_COST);
+            userXp = window.AnRuSync.getXP();
+        } else {
+            userXp -= UNLOCK_COST;
+            if(typeof S !== 'undefined') S.xp = userXp; 
+            localStorage.setItem(`mceo_${userEmail}_xp`, userXp.toString());
+        }
         
         unlockedNotes.push(noteId);
-        
-        // 💾 Save Deducted XP to Main App LocalStorage securely
-        localStorage.setItem(`mceo_${userEmail}_xp`, userXp.toString());
-        
-        // Trigger main app save to update globally in Firebase
-        if(typeof window.saveData === 'function') { window.saveData(); } 
-        else if(typeof saveData === 'function') { saveData(); }
         
         // 🔄 Update DOM
         document.getElementById('vaultXpDisplay').innerHTML = userXp + " XP";
@@ -229,9 +226,12 @@ window.openNotes = function(noteId, title, driveId, isFree) {
     playClick();
     document.getElementById('dvTitle').textContent = title;
     
-    // 🌐 Special Google Drive Link that shows folder in a GRID view
-    const driveLink = `https://drive.google.com/embeddedfolderview?id=${driveId}#grid`;
+    if (!driveId || driveId.startsWith('YOUR_DRIVE_FOLDER_ID')) {
+        showToast("📌 Yeh chapter jald hi upload hoga! Stay tuned.", "warn");
+        return;
+    }
     
+    const driveLink = `https://drive.google.com/embeddedfolderview?id=${driveId}#grid`;
     document.getElementById('driveIframe').src = driveLink;
     document.getElementById('driveViewer').classList.add('open');
 }

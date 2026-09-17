@@ -246,11 +246,17 @@ function finishSession() {
     if (logs.length > 2000) logs.pop(); 
     localStorage.setItem(logsKey, JSON.stringify(logs));
     
-    let currentXp = parseInt(localStorage.getItem(xpKey) || '0', 10);
-    currentXp += (dMins * 8); 
-    localStorage.setItem(xpKey, currentXp.toString());
+    const earnedXP = dMins * 8;
+    if (window.AnRuSync && typeof window.AnRuSync.addXP === 'function') {
+        window.AnRuSync.addXP(earnedXP);
+        window.AnRuSync.saveUserData({ logs: logs });
+    } else {
+        let currentXp = parseInt(localStorage.getItem(xpKey) || '0', 10);
+        currentXp += earnedXP; 
+        localStorage.setItem(xpKey, currentXp.toString());
+    }
     
-    alert(`🎉 MISSION COMPLETE! +${dMins * 8} XP ADDED TO PROFILE.`);
+    showFocusToast(`🎉 MISSION COMPLETE! +${earnedXP} XP Synced to Cloud ☁️`);
     
     // Reset Timer values after save
     if (cMode === 'stopwatch') {
@@ -441,4 +447,15 @@ function renderAnalytics() {
     }
     const historyListEl = document.getElementById('ui-history-list');
     if(historyListEl) historyListEl.innerHTML = histHtml;
+}
+
+function showFocusToast(msg) {
+    const t = document.getElementById('focusToast');
+    if (t) {
+        t.innerHTML = msg;
+        t.style.display = 'block';
+        setTimeout(() => { t.style.display = 'none'; }, 3500);
+    } else {
+        alert(msg);
+    }
 }

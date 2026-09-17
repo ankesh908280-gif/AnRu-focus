@@ -133,7 +133,7 @@
 
         extractAI: async function(base64Image, mimeType) {
             // 🔥 UPDATED TO GEMINI 3.6 FLASH AS PER DASHBOARD
-            const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.6-flash:generateContent?key=${AI_GEMINI_KEY}`;
+            const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${AI_GEMINI_KEY}`;
             
             const systemPrompt = `Analyze this screenshot from an online class app. Find all the distinct classes/lectures listed.
             For each class, extract:

@@ -45,10 +45,28 @@ window.onload = () => {
     updateDashboard();
 };
 
-function loadData() {
+async function loadData() {
     if(localStorage.getItem("anru_vocab_score")) score = parseInt(localStorage.getItem("anru_vocab_score"));
     if(localStorage.getItem("anru_vocab_mastered")) masteredWords = JSON.parse(localStorage.getItem("anru_vocab_mastered"));
     if(localStorage.getItem("anru_vocab_wrong")) wrongWords = JSON.parse(localStorage.getItem("anru_vocab_wrong"));
+
+    // Cloud Restore from Firestore
+    try {
+        const sess = window.AnRuSync ? window.AnRuSync.getSession() : JSON.parse(localStorage.getItem('mceo_sess') || 'null');
+        if (sess && !sess.isGuest && sess.email && typeof db !== 'undefined') {
+            const doc = await db.collection('users').doc(sess.email).get();
+            if (doc.exists && doc.data().vocab) {
+                const cloudVocab = doc.data().vocab;
+                if (cloudVocab.score !== undefined && cloudVocab.score > score) score = cloudVocab.score;
+                if (Array.isArray(cloudVocab.mastered) && cloudVocab.mastered.length > masteredWords.length) masteredWords = cloudVocab.mastered;
+                if (Array.isArray(cloudVocab.wrong) && cloudVocab.wrong.length > 0) wrongWords = cloudVocab.wrong;
+                localStorage.setItem("anru_vocab_score", score);
+                localStorage.setItem("anru_vocab_mastered", JSON.stringify(masteredWords));
+                localStorage.setItem("anru_vocab_wrong", JSON.stringify(wrongWords));
+                updateDashboard();
+            }
+        }
+    } catch(e) { console.log("Vocab offline mode:", e); }
 }
 
 function saveData() {
@@ -56,6 +74,13 @@ function saveData() {
     localStorage.setItem("anru_vocab_mastered", JSON.stringify(masteredWords));
     localStorage.setItem("anru_vocab_wrong", JSON.stringify(wrongWords));
     updateDashboard();
+
+    // Cloud Sync to Firestore
+    if (window.AnRuSync && typeof window.AnRuSync.saveUserData === 'function') {
+        window.AnRuSync.saveUserData({
+            vocab: { score: score, mastered: masteredWords, wrong: wrongWords }
+        });
+    }
 }
 
 function updateDashboard() {
