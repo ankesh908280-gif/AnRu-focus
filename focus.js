@@ -44,21 +44,7 @@ document.addEventListener("DOMContentLoaded", () => {
     updateDisplay();
     renderAnalytics();
 
-    // Auto-inject PiP button if missing in focus.html
-    const existingPipBtn = document.getElementById('pipTimerBtn');
-    if (!existingPipBtn) {
-        const playBtn = document.getElementById('main-play-btn');
-        if (playBtn && playBtn.parentElement) {
-            const btnHtml = `
-                <button class="f-timer-btn" id="pipTimerBtn" onclick="togglePipTimer()" style="margin-top:12px; width:100%; border-radius:14px; font-size:13px; font-weight:600; display:flex; align-items:center; justify-content:center; gap:8px; background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.12); color:#cbd5e1; padding:12px 18px; cursor:pointer; transition:0.3s;" title="Watch online class with a floating timer on screen">
-                  <i class="fa-solid fa-clone" style="color:var(--p1);"></i> <span>Floating PiP Timer (Live Class)</span>
-                </button>
-            `;
-            playBtn.parentElement.insertAdjacentHTML('afterend', btnHtml);
-        }
-    }
-
-});
+    });
 
 function getIndiaDate(d = new Date()) {
     const l = new Date(d);
@@ -118,8 +104,6 @@ function timerLoop() {
     }
     
     updateDisplay(exactLeft);
-    updatePipCanvas(exactLeft);
-    
     // Throttle MediaSession metadata updates
     let secFloor = Math.floor(exactLeft);
     if (secFloor !== lastSecNotified) {
@@ -141,9 +125,8 @@ function toggleTimer() {
         elPlayBtn.classList.add('paused');
         if (elBrain) elBrain.classList.remove('pulse-anim');
         
-        stopBackgroundAudio();
+        // 🔥 Keep silent audio active so Android OS does NOT dismiss the notification card!
         updateMediaSession(false);
-        updatePipCanvas();
     } else {
         // Start
         if (leftSecs <= 0 && cMode !== 'stopwatch') {
@@ -151,7 +134,7 @@ function toggleTimer() {
         }
         isRun = true;
         
-        if (elSaveBtn) elSaveBtn.style.display = 'flex'; // 🔥 Show Save Button
+        if (elSaveBtn) elSaveBtn.style.display = 'flex'; // Show Save Button
         
         const now = Date.now();
         if (cMode === 'stopwatch') {
@@ -162,7 +145,7 @@ function toggleTimer() {
         
         elPlayBtn.innerHTML = '<i class="fa-solid fa-pause"></i> Pause';
         elPlayBtn.classList.remove('paused');
-        if (elBrain) elBrain.classList.remove('pulse-anim');
+        if (elBrain) elBrain.classList.add('pulse-anim');
         
         startBackgroundAudio();
         setupMediaSessionHandlers();
@@ -264,7 +247,6 @@ function finishSession() {
     if (bgTimerInterval) clearInterval(bgTimerInterval);
     stopBackgroundAudio();
     updateMediaSession(false);
-    updatePipCanvas(0);
     // Calculate EXACT minutes studied
     let studiedSecs = cMode === 'stopwatch' ? leftSecs : (durationSecs - leftSecs);
     let dMins = Math.floor(studiedSecs / 60);
@@ -311,21 +293,7 @@ function finishSession() {
     updateDisplay();
     renderAnalytics();
 
-    // Auto-inject PiP button if missing in focus.html
-    const existingPipBtn = document.getElementById('pipTimerBtn');
-    if (!existingPipBtn) {
-        const playBtn = document.getElementById('main-play-btn');
-        if (playBtn && playBtn.parentElement) {
-            const btnHtml = `
-                <button class="f-timer-btn" id="pipTimerBtn" onclick="togglePipTimer()" style="margin-top:12px; width:100%; border-radius:14px; font-size:13px; font-weight:600; display:flex; align-items:center; justify-content:center; gap:8px; background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.12); color:#cbd5e1; padding:12px 18px; cursor:pointer; transition:0.3s;" title="Watch online class with a floating timer on screen">
-                  <i class="fa-solid fa-clone" style="color:var(--p1);"></i> <span>Floating PiP Timer (Live Class)</span>
-                </button>
-            `;
-            playBtn.parentElement.insertAdjacentHTML('afterend', btnHtml);
-        }
     }
-
-}
 
 // ================= DYNAMIC ANALYTICS ENGINE =================
 
@@ -410,14 +378,23 @@ function renderAnalytics() {
         if(dateRangeEl) dateRangeEl.textContent = now.getFullYear().toString();
         daysToLookBack = 365;
         uiSubText = 'This Year';
-        for (let i = 5; i >= 0; i--) {
-            let targetMonth = new Date(now.getFullYear(), now.getMonth() - i, 1);
+        const currentYear = now.getFullYear();
+        const currentMonthIdx = now.getMonth();
+        for (let m = 0; m < 12; m++) {
+            let targetMonth = new Date(currentYear, m, 1);
             let monthSum = logs.filter(l => {
-                let ld = new Date(l.dateStr);
-                return ld.getMonth() === targetMonth.getMonth() && ld.getFullYear() === targetMonth.getFullYear();
-            }).reduce((a,c)=>a+c.duration, 0);
+                if (!l.dateStr) return false;
+                let parts = l.dateStr.split('-');
+                let y = parseInt(parts[0], 10);
+                let mo = parseInt(parts[1], 10) - 1;
+                return y === currentYear && mo === m;
+            }).reduce((a,c) => a + (c.duration || 0), 0);
             maxMins = Math.max(maxMins, monthSum);
-            chartData.push({ label: targetMonth.toLocaleDateString('en-IN', {month:'short'}), val: monthSum, isCurrent: i===0 });
+            chartData.push({ 
+                label: targetMonth.toLocaleDateString('en-IN', {month:'short'}), 
+                val: monthSum, 
+                isCurrent: m === currentMonthIdx 
+            });
         }
     }
 
@@ -435,12 +412,15 @@ function renderAnalytics() {
         let barColor = item.isCurrent ? 'linear-gradient(180deg, #ec4899, rgba(236,72,153,0.15))' : 'linear-gradient(180deg, var(--neon-purple), rgba(168,85,247,0.15))';
         let shadowColor = item.isCurrent ? 'rgba(236,72,153,0.5)' : 'rgba(168,85,247,0.4)';
         
+        let barWidthStyle = timeframe === 'yearly' ? 'width:12px;' : '';
+        let labelStyle = timeframe === 'yearly' ? 'font-size:9px; letter-spacing:-0.4px;' : '';
+        
         chartHtml += `
             <div class="chart-col">
-              <div class="chart-bar-bg">
+              <div class="chart-bar-bg" style="${barWidthStyle}">
                 <div class="chart-bar-fill" style="height:${hPct}%; background:${barColor}; box-shadow:0 0 12px ${shadowColor};" data-tooltip="${formatTime(item.val)}"></div>
               </div>
-              <div class="chart-day" style="${item.isCurrent ? 'color:#fff;' : ''}">${item.label}</div>
+              <div class="chart-day" style="${item.isCurrent ? 'color:#fff;' : ''} ${labelStyle}">${item.label}</div>
             </div>
         `;
     });
@@ -518,18 +498,54 @@ function showFocusToast(msg) {
 }
 
 /* =========================================================
-   🚀 BACKGROUND NOTIFICATION (MEDIASESSION) & FLOATING PiP ENGINE
+   🚀 BACKGROUND NOTIFICATION CONTROLLER (MEDIASESSION ENGINE)
    ========================================================= */
 let silentAudioEl = null;
 let lastSecNotified = -1;
 let bgTimerInterval = null;
 
+// Digital 5-second PCM WAV silence generator
+function createSilentWavUrl(seconds = 5) {
+    try {
+        const sampleRate = 8000;
+        const numSamples = sampleRate * seconds;
+        const buffer = new ArrayBuffer(44 + numSamples);
+        const view = new DataView(buffer);
+        
+        function writeStr(offset, str) {
+            for (let i = 0; i < str.length; i++) view.setUint8(offset + i, str.charCodeAt(i));
+        }
+        
+        writeStr(0, 'RIFF');
+        view.setUint32(4, 36 + numSamples, true);
+        writeStr(8, 'WAVE');
+        writeStr(12, 'fmt ');
+        view.setUint32(16, 16, true);
+        view.setUint16(20, 1, true); // PCM
+        view.setUint16(22, 1, true); // Mono
+        view.setUint32(24, sampleRate, true);
+        view.setUint32(28, sampleRate, true);
+        view.setUint16(32, 1, true);
+        view.setUint16(34, 8, true);
+        writeStr(36, 'data');
+        view.setUint32(40, numSamples, true);
+        
+        const pcm = new Uint8Array(buffer, 44, numSamples);
+        pcm.fill(128); // 128 is pure zero amplitude in 8-bit PCM
+        
+        const blob = new Blob([buffer], { type: 'audio/wav' });
+        return URL.createObjectURL(blob);
+    } catch(e) {
+        return "data:audio/wav;base64,UklGRigAAABXQVZFZm10IBIAAAABAAEARKwAAIhYAQACABAAAABkYXRhAgAAAAEA";
+    }
+}
+
 function getSilentAudio() {
     if (!silentAudioEl) {
         silentAudioEl = document.createElement('audio');
         silentAudioEl.loop = true;
-        // 1-second silent WAV base64
-        silentAudioEl.src = "data:audio/wav;base64,UklGRigAAABXQVZFZm10IBIAAAABAAEARKwAAIhYAQACABAAAABkYXRhAgAAAAEA";
+        silentAudioEl.volume = 0.01; // Non-zero volume keeps Android Chrome from muting the media session
+        silentAudioEl.src = createSilentWavUrl(5);
     }
     return silentAudioEl;
 }
@@ -537,9 +553,11 @@ function getSilentAudio() {
 function startBackgroundAudio() {
     try {
         const audio = getSilentAudio();
-        audio.play().catch(e => {
-            console.log("Silent background audio waiting for user gesture:", e);
-        });
+        if (audio.paused) {
+            audio.play().catch(e => {
+                console.log("Silent background audio play waiting for user gesture:", e);
+            });
+        }
     } catch(e) {}
 }
 
@@ -564,13 +582,12 @@ function startBackgroundTimer() {
                 isRun = false;
                 clearInterval(bgTimerInterval);
                 stopBackgroundAudio();
-                updateMediaSession(false);
+                if ('mediaSession' in navigator) navigator.mediaSession.playbackState = 'none';
                 finishSession();
                 return;
             }
         }
         updateMediaSession(isRun);
-        updatePipCanvas(leftSecs);
     }, 1000);
 }
 
@@ -580,12 +597,21 @@ function updateMediaSession(running = isRun) {
     let m = Math.floor(leftSecs / 60);
     let s = Math.floor(leftSecs % 60);
     const timeStr = `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
-    const modeTitle = cMode === 'stopwatch' ? `⏱️ Studying: ${timeStr}` : `⏳ Focus: ${timeStr} left`;
+    
+    let titleText = '';
+    let artistText = '';
+    if (!running) {
+        titleText = `⏸️ PAUSED (${timeStr}) • Tap ▶ to Resume`;
+        artistText = "AnRu Focus • Paused";
+    } else {
+        titleText = cMode === 'stopwatch' ? `⏱️ Studying: ${timeStr}` : `⏳ Focus: ${timeStr} left`;
+        artistText = "AnRu Focus • Online Class Mode";
+    }
     
     navigator.mediaSession.metadata = new MediaMetadata({
-        title: modeTitle,
-        artist: "AnRu Focus • Online Class Mode",
-        album: "Live Lecture Tracker",
+        title: titleText,
+        artist: artistText,
+        album: "Daily Target: 4h • Class 12th",
         artwork: [
             { src: "https://img.icons8.com/fluency/96/brain.png", sizes: "96x96", type: "image/png" },
             { src: "https://img.icons8.com/fluency/192/brain.png", sizes: "192x192", type: "image/png" }
@@ -593,6 +619,38 @@ function updateMediaSession(running = isRun) {
     });
     
     navigator.mediaSession.playbackState = running ? "playing" : "paused";
+
+    try {
+        if ('setPositionState' in navigator.mediaSession && durationSecs > 0) {
+            let elapsed = cMode === 'stopwatch' ? leftSecs : (durationSecs - leftSecs);
+            let total = cMode === 'stopwatch' ? Math.max(elapsed, 3600) : durationSecs;
+            elapsed = Math.min(Math.max(0, elapsed), total);
+            navigator.mediaSession.setPositionState({
+                duration: total,
+                playbackRate: running ? 1.0 : 0.0,
+                position: elapsed
+            });
+        }
+    } catch(e) {}
+}
+
+function resetFocusTimer() {
+    isRun = false;
+    cancelAnimationFrame(rafId);
+    if (bgTimerInterval) clearInterval(bgTimerInterval);
+    stopBackgroundAudio();
+    if ('mediaSession' in navigator) navigator.mediaSession.playbackState = 'none';
+    
+    if (cMode === 'stopwatch') {
+        leftSecs = 0;
+    } else {
+        leftSecs = durationSecs;
+    }
+    updateDisplay(leftSecs);
+    elPlayBtn.innerHTML = '<i class="fa-solid fa-play"></i> Start Focus';
+    elPlayBtn.classList.remove('paused');
+    if (elBrain) elBrain.classList.remove('pulse-anim');
+    if (elSaveBtn) elSaveBtn.style.display = 'none';
 }
 
 function setupMediaSessionHandlers() {
@@ -605,14 +663,36 @@ function setupMediaSessionHandlers() {
         navigator.mediaSession.setActionHandler('pause', () => {
             if (isRun) toggleTimer();
         });
+        navigator.mediaSession.setActionHandler('previoustrack', () => {
+            resetFocusTimer();
+        });
+        navigator.mediaSession.setActionHandler('nexttrack', () => {
+            manualFinish();
+        });
         navigator.mediaSession.setActionHandler('stop', () => {
             manualFinish();
         });
         navigator.mediaSession.setActionHandler('seekbackward', () => {
-            if (!isRun) toggleTimer();
+            if (cMode !== 'stopwatch') {
+                leftSecs = Math.min(durationSecs, leftSecs + 60);
+                endTime += 60000;
+            } else {
+                startTime += 60000;
+                leftSecs = Math.max(0, leftSecs - 60);
+            }
+            updateDisplay(leftSecs);
+            updateMediaSession(isRun);
         });
         navigator.mediaSession.setActionHandler('seekforward', () => {
-            manualFinish();
+            if (cMode !== 'stopwatch') {
+                leftSecs = Math.max(0, leftSecs - 60);
+                endTime -= 60000;
+            } else {
+                startTime -= 60000;
+                leftSecs += 60;
+            }
+            updateDisplay(leftSecs);
+            updateMediaSession(isRun);
         });
     } catch(e) {
         console.warn("MediaSession action error:", e);
@@ -639,110 +719,3 @@ document.addEventListener('visibilitychange', () => {
         rafId = requestAnimationFrame(timerLoop);
     }
 });
-
-// ================= FLOATING PiP (PICTURE-IN-PICTURE) TIMER =================
-let pipVideo = null;
-let pipCanvas = null;
-let pipCtx = null;
-let isPipActive = false;
-
-function initPipElements() {
-    if (!pipCanvas) {
-        pipCanvas = document.createElement('canvas');
-        pipCanvas.width = 340;
-        pipCanvas.height = 180;
-        pipCtx = pipCanvas.getContext('2d');
-    }
-    if (!pipVideo) {
-        pipVideo = document.createElement('video');
-        pipVideo.muted = true;
-        pipVideo.playsInline = true;
-        pipVideo.style.display = 'none';
-        document.body.appendChild(pipVideo);
-        
-        pipVideo.addEventListener('enterpictureinpicture', () => {
-            isPipActive = true;
-            updatePipBtnUI(true);
-            showFocusToast("📺 Floating Timer Active! Switch to your online class now.", "success");
-        });
-        pipVideo.addEventListener('leavepictureinpicture', () => {
-            isPipActive = false;
-            updatePipBtnUI(false);
-        });
-    }
-}
-
-function updatePipCanvas(exactLeft = leftSecs) {
-    if (!pipCanvas || !pipCtx) return;
-    
-    let m = Math.floor(exactLeft / 60);
-    let s = Math.floor(exactLeft % 60);
-    const timeStr = `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
-    
-    // Dark Futuristic Glass Gradient
-    const grad = pipCtx.createLinearGradient(0, 0, 340, 180);
-    grad.addColorStop(0, '#0c071e');
-    grad.addColorStop(1, '#1b0d36');
-    pipCtx.fillStyle = grad;
-    pipCtx.fillRect(0, 0, 340, 180);
-    
-    // Glowing Neon Border
-    pipCtx.strokeStyle = isRun ? '#10b981' : '#a855f7';
-    pipCtx.lineWidth = 4;
-    pipCtx.strokeRect(2, 2, 336, 176);
-    
-    // Status Header
-    pipCtx.fillStyle = isRun ? '#10b981' : '#fbbf24';
-    pipCtx.font = 'bold 16px sans-serif';
-    pipCtx.textAlign = 'center';
-    const statusText = cMode === 'stopwatch' ? '⏱️ STOPWATCH' : (isRun ? '🔥 FOCUSING' : '⏸️ PAUSED');
-    pipCtx.fillText(statusText, 170, 42);
-    
-    // Timer Digits
-    pipCtx.fillStyle = '#ffffff';
-    pipCtx.font = 'bold 54px monospace';
-    pipCtx.fillText(timeStr, 170, 112);
-    
-    // Footer Tag
-    pipCtx.fillStyle = '#94a3b8';
-    pipCtx.font = '13px sans-serif';
-    pipCtx.fillText('AnRu Focus • Live Class', 170, 150);
-}
-
-async function togglePipTimer() {
-    if (!document.pictureInPictureEnabled) {
-        showFocusToast("⚠️ Picture-in-Picture is not supported in this browser.", "error");
-        return;
-    }
-    
-    initPipElements();
-    updatePipCanvas();
-    
-    try {
-        if (document.pictureInPictureElement) {
-            await document.exitPictureInPicture();
-        } else {
-            const stream = pipCanvas.captureStream(12);
-            pipVideo.srcObject = stream;
-            await pipVideo.play();
-            await pipVideo.requestPictureInPicture();
-        }
-    } catch(err) {
-        console.error("PiP Error:", err);
-        showFocusToast("⚠️ Pehle 'Start Focus' par click karein!", "error");
-    }
-}
-
-function updatePipBtnUI(active) {
-    const btn = document.getElementById('pipTimerBtn');
-    if (!btn) return;
-    if (active) {
-        btn.innerHTML = '<i class="fa-solid fa-compress" style="color:#10b981"></i> <span>Close Floating Timer</span>';
-        btn.style.borderColor = '#10b981';
-        btn.style.color = '#10b981';
-    } else {
-        btn.innerHTML = '<i class="fa-solid fa-clone" style="color:var(--p1)"></i> <span>Floating PiP Timer (Live Class)</span>';
-        btn.style.borderColor = 'rgba(255,255,255,0.12)';
-        btn.style.color = '#cbd5e1';
-    }
-}
