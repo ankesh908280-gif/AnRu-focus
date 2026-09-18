@@ -96,19 +96,21 @@ function timerLoop() {
             if (elBrain) elBrain.classList.remove('pulse-anim');
             if (elSaveBtn) elSaveBtn.style.display = 'none';
             
-            stopBackgroundAudio();
-            updateMediaSession(false);
+            if (window.AnruNotifier) AnruNotifier.clearTimerNotification();
             finishSession();
             return;
         }
     }
     
     updateDisplay(exactLeft);
-    // Throttle MediaSession metadata updates
+    
+    // Throttle system notification update to once per second (ZERO audio, ZERO ducking!)
     let secFloor = Math.floor(exactLeft);
     if (secFloor !== lastSecNotified) {
         lastSecNotified = secFloor;
-        updateMediaSession(true);
+        if (window.AnruNotifier) {
+            AnruNotifier.updateTimerNotification(exactLeft, true, cMode, durationSecs);
+        }
     }
     
     rafId = requestAnimationFrame(timerLoop);
@@ -125,8 +127,10 @@ function toggleTimer() {
         elPlayBtn.classList.add('paused');
         if (elBrain) elBrain.classList.remove('pulse-anim');
         
-        // 🔥 Keep silent audio active so Android OS does NOT dismiss the notification card!
-        updateMediaSession(false);
+        // ZERO audio! Update system notification with Resume ▶️ action button
+        if (window.AnruNotifier) {
+            AnruNotifier.updateTimerNotification(leftSecs, false, cMode, durationSecs);
+        }
     } else {
         // Start
         if (leftSecs <= 0 && cMode !== 'stopwatch') {
@@ -147,9 +151,10 @@ function toggleTimer() {
         elPlayBtn.classList.remove('paused');
         if (elBrain) elBrain.classList.add('pulse-anim');
         
-        startBackgroundAudio();
-        setupMediaSessionHandlers();
-        updateMediaSession(true);
+        // ZERO audio! Update system notification with Pause ⏸️ action button
+        if (window.AnruNotifier) {
+            AnruNotifier.updateTimerNotification(leftSecs, true, cMode, durationSecs);
+        }
         startBackgroundTimer();
         
         rafId = requestAnimationFrame(timerLoop);
@@ -245,8 +250,7 @@ function customTimer(el) {
 
 function finishSession() {
     if (bgTimerInterval) clearInterval(bgTimerInterval);
-    stopBackgroundAudio();
-    updateMediaSession(false);
+    if (window.AnruNotifier) AnruNotifier.clearTimerNotification();
     // Calculate EXACT minutes studied
     let studiedSecs = cMode === 'stopwatch' ? leftSecs : (durationSecs - leftSecs);
     let dMins = Math.floor(studiedSecs / 60);
@@ -281,6 +285,7 @@ function finishSession() {
     }
     
     showFocusToast(`🎉 MISSION COMPLETE! +${earnedXP} XP Synced to Cloud ☁️`);
+    if (window.AnruNotifier) AnruNotifier.showSessionCompleted(dMins);
     
     // Reset Timer values after save
     if (cMode === 'stopwatch') {
@@ -498,75 +503,24 @@ function showFocusToast(msg) {
 }
 
 /* =========================================================
-   🚀 BACKGROUND NOTIFICATION CONTROLLER (MEDIASESSION ENGINE)
+   🚀 ZERO-AUDIO-DUCKING BACKGROUND TIMER & SYSTEM NOTIFICATION CONTROLLER
    ========================================================= */
-let silentAudioEl = null;
 let lastSecNotified = -1;
 let bgTimerInterval = null;
 
-// Digital 5-second PCM WAV silence generator
-function createSilentWavUrl(seconds = 5) {
-    try {
-        const sampleRate = 8000;
-        const numSamples = sampleRate * seconds;
-        const buffer = new ArrayBuffer(44 + numSamples);
-        const view = new DataView(buffer);
-        
-        function writeStr(offset, str) {
-            for (let i = 0; i < str.length; i++) view.setUint8(offset + i, str.charCodeAt(i));
+// Service Worker timer action listener
+if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.addEventListener('message', (event) => {
+        if (event.data && event.data.type === 'TIMER_ACTION') {
+            if (event.data.action === 'pause') {
+                if (isRun) toggleTimer();
+            } else if (event.data.action === 'resume') {
+                if (!isRun) toggleTimer();
+            } else if (event.data.action === 'finish') {
+                manualFinish();
+            }
         }
-        
-        writeStr(0, 'RIFF');
-        view.setUint32(4, 36 + numSamples, true);
-        writeStr(8, 'WAVE');
-        writeStr(12, 'fmt ');
-        view.setUint32(16, 16, true);
-        view.setUint16(20, 1, true); // PCM
-        view.setUint16(22, 1, true); // Mono
-        view.setUint32(24, sampleRate, true);
-        view.setUint32(28, sampleRate, true);
-        view.setUint16(32, 1, true);
-        view.setUint16(34, 8, true);
-        writeStr(36, 'data');
-        view.setUint32(40, numSamples, true);
-        
-        const pcm = new Uint8Array(buffer, 44, numSamples);
-        pcm.fill(128); // 128 is pure zero amplitude in 8-bit PCM
-        
-        const blob = new Blob([buffer], { type: 'audio/wav' });
-        return URL.createObjectURL(blob);
-    } catch(e) {
-        return "data:audio/wav;base64,UklGRigAAABXQVZFZm10IBIAAAABAAEARKwAAIhYAQACABAAAABkYXRhAgAAAAEA";
-    }
-}
-
-function getSilentAudio() {
-    if (!silentAudioEl) {
-        silentAudioEl = document.createElement('audio');
-        silentAudioEl.loop = true;
-        silentAudioEl.volume = 0.01; // Non-zero volume keeps Android Chrome from muting the media session
-        silentAudioEl.src = createSilentWavUrl(5);
-    }
-    return silentAudioEl;
-}
-
-function startBackgroundAudio() {
-    try {
-        const audio = getSilentAudio();
-        if (audio.paused) {
-            audio.play().catch(e => {
-                console.log("Silent background audio play waiting for user gesture:", e);
-            });
-        }
-    } catch(e) {}
-}
-
-function stopBackgroundAudio() {
-    try {
-        if (silentAudioEl) {
-            silentAudioEl.pause();
-        }
-    } catch(e) {}
+    });
 }
 
 function startBackgroundTimer() {
@@ -581,65 +535,22 @@ function startBackgroundTimer() {
             if (leftSecs <= 0) {
                 isRun = false;
                 clearInterval(bgTimerInterval);
-                stopBackgroundAudio();
-                if ('mediaSession' in navigator) navigator.mediaSession.playbackState = 'none';
+                if (window.AnruNotifier) AnruNotifier.clearTimerNotification();
                 finishSession();
                 return;
             }
         }
-        updateMediaSession(isRun);
-    }, 1000);
-}
-
-function updateMediaSession(running = isRun) {
-    if (!('mediaSession' in navigator)) return;
-    
-    let m = Math.floor(leftSecs / 60);
-    let s = Math.floor(leftSecs % 60);
-    const timeStr = `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
-    
-    let titleText = '';
-    let artistText = '';
-    if (!running) {
-        titleText = `⏸️ PAUSED (${timeStr}) • Tap ▶ to Resume`;
-        artistText = "AnRu Focus • Paused";
-    } else {
-        titleText = cMode === 'stopwatch' ? `⏱️ Studying: ${timeStr}` : `⏳ Focus: ${timeStr} left`;
-        artistText = "AnRu Focus • Online Class Mode";
-    }
-    
-    navigator.mediaSession.metadata = new MediaMetadata({
-        title: titleText,
-        artist: artistText,
-        album: "Daily Target: 4h • Class 12th",
-        artwork: [
-            { src: "https://img.icons8.com/fluency/96/brain.png", sizes: "96x96", type: "image/png" },
-            { src: "https://img.icons8.com/fluency/192/brain.png", sizes: "192x192", type: "image/png" }
-        ]
-    });
-    
-    navigator.mediaSession.playbackState = running ? "playing" : "paused";
-
-    try {
-        if ('setPositionState' in navigator.mediaSession && durationSecs > 0) {
-            let elapsed = cMode === 'stopwatch' ? leftSecs : (durationSecs - leftSecs);
-            let total = cMode === 'stopwatch' ? Math.max(elapsed, 3600) : durationSecs;
-            elapsed = Math.min(Math.max(0, elapsed), total);
-            navigator.mediaSession.setPositionState({
-                duration: total,
-                playbackRate: running ? 1.0 : 0.0,
-                position: elapsed
-            });
+        if (window.AnruNotifier) {
+            AnruNotifier.updateTimerNotification(leftSecs, isRun, cMode, durationSecs);
         }
-    } catch(e) {}
+    }, 1000);
 }
 
 function resetFocusTimer() {
     isRun = false;
     cancelAnimationFrame(rafId);
     if (bgTimerInterval) clearInterval(bgTimerInterval);
-    stopBackgroundAudio();
-    if ('mediaSession' in navigator) navigator.mediaSession.playbackState = 'none';
+    if (window.AnruNotifier) AnruNotifier.clearTimerNotification();
     
     if (cMode === 'stopwatch') {
         leftSecs = 0;
@@ -651,52 +562,6 @@ function resetFocusTimer() {
     elPlayBtn.classList.remove('paused');
     if (elBrain) elBrain.classList.remove('pulse-anim');
     if (elSaveBtn) elSaveBtn.style.display = 'none';
-}
-
-function setupMediaSessionHandlers() {
-    if (!('mediaSession' in navigator)) return;
-    
-    try {
-        navigator.mediaSession.setActionHandler('play', () => {
-            if (!isRun) toggleTimer();
-        });
-        navigator.mediaSession.setActionHandler('pause', () => {
-            if (isRun) toggleTimer();
-        });
-        navigator.mediaSession.setActionHandler('previoustrack', () => {
-            resetFocusTimer();
-        });
-        navigator.mediaSession.setActionHandler('nexttrack', () => {
-            manualFinish();
-        });
-        navigator.mediaSession.setActionHandler('stop', () => {
-            manualFinish();
-        });
-        navigator.mediaSession.setActionHandler('seekbackward', () => {
-            if (cMode !== 'stopwatch') {
-                leftSecs = Math.min(durationSecs, leftSecs + 60);
-                endTime += 60000;
-            } else {
-                startTime += 60000;
-                leftSecs = Math.max(0, leftSecs - 60);
-            }
-            updateDisplay(leftSecs);
-            updateMediaSession(isRun);
-        });
-        navigator.mediaSession.setActionHandler('seekforward', () => {
-            if (cMode !== 'stopwatch') {
-                leftSecs = Math.max(0, leftSecs - 60);
-                endTime -= 60000;
-            } else {
-                startTime -= 60000;
-                leftSecs += 60;
-            }
-            updateDisplay(leftSecs);
-            updateMediaSession(isRun);
-        });
-    } catch(e) {
-        console.warn("MediaSession action error:", e);
-    }
 }
 
 // Background tab visibility recovery (Instant resync when returning to app)
