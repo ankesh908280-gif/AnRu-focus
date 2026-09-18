@@ -43,6 +43,21 @@ document.addEventListener("DOMContentLoaded", () => {
 
     updateDisplay();
     renderAnalytics();
+
+    // Auto-inject PiP button if missing in focus.html
+    const existingPipBtn = document.getElementById('pipTimerBtn');
+    if (!existingPipBtn) {
+        const playBtn = document.getElementById('main-play-btn');
+        if (playBtn && playBtn.parentElement) {
+            const btnHtml = `
+                <button class="f-timer-btn" id="pipTimerBtn" onclick="togglePipTimer()" style="margin-top:12px; width:100%; border-radius:14px; font-size:13px; font-weight:600; display:flex; align-items:center; justify-content:center; gap:8px; background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.12); color:#cbd5e1; padding:12px 18px; cursor:pointer; transition:0.3s;" title="Watch online class with a floating timer on screen">
+                  <i class="fa-solid fa-clone" style="color:var(--p1);"></i> <span>Floating PiP Timer (Live Class)</span>
+                </button>
+            `;
+            playBtn.parentElement.insertAdjacentHTML('afterend', btnHtml);
+        }
+    }
+
 });
 
 function getIndiaDate(d = new Date()) {
@@ -74,7 +89,7 @@ function updateDisplay(exactLeft = leftSecs) {
 function timerLoop() {
     if (!isRun) return;
     
-    let now = performance.now();
+    let now = Date.now();
     let exactLeft;
 
     if (cMode === 'stopwatch') {
@@ -95,12 +110,23 @@ function timerLoop() {
             if (elBrain) elBrain.classList.remove('pulse-anim');
             if (elSaveBtn) elSaveBtn.style.display = 'none';
             
+            stopBackgroundAudio();
+            updateMediaSession(false);
             finishSession();
             return;
         }
     }
     
     updateDisplay(exactLeft);
+    updatePipCanvas(exactLeft);
+    
+    // Throttle MediaSession metadata updates
+    let secFloor = Math.floor(exactLeft);
+    if (secFloor !== lastSecNotified) {
+        lastSecNotified = secFloor;
+        updateMediaSession(true);
+    }
+    
     rafId = requestAnimationFrame(timerLoop);
 }
 
@@ -109,9 +135,15 @@ function toggleTimer() {
         // Pause
         isRun = false;
         cancelAnimationFrame(rafId);
+        if (bgTimerInterval) clearInterval(bgTimerInterval);
+        
         elPlayBtn.innerHTML = '<i class="fa-solid fa-play"></i> Resume';
         elPlayBtn.classList.add('paused');
         if (elBrain) elBrain.classList.remove('pulse-anim');
+        
+        stopBackgroundAudio();
+        updateMediaSession(false);
+        updatePipCanvas();
     } else {
         // Start
         if (leftSecs <= 0 && cMode !== 'stopwatch') {
@@ -121,21 +153,27 @@ function toggleTimer() {
         
         if (elSaveBtn) elSaveBtn.style.display = 'flex'; // 🔥 Show Save Button
         
+        const now = Date.now();
         if (cMode === 'stopwatch') {
-            startTime = performance.now() - (leftSecs * 1000);
+            startTime = now - (leftSecs * 1000);
         } else {
-            endTime = performance.now() + (leftSecs * 1000);
+            endTime = now + (leftSecs * 1000);
         }
         
         elPlayBtn.innerHTML = '<i class="fa-solid fa-pause"></i> Pause';
         elPlayBtn.classList.remove('paused');
-        if (elBrain) elBrain.classList.add('pulse-anim');
+        if (elBrain) elBrain.classList.remove('pulse-anim');
+        
+        startBackgroundAudio();
+        setupMediaSessionHandlers();
+        updateMediaSession(true);
+        startBackgroundTimer();
         
         rafId = requestAnimationFrame(timerLoop);
     }
 }
 
-// 🔥 NEW: Early Manual Finish Logic (Saves exact studied time)
+// 🔥 Manual Finish Logic
 function manualFinish() {
     let studiedSecs = cMode === 'stopwatch' ? leftSecs : (durationSecs - leftSecs);
     
@@ -223,7 +261,11 @@ function customTimer(el) {
 // ================= DATA SYNC & FINISH =================
 
 function finishSession() {
-    // 🔥 BUG FIX: Calculate EXACT minutes studied (No more fake 60 mins!)
+    if (bgTimerInterval) clearInterval(bgTimerInterval);
+    stopBackgroundAudio();
+    updateMediaSession(false);
+    updatePipCanvas(0);
+    // Calculate EXACT minutes studied
     let studiedSecs = cMode === 'stopwatch' ? leftSecs : (durationSecs - leftSecs);
     let dMins = Math.floor(studiedSecs / 60);
     
@@ -268,6 +310,21 @@ function finishSession() {
     
     updateDisplay();
     renderAnalytics();
+
+    // Auto-inject PiP button if missing in focus.html
+    const existingPipBtn = document.getElementById('pipTimerBtn');
+    if (!existingPipBtn) {
+        const playBtn = document.getElementById('main-play-btn');
+        if (playBtn && playBtn.parentElement) {
+            const btnHtml = `
+                <button class="f-timer-btn" id="pipTimerBtn" onclick="togglePipTimer()" style="margin-top:12px; width:100%; border-radius:14px; font-size:13px; font-weight:600; display:flex; align-items:center; justify-content:center; gap:8px; background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.12); color:#cbd5e1; padding:12px 18px; cursor:pointer; transition:0.3s;" title="Watch online class with a floating timer on screen">
+                  <i class="fa-solid fa-clone" style="color:var(--p1);"></i> <span>Floating PiP Timer (Live Class)</span>
+                </button>
+            `;
+            playBtn.parentElement.insertAdjacentHTML('afterend', btnHtml);
+        }
+    }
+
 }
 
 // ================= DYNAMIC ANALYTICS ENGINE =================
@@ -457,5 +514,235 @@ function showFocusToast(msg) {
         setTimeout(() => { t.style.display = 'none'; }, 3500);
     } else {
         alert(msg);
+    }
+}
+
+/* =========================================================
+   🚀 BACKGROUND NOTIFICATION (MEDIASESSION) & FLOATING PiP ENGINE
+   ========================================================= */
+let silentAudioEl = null;
+let lastSecNotified = -1;
+let bgTimerInterval = null;
+
+function getSilentAudio() {
+    if (!silentAudioEl) {
+        silentAudioEl = document.createElement('audio');
+        silentAudioEl.loop = true;
+        // 1-second silent WAV base64
+        silentAudioEl.src = "data:audio/wav;base64,UklGRigAAABXQVZFZm10IBIAAAABAAEARKwAAIhYAQACABAAAABkYXRhAgAAAAEA";
+    }
+    return silentAudioEl;
+}
+
+function startBackgroundAudio() {
+    try {
+        const audio = getSilentAudio();
+        audio.play().catch(e => {
+            console.log("Silent background audio waiting for user gesture:", e);
+        });
+    } catch(e) {}
+}
+
+function stopBackgroundAudio() {
+    try {
+        if (silentAudioEl) {
+            silentAudioEl.pause();
+        }
+    } catch(e) {}
+}
+
+function startBackgroundTimer() {
+    if (bgTimerInterval) clearInterval(bgTimerInterval);
+    bgTimerInterval = setInterval(() => {
+        if (!isRun) return;
+        let now = Date.now();
+        if (cMode === 'stopwatch') {
+            leftSecs = (now - startTime) / 1000;
+        } else {
+            leftSecs = Math.max(0, (endTime - now) / 1000);
+            if (leftSecs <= 0) {
+                isRun = false;
+                clearInterval(bgTimerInterval);
+                stopBackgroundAudio();
+                updateMediaSession(false);
+                finishSession();
+                return;
+            }
+        }
+        updateMediaSession(isRun);
+        updatePipCanvas(leftSecs);
+    }, 1000);
+}
+
+function updateMediaSession(running = isRun) {
+    if (!('mediaSession' in navigator)) return;
+    
+    let m = Math.floor(leftSecs / 60);
+    let s = Math.floor(leftSecs % 60);
+    const timeStr = `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
+    const modeTitle = cMode === 'stopwatch' ? `⏱️ Studying: ${timeStr}` : `⏳ Focus: ${timeStr} left`;
+    
+    navigator.mediaSession.metadata = new MediaMetadata({
+        title: modeTitle,
+        artist: "AnRu Focus • Online Class Mode",
+        album: "Live Lecture Tracker",
+        artwork: [
+            { src: "https://img.icons8.com/fluency/96/brain.png", sizes: "96x96", type: "image/png" },
+            { src: "https://img.icons8.com/fluency/192/brain.png", sizes: "192x192", type: "image/png" }
+        ]
+    });
+    
+    navigator.mediaSession.playbackState = running ? "playing" : "paused";
+}
+
+function setupMediaSessionHandlers() {
+    if (!('mediaSession' in navigator)) return;
+    
+    try {
+        navigator.mediaSession.setActionHandler('play', () => {
+            if (!isRun) toggleTimer();
+        });
+        navigator.mediaSession.setActionHandler('pause', () => {
+            if (isRun) toggleTimer();
+        });
+        navigator.mediaSession.setActionHandler('stop', () => {
+            manualFinish();
+        });
+        navigator.mediaSession.setActionHandler('seekbackward', () => {
+            if (!isRun) toggleTimer();
+        });
+        navigator.mediaSession.setActionHandler('seekforward', () => {
+            manualFinish();
+        });
+    } catch(e) {
+        console.warn("MediaSession action error:", e);
+    }
+}
+
+// Background tab visibility recovery (Instant resync when returning to app)
+document.addEventListener('visibilitychange', () => {
+    if (!document.hidden && isRun) {
+        let now = Date.now();
+        if (cMode === 'stopwatch') {
+            leftSecs = (now - startTime) / 1000;
+        } else {
+            leftSecs = Math.max(0, (endTime - now) / 1000);
+            if (leftSecs <= 0) {
+                isRun = false;
+                updateDisplay(0);
+                finishSession();
+                return;
+            }
+        }
+        updateDisplay(leftSecs);
+        cancelAnimationFrame(rafId);
+        rafId = requestAnimationFrame(timerLoop);
+    }
+});
+
+// ================= FLOATING PiP (PICTURE-IN-PICTURE) TIMER =================
+let pipVideo = null;
+let pipCanvas = null;
+let pipCtx = null;
+let isPipActive = false;
+
+function initPipElements() {
+    if (!pipCanvas) {
+        pipCanvas = document.createElement('canvas');
+        pipCanvas.width = 340;
+        pipCanvas.height = 180;
+        pipCtx = pipCanvas.getContext('2d');
+    }
+    if (!pipVideo) {
+        pipVideo = document.createElement('video');
+        pipVideo.muted = true;
+        pipVideo.playsInline = true;
+        pipVideo.style.display = 'none';
+        document.body.appendChild(pipVideo);
+        
+        pipVideo.addEventListener('enterpictureinpicture', () => {
+            isPipActive = true;
+            updatePipBtnUI(true);
+            showFocusToast("📺 Floating Timer Active! Switch to your online class now.", "success");
+        });
+        pipVideo.addEventListener('leavepictureinpicture', () => {
+            isPipActive = false;
+            updatePipBtnUI(false);
+        });
+    }
+}
+
+function updatePipCanvas(exactLeft = leftSecs) {
+    if (!pipCanvas || !pipCtx) return;
+    
+    let m = Math.floor(exactLeft / 60);
+    let s = Math.floor(exactLeft % 60);
+    const timeStr = `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
+    
+    // Dark Futuristic Glass Gradient
+    const grad = pipCtx.createLinearGradient(0, 0, 340, 180);
+    grad.addColorStop(0, '#0c071e');
+    grad.addColorStop(1, '#1b0d36');
+    pipCtx.fillStyle = grad;
+    pipCtx.fillRect(0, 0, 340, 180);
+    
+    // Glowing Neon Border
+    pipCtx.strokeStyle = isRun ? '#10b981' : '#a855f7';
+    pipCtx.lineWidth = 4;
+    pipCtx.strokeRect(2, 2, 336, 176);
+    
+    // Status Header
+    pipCtx.fillStyle = isRun ? '#10b981' : '#fbbf24';
+    pipCtx.font = 'bold 16px sans-serif';
+    pipCtx.textAlign = 'center';
+    const statusText = cMode === 'stopwatch' ? '⏱️ STOPWATCH' : (isRun ? '🔥 FOCUSING' : '⏸️ PAUSED');
+    pipCtx.fillText(statusText, 170, 42);
+    
+    // Timer Digits
+    pipCtx.fillStyle = '#ffffff';
+    pipCtx.font = 'bold 54px monospace';
+    pipCtx.fillText(timeStr, 170, 112);
+    
+    // Footer Tag
+    pipCtx.fillStyle = '#94a3b8';
+    pipCtx.font = '13px sans-serif';
+    pipCtx.fillText('AnRu Focus • Live Class', 170, 150);
+}
+
+async function togglePipTimer() {
+    if (!document.pictureInPictureEnabled) {
+        showFocusToast("⚠️ Picture-in-Picture is not supported in this browser.", "error");
+        return;
+    }
+    
+    initPipElements();
+    updatePipCanvas();
+    
+    try {
+        if (document.pictureInPictureElement) {
+            await document.exitPictureInPicture();
+        } else {
+            const stream = pipCanvas.captureStream(12);
+            pipVideo.srcObject = stream;
+            await pipVideo.play();
+            await pipVideo.requestPictureInPicture();
+        }
+    } catch(err) {
+        console.error("PiP Error:", err);
+        showFocusToast("⚠️ Pehle 'Start Focus' par click karein!", "error");
+    }
+}
+
+function updatePipBtnUI(active) {
+    const btn = document.getElementById('pipTimerBtn');
+    if (!btn) return;
+    if (active) {
+        btn.innerHTML = '<i class="fa-solid fa-compress" style="color:#10b981"></i> <span>Close Floating Timer</span>';
+        btn.style.borderColor = '#10b981';
+        btn.style.color = '#10b981';
+    } else {
+        btn.innerHTML = '<i class="fa-solid fa-clone" style="color:var(--p1)"></i> <span>Floating PiP Timer (Live Class)</span>';
+        btn.style.borderColor = 'rgba(255,255,255,0.12)';
+        btn.style.color = '#cbd5e1';
     }
 }
