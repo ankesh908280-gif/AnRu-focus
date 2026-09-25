@@ -130,14 +130,117 @@ input::placeholder, textarea::placeholder { color: var(--textMuted); }
 .btn-logout { padding: 7px 14px; background: rgba(248,113,113,0.1); border: 1px solid rgba(248,113,113,0.2); border-radius: 8px; color: var(--danger); font-size: 12px; font-weight: 600; cursor: pointer; transition: all 0.2s; }
 .btn-logout:hover { background: var(--danger); color: #fff; }
 
-.bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; display: flex; background: rgba(15,12,41,0.92); backdrop-filter: blur(30px); border-top: 1px solid rgba(255,255,255,0.08); padding: 8px 0 14px; z-index: 200; transition: transform 0.3s; }
-.bnav-item { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 6px 0; background: none; border: none; color: var(--textMuted); font-family: 'Outfit', sans-serif; font-size: 11px; font-weight: 500; cursor: pointer; transition: all 0.3s; position: relative; }
-.bnav-item .bni { font-size: 22px; transition: transform 0.3s; }
-.bnav-item:hover { color: #fff; }
-.bnav-item.active { color: #fff; }
-.bnav-item.active .bni { transform: scale(1.2) translateY(-2px); }
-.bnav-item.active::before { content: ''; position: absolute; top: 0; left: 50%; transform: translateX(-50%); width: 30px; height: 3px; background: var(--grad); border-radius: 0 0 4px 4px; }
-.bnav-badge { position: absolute; top: 4px; right: calc(50% - 18px); background: var(--p4); color: #fff; font-size: 10px; font-weight: 800; min-width: 18px; height: 18px; border-radius: 9px; display: flex; align-items: center; justify-content: center; padding: 0 4px; animation: badgePop 0.3s; }
+/* =========================================================
+   🍏 APPLE-STYLE FLOATING GLASS DOCK (DYNAMIC ISLAND TAB BAR)
+   ========================================================= */
+.bottom-nav {
+  position: fixed;
+  bottom: 12px;
+  left: 14px;
+  right: 14px;
+  max-width: 480px;
+  margin: 0 auto;
+  height: 64px;
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  background: rgba(16, 12, 34, 0.78);
+  backdrop-filter: blur(40px) saturate(200%);
+  -webkit-backdrop-filter: blur(40px) saturate(200%);
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: 32px;
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.65), 
+              inset 0 1px 1px rgba(255, 255, 255, 0.22),
+              0 0 25px rgba(168, 85, 247, 0.15);
+  padding: 0 8px;
+  z-index: 999;
+  transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.3s;
+}
+
+.bnav-item {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  height: 52px;
+  background: transparent;
+  border: none;
+  color: rgba(255, 255, 255, 0.45);
+  font-family: 'Outfit', -apple-system, sans-serif;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.3px;
+  cursor: pointer;
+  position: relative;
+  border-radius: 26px;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.bnav-item .bni {
+  font-size: 20px;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.bnav-item:hover {
+  color: rgba(255, 255, 255, 0.85);
+}
+
+.bnav-item.active {
+  color: #ffffff;
+  background: radial-gradient(circle at center, rgba(168, 85, 247, 0.25) 0%, transparent 75%);
+}
+
+.bnav-item.active .bni {
+  transform: scale(1.18) translateY(-2px);
+  color: #ffffff;
+  filter: drop-shadow(0 0 10px rgba(168, 85, 247, 0.9));
+}
+
+/* Apple-style floating active indicator dot/pill */
+.bnav-item.active::after {
+  content: '';
+  position: absolute;
+  bottom: 4px;
+  width: 14px;
+  height: 3px;
+  background: linear-gradient(90deg, var(--p1), var(--p2));
+  border-radius: 4px;
+  box-shadow: 0 0 10px var(--p1), 0 0 4px var(--p2);
+}
+
+.bnav-item:active {
+  transform: scale(0.92);
+}
+
+.bnav-badge {
+  position: absolute;
+  top: 4px;
+  right: calc(50% - 18px);
+  background: linear-gradient(135deg, #ef4444, #f43f5e);
+  color: #ffffff;
+  font-size: 9px;
+  font-weight: 800;
+  min-width: 18px;
+  height: 18px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 4px;
+  box-shadow: 0 2px 8px rgba(239, 68, 68, 0.6);
+  border: 2px solid rgba(16, 12, 34, 0.95);
+  animation: badgePulse 2s infinite;
+}
+
+@keyframes badgePulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.12); box-shadow: 0 0 12px rgba(239, 68, 68, 0.9); }
+}
 
 /* ████████████████████████████████████████████████████████████
                   5. DASHBOARD ELEMENTS 
@@ -763,4 +866,47 @@ input:checked + .slider:before {
 /* Separate floating buttons so they never collide */
 #floatingNoteBtn {
   bottom: 155px !important;
+}
+
+
+/* =========================================================
+   ✨ NEW FEATURES STYLING (D-DAY, HEATMAP, BOSS & WHEEL)
+   ========================================================= */
+
+/* D-Day Card */
+.dday-card {
+  transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.25s;
+}
+.dday-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 30px rgba(168, 85, 247, 0.35);
+}
+
+/* Study Activity Heatmap */
+.heatmap-col {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  flex: 1;
+}
+.heatmap-cell {
+  width: 100%;
+  aspect-ratio: 1;
+  border-radius: 3px;
+  background: rgba(255, 255, 255, 0.05);
+  transition: transform 0.2s, background 0.3s;
+  cursor: pointer;
+}
+.heatmap-cell:hover {
+  transform: scale(1.25);
+  z-index: 2;
+}
+.heatmap-cell.lvl-1 { background: rgba(168, 85, 247, 0.35); }
+.heatmap-cell.lvl-2 { background: rgba(168, 85, 247, 0.7); box-shadow: 0 0 6px rgba(168, 85, 247, 0.4); }
+.heatmap-cell.lvl-3 { background: linear-gradient(135deg, #a855f7, #ec4899); box-shadow: 0 0 10px rgba(236, 72, 153, 0.6); }
+
+/* Boss Battle Animations */
+@keyframes bossPulse {
+  0%, 100% { transform: scale(1) translateY(0); }
+  50% { transform: scale(1.08) translateY(-6px); filter: drop-shadow(0 0 30px rgba(239, 68, 68, 0.8)); }
 }

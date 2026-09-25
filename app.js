@@ -1445,7 +1445,7 @@ function updateAiAdvisor() {
 
 function nextAiAdvice() {
   _aiAdvIdx++;
-  updateAiAdvisor();
+  updateAiAdvisor(); updateDDayWidget();
   if (typeof playSfx === 'function') playSfx('click');
 }
 
@@ -1461,9 +1461,26 @@ function renderDashboard(){
   const target = 2; 
   const todayCompleted = S.tasks.filter(t => t.date === todayStr && t.isDone && !t.isBacklog).length;
   const targetText = document.getElementById('targetTextUI'); const targetBar = document.getElementById('targetBarUI');
-  if(targetText) targetText.textContent = `${todayCompleted}/${target} Done`; if(targetBar) targetBar.style.width = `${Math.min(100, (todayCompleted/target)*100)}%`;
+  if(targetText) targetText.textContent = `${todayCompleted}/${target} Done`; 
+  if(targetBar) targetBar.style.width = `${Math.min(100, (todayCompleted/target)*100)}%`;
+  const wheelBanner = document.getElementById('dailyWheelBannerUI');
+  if (wheelBanner) {
+    if (todayCompleted >= target) {
+      wheelBanner.style.display = 'flex';
+      const sub = document.getElementById('wheelBannerSub');
+      if (sub) {
+        if (S.lastSpinDate === todayStr) {
+          sub.textContent = "Today's lucky reward claimed! Kal naya spin aayega.";
+        } else {
+          sub.textContent = "Tap here to spin the Lucky Wheel for XP & gifts!";
+        }
+      }
+    } else {
+      wheelBanner.style.display = 'none';
+    }
+  }
 
-  updateAiAdvisor();
+  updateAiAdvisor(); updateDDayWidget();
 
   const standardTasks = S.tasks.filter(t => !t.isBacklog); 
   const total = S.tasks.length; const done = S.tasks.filter(t => t.isDone).length; const pending = total - done; 
@@ -1505,6 +1522,7 @@ function calcStreak(){
 }
 
 function renderProfile(){
+  renderStudyHeatmap();
   updateNavUser();
   const ps1 = document.getElementById('ps1'); if(ps1) ps1.textContent = S.tasks.length;
   const ps2 = document.getElementById('ps2'); if(ps2) ps2.textContent = S.tasks.filter(t=>t.isDone).length;
@@ -1807,4 +1825,148 @@ function loadQuotesEngine() {
         quoteEl.innerHTML = pickQuote();
         setInterval(() => { quoteEl.innerHTML = pickQuote(); }, 12000);
     }
+}
+
+
+/* =========================================================
+   🎓 D-DAY EXAM COUNTDOWN WIDGET & MODAL ENGINE
+   ========================================================= */
+function updateDDayWidget() {
+  const titleEl = document.getElementById('dDayExamTitle');
+  const dispEl = document.getElementById('dDayDateDisplay');
+  const numEl = document.getElementById('dDayCountNum');
+  if (!numEl) return;
+
+  const examTarget = S.session?.examTarget || JSON.parse(localStorage.getItem('anru_dday_target') || 'null') || {
+    name: S.session?.course || "Class 12th Board Exam",
+    date: "2027-02-15"
+  };
+
+  if (titleEl) titleEl.textContent = examTarget.name || "Target Exam D-Day";
+  if (dispEl) {
+    const d = new Date(examTarget.date + "T00:00:00");
+    dispEl.textContent = d.toLocaleDateString('en-IN', { day:'numeric', month:'short', year:'numeric' });
+  }
+
+  const targetDate = new Date(examTarget.date + "T00:00:00");
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const diffDays = Math.ceil((targetDate - today) / (1000 * 60 * 60 * 24));
+
+  if (diffDays > 0) {
+    numEl.textContent = diffDays;
+    numEl.style.fontSize = diffDays > 99 ? "22px" : "26px";
+    numEl.style.color = diffDays < 30 ? "#f87171" : "#fbbf24";
+  } else if (diffDays === 0) {
+    numEl.textContent = "TODAY";
+    numEl.style.fontSize = "16px";
+    numEl.style.color = "#4ade80";
+  } else {
+    numEl.textContent = "DONE";
+    numEl.style.fontSize = "16px";
+    numEl.style.color = "#a855f7";
+  }
+}
+
+function openDDayModal() {
+  const current = S.session?.examTarget || JSON.parse(localStorage.getItem('anru_dday_target') || 'null') || {
+    name: S.session?.course || "Class 12th Board Exam",
+    date: "2027-02-15"
+  };
+
+  const mc = document.getElementById('modalContent');
+  const ov = document.getElementById('modalOverlay');
+  if (!mc || !ov) return;
+
+  mc.innerHTML = `
+    <div class="modal-title"><i class="fa-solid fa-hourglass-half" style="color:#fbbf24;"></i> Target Exam D-Day</div>
+    <p style="font-size:12px; color:var(--textMuted); margin-bottom:14px;">Apne target exam ka naam aur exam date set karein, dashboard par countdown dikhega.</p>
+    <div class="inp-wrap">
+      <span class="ico"><i class="fa-solid fa-graduation-cap" style="color:#a855f7;"></i></span>
+      <input type="text" id="ddayNameInput" placeholder="Exam Name (e.g. UP Board 12th)" value="${current.name || ''}">
+    </div>
+    <div class="inp-wrap">
+      <span class="ico"><i class="fa-solid fa-calendar-days" style="color:#60a5fa;"></i></span>
+      <input type="date" id="ddayDateInput" value="${current.date || '2027-02-15'}">
+    </div>
+    <button class="btn btn-grad" style="width:100%; border-radius:12px; margin-top:8px;" onclick="saveDDayTarget()">Save Target Date <i class="fa-solid fa-check"></i></button>
+  `;
+  ov.classList.add('open');
+  if (typeof playSfx === 'function') playSfx('click');
+}
+
+function saveDDayTarget() {
+  const name = document.getElementById('ddayNameInput').value.trim() || "Target Exam";
+  const date = document.getElementById('ddayDateInput').value;
+  if (!date) return showToast("Kripya ek valid date chunein!", "error");
+
+  if (!S.session) S.session = {};
+  S.session.examTarget = { name, date };
+  localStorage.setItem('anru_dday_target', JSON.stringify({ name, date }));
+  saveData();
+  updateDDayWidget();
+  closeModal();
+  if (typeof playSfx === 'function') playSfx('success');
+  showToast("⏳ Exam D-Day Target Saved!", "success");
+}
+
+/* =========================================================
+   🗓️ 365-DAY STUDY ACTIVITY HEATMAP (GITHUB STYLE)
+   ========================================================= */
+function renderStudyHeatmap() {
+  const grid = document.getElementById('studyHeatmapGrid');
+  const countEl = document.getElementById('heatmapActiveCount');
+  if (!grid) return;
+
+  const today = new Date();
+  const daysTotal = 15 * 7; // 15 weeks = 105 days
+  const startDate = new Date();
+  startDate.setDate(today.getDate() - (daysTotal - 1));
+
+  const taskMap = {};
+  if (S.tasks) {
+    S.tasks.filter(t => t.isDone && t.date).forEach(t => {
+      taskMap[t.date] = (taskMap[t.date] || 0) + 1;
+    });
+  }
+
+  const focusMap = {};
+  if (S.timer && S.timer.logs) {
+    S.timer.logs.forEach(l => {
+      if (l.dateStr) focusMap[l.dateStr] = (focusMap[l.dateStr] || 0) + (l.duration || 0);
+    });
+  }
+
+  let activeDays = 0;
+  let html = '';
+
+  for (let w = 0; w < 15; w++) {
+    html += '<div class="heatmap-col">';
+    for (let d = 0; d < 7; d++) {
+      const cur = new Date(startDate);
+      cur.setDate(startDate.getDate() + (w * 7 + d));
+      const dateStr = getLocISO(cur);
+      const isFuture = cur > today;
+
+      const tasksDone = taskMap[dateStr] || 0;
+      const focusMins = focusMap[dateStr] || 0;
+      const score = (tasksDone * 2) + Math.floor(focusMins / 20);
+
+      let lvlClass = '';
+      if (!isFuture) {
+        if (score >= 6) { lvlClass = 'lvl-3'; activeDays++; }
+        else if (score >= 3) { lvlClass = 'lvl-2'; activeDays++; }
+        else if (score >= 1) { lvlClass = 'lvl-1'; activeDays++; }
+      }
+
+      const dateLabel = cur.toLocaleDateString('en-IN', { day:'numeric', month:'short' });
+      const tip = isFuture ? 'Future' : `${dateLabel}: ${tasksDone} tasks done, ${focusMins}m focus`;
+
+      html += `<div class="heatmap-cell ${lvlClass}" title="${tip}" onclick="showToast('${tip}', 'info')"></div>`;
+    }
+    html += '</div>';
+  }
+
+  grid.innerHTML = html;
+  if (countEl) countEl.textContent = `${activeDays} Active Days`;
 }

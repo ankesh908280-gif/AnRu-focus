@@ -177,7 +177,7 @@
       <header class="f-right-header">
         <a href="index.html#hub" class="f-icon-btn f-back-btn-desktop"><i class="fa-solid fa-chevron-left"></i></a>
         <h2><i class="fa-solid fa-brain"></i> Focus Session</h2>
-        <button class="f-icon-btn-transparent" onclick="openFocusSettingsModal()"><i class="fa-solid fa-gear"></i></button>
+        <div style="display:flex; gap:8px;"><button class="f-icon-btn-transparent" onclick="FocusAudio.openSoundModal()" title="Focus Soundscapes"><i class="fa-solid fa-headphones"></i></button><button class="f-icon-btn-transparent" onclick="openFocusSettingsModal()"><i class="fa-solid fa-gear"></i></button></div>
       </header>
 
       <div class="f-glass-card f-today-focus">
@@ -278,6 +278,7 @@
   <script src="app.js"></script>
   <script src="anru-notify.js"></script>
   <script src="anru-modal.js"></script>
+  <script src="focus-audio.js"></script>
   <script src="focus.js?v=3.0"></script>
 </body>
 </html>
