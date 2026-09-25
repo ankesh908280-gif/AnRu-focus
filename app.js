@@ -118,10 +118,41 @@ function playSfx(name){
     else if(name==='unlock'){ sfxTone(523.25,0,0.1,'sine',0.16); sfxTone(659.25,0.08,0.1,'sine',0.16); sfxTone(783.99,0.16,0.1,'sine',0.16); sfxTone(1046.5,0.24,0.22,'sine',0.2); }
   }catch(e){}
 }
-function toggleSfx(){ S.sfx = !S.sfx; updateSfxToggle(); localStorage.setItem('mceo_sfx', JSON.stringify(S.sfx)); if(S.sfx) playSfx('click'); showToast(S.sfx?'<i class="fa-solid fa-volume-high"></i> Sound Effects On!':'<i class="fa-solid fa-volume-xmark"></i> Sound Effects Off'); }
-function updateSfxToggle(){ const sw=document.getElementById('sfxSw'); if(sw) sw.classList.toggle('on', S.sfx); }
-function toggleNotif(){ S.notif=!S.notif; if(S.notif&&'Notification' in window&&Notification.permission!=='granted'){Notification.requestPermission().then(p=>{if(p!=='granted'){S.notif=false; updateNotifToggle();}});} updateNotifToggle(); localStorage.setItem('mceo_notif', JSON.stringify(S.notif)); showToast(S.notif?'<i class="fa-solid fa-bell"></i> Notifications Active!':'<i class="fa-solid fa-bell-slash"></i> Notifications Sleeping'); }
-function updateNotifToggle(){const sw=document.getElementById('notifSw'); if(sw)sw.classList.toggle('on',S.notif);}
+function toggleSfx(checked){ 
+  S.sfx = (typeof checked === 'boolean') ? checked : !S.sfx; 
+  updateSfxToggle(); 
+  localStorage.setItem('mceo_sfx', JSON.stringify(S.sfx)); 
+  if(S.sfx) playSfx('click'); 
+  showToast(S.sfx ? '<i class="fa-solid fa-volume-high"></i> Sound Effects On!' : '<i class="fa-solid fa-volume-xmark"></i> Sound Effects Off'); 
+}
+function updateSfxToggle(){ 
+  const sw = document.getElementById('sfxSw'); 
+  if(sw) { sw.checked = !!S.sfx; sw.classList.toggle('on', !!S.sfx); } 
+}
+
+function toggleNotifs(checked){ 
+  S.notif = (typeof checked === 'boolean') ? checked : !S.notif; 
+  updateNotifToggle(); 
+  if(S.notif && 'Notification' in window && Notification.permission !== 'granted'){
+    Notification.requestPermission().then(p => {
+      if(p !== 'granted'){ S.notif = false; updateNotifToggle(); showToast('⚠️ Notification permission denied', 'warn'); }
+      else { showToast('<i class="fa-solid fa-bell"></i> Notifications Active!', 'success'); }
+    });
+  } else {
+    showToast(S.notif ? '<i class="fa-solid fa-bell"></i> Notifications Active!' : '<i class="fa-solid fa-bell-slash"></i> Notifications Sleeping'); 
+  }
+  localStorage.setItem('mceo_notif', JSON.stringify(S.notif)); 
+}
+function toggleNotif(){ toggleNotifs(); }
+function updateNotifToggle(){ 
+  const sw = document.getElementById('notifSw'); 
+  if(sw) { sw.checked = !!S.notif; sw.classList.toggle('on', !!S.notif); } 
+}
+
+function updateEyeStrainToggle() { 
+  const sw = document.getElementById('eyeStrainSw'); 
+  if(sw) { sw.checked = !!S.eyeStrain; sw.classList.toggle('on', !!S.eyeStrain); } 
+}
 
 /* ████████████████████████████████████████████████████████████
                   3. CLOUD SYNC & DATA MANAGEMENT ☁️
@@ -1375,7 +1406,10 @@ function renderDashboard(){
   const total = S.tasks.length; const done = S.tasks.filter(t => t.isDone).length; const pending = total - done; 
   const pct = total ? Math.round((done / total) * 100) : 0;
   const backlogCount = S.tasks.filter(t => t.isBacklog && !t.isDone).length; document.getElementById('backlogBannerDesc').textContent = `${backlogCount} class backlogs active`;
-  animNum('dTotal',total); animNum('dPending',pending); animNum('dXP',S.xp); animNum('dStreak',calcStreak());
+  animNum('dTotal', total); if (document.getElementById('sTotal')) animNum('sTotal', total);
+  animNum('dPending', pending); if (document.getElementById('sPending')) animNum('sPending', pending);
+  animNum('dXP', S.xp); if (document.getElementById('sXP')) animNum('sXP', S.xp);
+  animNum('dStreak', calcStreak()); if (document.getElementById('sStreak')) animNum('sStreak', calcStreak());
   setTimeout(()=>{const r = document.getElementById('pRing'); if(r) r.style.strokeDashoffset=(239-239*pct/100).toFixed(1);},100);
   document.getElementById('pPct').textContent=pct+'%'; document.getElementById('pDone').textContent=`${done}/${total}`; document.getElementById('pBar').style.width=pct+'%';
   document.getElementById('pDesc').innerHTML=total===0?'Add tasks to start tracking your mission!':pct===100?'<i class="fa-solid fa-trophy" style="color:var(--warn)"></i> All tasks complete! You are unstoppable!':`${done} of ${total} tasks complete — keep pushing!`;
@@ -1455,8 +1489,138 @@ function printReport() { window.print(); playSfx('success'); showToast('<i class
 /* ████████████████████████████████████████████████████████████
                   15. SETTINGS, NOTIFS & MODALS 
 ████████████████████████████████████████████████████████████ */
-function toggleEyeStrain() { S.eyeStrain = !S.eyeStrain; updateEyeStrainToggle(); saveData(); showToast(S.eyeStrain ? '<i class="fa-solid fa-eye-low-vision"></i> Eye-Strain Break ON (45m)' : '<i class="fa-solid fa-eye"></i> Eye-Strain Break OFF'); }
-function updateEyeStrainToggle() { const sw=document.getElementById('eyeStrainSw'); if(sw) sw.classList.toggle('on', S.eyeStrain); }
+function toggleEyeStrain(checked) { 
+  S.eyeStrain = (typeof checked === 'boolean') ? checked : !S.eyeStrain; 
+  updateEyeStrainToggle(); 
+  saveData(); 
+  showToast(S.eyeStrain ? '<i class="fa-solid fa-eye-low-vision"></i> Eye-Strain Break ON (45m)' : '<i class="fa-solid fa-eye"></i> Eye-Strain Break OFF'); 
+}
+function updateEyeStrainToggle() { 
+  const sw = document.getElementById('eyeStrainSw'); 
+  if(sw) { sw.checked = !!S.eyeStrain; sw.classList.toggle('on', !!S.eyeStrain); } 
+}
+
+function changeCourse() {
+  if (window.AnruModal) {
+    AnruModal.prompt({
+      title: "Target Exam / Course",
+      message: "Apna target exam ya stream update karein (e.g. Class 12th Board, JEE, NEET, Vidyakul):",
+      icon: "fa-graduation-cap",
+      badgeClass: "purple",
+      defaultValue: S.session?.course || "Class 12th Board",
+      placeholder: "Enter exam or course...",
+      inputType: "text",
+      confirmText: "Save",
+      onConfirm: function(val) {
+        if (val && val.trim()) {
+          if (!S.session) S.session = {};
+          S.session.course = val.trim();
+          saveData();
+          const cd = document.getElementById('courseDisplay');
+          if (cd) cd.textContent = S.session.course;
+          showToast("🎯 Target Exam Updated!", "success");
+        }
+      }
+    });
+  } else {
+    const val = prompt("Enter target exam or stream:", S.session?.course || "Class 12th Board");
+    if (val && val.trim()) {
+      if (!S.session) S.session = {};
+      S.session.course = val.trim();
+      saveData();
+      const cd = document.getElementById('courseDisplay');
+      if (cd) cd.textContent = S.session.course;
+      showToast("🎯 Target Exam Updated!", "success");
+    }
+  }
+}
+
+function exportData() {
+  try {
+    const packagedData = {
+      version: "2.5",
+      exportDate: new Date().toISOString(),
+      tasks: S.tasks,
+      subjects: S.subjects,
+      logs: S.timer ? S.timer.logs : [],
+      xp: S.xp,
+      notif: S.notif,
+      unlocks: S.unlocks,
+      theme: S.theme,
+      freezeDate: S.freezeDate,
+      drainDate: S.lastDrainDate,
+      eyeStrain: S.eyeStrain,
+      activeBuff: S.activeBuff,
+      session: S.session,
+      localFocusLogs: JSON.parse(localStorage.getItem('anru_focus_logs') || '[]'),
+      unlockedNotes: JSON.parse(localStorage.getItem('unlocked_notes') || '[]')
+    };
+    const blob = new Blob([JSON.stringify(packagedData, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `AnRu_Focus_Backup_${new Date().toISOString().split('T')[0]}.json`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    showToast('<i class="fa-solid fa-file-arrow-down"></i> Backup downloaded successfully!', 'success');
+    playSfx('success');
+  } catch(e) {
+    showToast('❌ Export failed: ' + e.message, 'error');
+  }
+}
+
+function importData(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    try {
+      const data = JSON.parse(e.target.result);
+      if (data && (data.tasks || data.xp !== undefined || data.session)) {
+        if (window.AnruModal) {
+          AnruModal.confirm({
+            title: "Restore Backup",
+            message: "Kya aap is backup file se apna data restore karna chahte hain? Current data replace ho jayega.",
+            icon: "fa-database",
+            badgeClass: "warn",
+            confirmText: "Restore Data",
+            onConfirm: function() {
+              applyRestoredBackup(data);
+            }
+          });
+        } else {
+          if (confirm("Restore this backup? Current data will be replaced.")) {
+            applyRestoredBackup(data);
+          }
+        }
+      } else {
+        showToast('❌ Invalid backup format!', 'error');
+      }
+    } catch(err) {
+      showToast('❌ Failed to parse JSON backup: ' + err.message, 'error');
+    }
+  };
+  reader.readAsText(file);
+  event.target.value = '';
+}
+
+function applyRestoredBackup(data) {
+  if (data.tasks) S.tasks = data.tasks;
+  if (data.subjects) S.subjects = data.subjects;
+  if (data.xp !== undefined) S.xp = data.xp;
+  if (data.unlocks) S.unlocks = data.unlocks;
+  if (data.theme) S.theme = data.theme;
+  if (data.session) S.session = data.session;
+  if (data.freezeDate) S.freezeDate = data.freezeDate;
+  if (data.localFocusLogs) localStorage.setItem('anru_focus_logs', JSON.stringify(data.localFocusLogs));
+  if (data.unlockedNotes) localStorage.setItem('unlocked_notes', JSON.stringify(data.unlockedNotes));
+  saveData();
+  renderAll();
+  showToast('<i class="fa-solid fa-bolt"></i> Data restored successfully!', 'success');
+  playSfx('success');
+}
 
 function exportBackupData() {
   const packagedData = { tasks: S.tasks, subjects: S.subjects, logs: S.timer.logs, xp: S.xp, notif: S.notif, unlocks: S.unlocks, theme: S.theme, freezeDate: S.freezeDate, drainDate: S.lastDrainDate, eyeStrain: S.eyeStrain, activeBuff: S.activeBuff };
