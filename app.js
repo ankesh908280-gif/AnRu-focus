@@ -644,32 +644,68 @@ function checkAccountabilityDrain() {
 
 function applyTheme(th) { S.theme = th; saveData(); document.body.className = th === 'default' ? '' : `theme-${th}`; }
 
+function switchShopTab(tab, el) {
+  document.querySelectorAll('.shop-tab-btn').forEach(b => b.classList.remove('active'));
+  if (el) el.classList.add('active');
+  document.querySelectorAll('.shop-section').forEach(s => s.classList.remove('active'));
+  const target = document.getElementById('shopSection' + tab.charAt(0).toUpperCase() + tab.slice(1));
+  if (target) target.classList.add('active');
+  playSfx('click');
+}
+
+const ALL_SHOP_THEMES = ['sunset','gold','matrix','cyber','ocean','midnight','emerald'];
+const ALL_SHOP_BADGES = ['badge_ninja','badge_scholar','badge_topper','badge_crusher','badge_master','badge_legend'];
+
 function buyShopItem(item, cost) {
   if(item === 'default') { applyTheme('default'); playSfx('click'); showToast('<i class="fa-solid fa-meteor"></i> Restored AnRu Dark Theme!', 'success'); updateShopUI(); return; }
+  
   if(item === 'potion') {
     if(S.xp < cost){ playSfx('error'); return showToast(`Not enough XP! Need ${cost}`, 'error'); }
     S.xp -= cost; S.activeBuff = { type: 'xp_boost', endTime: Date.now() + (1 * 60 * 60 * 1000) };
     saveData(); renderDashboard(); updateShopUI(); playSfx('unlock'); checkBuffState(); showToast('<i class="fa-solid fa-flask"></i> 2x XP Potion Active for 1 Hour!', 'success'); return;
   }
+  
+  if(item === 'shield') {
+    if(S.xp < cost){ playSfx('error'); return showToast(`Not enough XP! Need ${cost}`, 'error'); }
+    S.xp -= cost; S.examShield = true;
+    saveData(); renderDashboard(); updateShopUI(); playSfx('unlock'); showToast('<i class="fa-solid fa-shield-halved"></i> Exam Shield Active! Tasks protected from penalties.', 'success'); return;
+  }
+
+  if(item === 'overclock') {
+    if(S.xp < cost){ playSfx('error'); return showToast(`Not enough XP! Need ${cost}`, 'error'); }
+    S.xp -= cost; S.activeBuff = { type: 'overclock', endTime: Date.now() + (2 * 60 * 60 * 1000) };
+    saveData(); renderDashboard(); updateShopUI(); playSfx('unlock'); checkBuffState(); showToast('<i class="fa-solid fa-bolt-lightning"></i> Brain Overclock Active! +50% XP on focus for 2 Hours!', 'success'); return;
+  }
+
   if(item === 'timetravel') {
      if(S.xp < cost){ playSfx('error'); return showToast(`Not enough XP! Need ${cost}`, 'error'); }
      S.xp -= cost; let yest = new Date(); yest.setDate(yest.getDate() - 1);
      S.tasks.push({ id:Date.now(), name: "Time Travel Recovery", date: getLocISO(yest), subj: "", priority: "med", isDone: true, isBacklog: false });
      saveData(); renderDashboard(); updateShopUI(); playSfx('unlock'); showToast('<i class="fa-solid fa-hourglass-start"></i> Timeline Restored! Streak Saved.', 'success'); return;
   }
+  
   if(item === 'freeze') {
     if(S.xp < cost){ playSfx('error'); return showToast(`Not enough XP! Need ${cost}`, 'error'); }
     S.xp -= cost; let tomorrow = new Date(); tomorrow.setDate(tomorrow.getDate() + 1); S.freezeDate = getLocISO(tomorrow);
     saveData(); renderDashboard(); updateShopUI(); playSfx('unlock'); showToast('<i class="fa-solid fa-snowflake"></i> Streak Freeze active for tomorrow!', 'success'); return;
   } 
+
+  // If already unlocked
   if(S.unlocks[item]) { 
-     if(item.startsWith('theme_') || ['sunset','gold','matrix','cyber','ocean'].includes(item)) { applyTheme(item); playSfx('click'); showToast(`<i class="fa-solid fa-palette"></i> Applied theme!`, 'success'); } 
-     else if (item.startsWith('badge_')) { playSfx('click'); showToast(`<i class="fa-solid fa-medal"></i> Badge is already equipped!`, 'success'); }
-     updateShopUI(); updateNavUser(); return; 
+     if(item.startsWith('theme_') || ALL_SHOP_THEMES.includes(item)) { 
+       applyTheme(item); playSfx('click'); showToast(`<i class="fa-solid fa-palette"></i> Applied ${item.toUpperCase()} theme!`, 'success'); 
+     } else if (ALL_SHOP_BADGES.includes(item)) { 
+       S.equippedBadge = item;
+       playSfx('click'); showToast(`<i class="fa-solid fa-medal"></i> Equipped Title!`, 'success'); 
+     }
+     saveData(); updateShopUI(); updateNavUser(); return; 
   }
+
+  // Buying new unlock
   if(S.xp < cost){ playSfx('error'); return showToast(`Not enough XP! Need ${cost}`, 'error'); }
   S.xp -= cost; S.unlocks[item] = true; 
-  if(['sunset','gold','matrix','cyber','ocean'].includes(item)) applyTheme(item);
+  if(ALL_SHOP_THEMES.includes(item)) applyTheme(item);
+  if(ALL_SHOP_BADGES.includes(item)) S.equippedBadge = item;
   saveData(); renderDashboard(); updateShopUI(); updateNavUser(); playSfx('unlock'); showToast(`<i class="fa-solid fa-unlock-keyhole"></i> Unlocked successfully!`, 'success');
 }
 
@@ -681,7 +717,7 @@ function buyMysteryBox() {
   } else if (roll < 0.5) { 
       let tomorrow = new Date(); tomorrow.setDate(tomorrow.getDate() + 1); S.freezeDate = getLocISO(tomorrow);
       rewardMsg = `<i class="fa-solid fa-snowflake"></i> EPIC! You found a free Streak Freeze!`; playSfx('success'); 
-  } else if (roll < 0.75) {
+  } else if (roll < 0.75) { 
       S.activeBuff = { type: 'xp_boost', endTime: Date.now() + (2 * 60 * 60 * 1000) }; rewardMsg = `<i class="fa-solid fa-bolt"></i> LEGENDARY! 2x XP Multiplier Active for 2 Hours!`; 
       if (typeof confetti === 'function') confetti({ particleCount: 150, spread: 70, origin: {y:0.4}, zIndex: 9999 }); playSfx('unlock'); checkBuffState();
   } else { S.xp += 50; rewardMsg = `<i class="fa-solid fa-gift"></i> You found 50 XP! Better luck next time.`; playSfx('coin'); }
@@ -710,9 +746,17 @@ function updateShopUI() {
   const oBtn = document.getElementById('btnThemeOcean'); if(oBtn) oBtn.textContent = S.unlocks.ocean ? (S.theme==='ocean'?'Applied':'Use') : '300 XP';
   const sBtn = document.getElementById('btnThemeSunset'); if(sBtn) sBtn.textContent = S.unlocks.sunset ? (S.theme==='sunset'?'Applied':'Use') : '400 XP';
   const gBtn = document.getElementById('btnThemeGold'); if(gBtn) gBtn.textContent = S.unlocks.gold ? (S.theme==='gold'?'Applied':'Use') : '800 XP';
-  const bNinja = document.getElementById('btnBadgeNinja'); if(bNinja) bNinja.textContent = S.unlocks.badge_ninja ? 'Unlocked' : '300 XP';
-  const bScholar = document.getElementById('btnBadgeScholar'); if(bScholar) bScholar.textContent = S.unlocks.badge_scholar ? 'Unlocked' : '500 XP';
-  const bLegend = document.getElementById('btnBadgeLegend'); if(bLegend) bLegend.textContent = S.unlocks.badge_legend ? 'Unlocked' : '1000 XP';
+  const midBtn = document.getElementById('btnThemeMidnight'); if(midBtn) midBtn.textContent = S.unlocks.midnight ? (S.theme==='midnight'?'Applied':'Use') : '350 XP';
+  const emrBtn = document.getElementById('btnThemeEmerald'); if(emrBtn) emrBtn.textContent = S.unlocks.emerald ? (S.theme==='emerald'?'Applied':'Use') : '450 XP';
+
+  const bNinja = document.getElementById('btnBadgeNinja'); if(bNinja) bNinja.textContent = S.unlocks.badge_ninja ? (S.equippedBadge==='badge_ninja'?'Equipped':'Equip') : '300 XP';
+  const bScholar = document.getElementById('btnBadgeScholar'); if(bScholar) bScholar.textContent = S.unlocks.badge_scholar ? (S.equippedBadge==='badge_scholar'?'Equipped':'Equip') : '500 XP';
+  const bCrusher = document.getElementById('btnBadgeCrusher'); if(bCrusher) bCrusher.textContent = S.unlocks.badge_crusher ? (S.equippedBadge==='badge_crusher'?'Equipped':'Equip') : '500 XP';
+  const bTopper = document.getElementById('btnBadgeTopper'); if(bTopper) bTopper.textContent = S.unlocks.badge_topper ? (S.equippedBadge==='badge_topper'?'Equipped':'Equip') : '750 XP';
+  const bMaster = document.getElementById('btnBadgeMaster'); if(bMaster) bMaster.textContent = S.unlocks.badge_master ? (S.equippedBadge==='badge_master'?'Equipped':'Equip') : '1000 XP';
+  const bLegend = document.getElementById('btnBadgeLegend'); if(bLegend) bLegend.textContent = S.unlocks.badge_legend ? (S.equippedBadge==='badge_legend'?'Equipped':'Equip') : '1500 XP';
+  
+  const shBtn = document.getElementById('btnPowerShield'); if(shBtn) shBtn.textContent = S.examShield ? 'Active 🛡️' : '350 XP';
 }
 
 function getRank(xp) {
