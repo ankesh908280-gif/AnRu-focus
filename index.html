@@ -162,9 +162,11 @@
       </div>
 
       <!-- 💡 4. CONTEXTUAL AI SMART SUGGESTION CHIP (Right Above Tasks) -->
-      <div class="glass" id="aiSuggesterUI" style="padding:10px 14px; margin-bottom:14px; border: 1px solid rgba(168,85,247,0.3); border-radius:14px; display:flex; align-items:center; gap:10px;">
-        <div style="font-size:16px; color:#fbbf24;"><i class="fa-solid fa-lightbulb"></i></div>
-        <div style="flex:1; font-size:12px; color:#e2e8f0; line-height:1.4;" id="aiSuggesterText">Analysing your syllabus & study routine...</div>
+            <!-- 💡 4. SMART AI SYLLABUS & STUDY ADVISOR STRIP -->
+      <div class="glass" id="aiSuggesterUI" onclick="nextAiAdvice()" style="cursor:pointer; background: linear-gradient(135deg, rgba(168,85,247,0.15), rgba(59,130,246,0.12)); border: 1px solid rgba(168,85,247,0.35); border-radius:14px; padding:12px 14px; margin-bottom:14px; display:flex; align-items:center; gap:12px; box-shadow: 0 4px 18px rgba(0,0,0,0.25); transition: transform 0.2s;" onmouseenter="this.style.transform='scale(1.01)'" onmouseleave="this.style.transform='scale(1)'">
+        <div style="font-size:18px; color:#fbbf24; flex-shrink:0; display:flex; align-items:center; justify-content:center; width:34px; height:34px; border-radius:10px; background:rgba(251,191,36,0.15);"><i class="fa-solid fa-lightbulb"></i></div>
+        <div style="flex:1; font-size:12px; color:#e2e8f0; line-height:1.4;" id="aiSuggesterText"><span style="color:#a855f7; font-weight:700;">AI Advisor:</span> Analyzing syllabus & study routine...</div>
+        <div style="font-size:11px; color:rgba(255,255,255,0.4); flex-shrink:0;" title="Tap for next advice"><i class="fa-solid fa-rotate"></i></div>
       </div>
 
       <!-- 📊 5. COMPACT BENTO-GRID STATS -->
@@ -623,12 +625,50 @@
       </div>
 
       <!-- Settings & System Cards -->
-      <div class="sec-head" style="margin-top:20px;"><div class="sec-title"><i class="fa-solid fa-sliders" style="color: var(--p1);"></i> Preferences</div></div>
+      <!-- 📊 ACADEMIC ANALYTICS & REPORTS -->
+      <div class="sec-head" style="margin-top:20px;"><div class="sec-title"><i class="fa-solid fa-chart-line" style="color: #60a5fa;"></i> Academic Reports</div></div>
       <div class="glass settings-card" style="margin-bottom:20px;">
-        <div class="setting-row"><div class="s-info"><div class="s-label">Sound Effects (SFX)</div><div class="s-sub">Play audio on actions</div></div><label class="switch"><input type="checkbox" id="sfxSw" onchange="toggleSfx(this.checked)"><span class="slider"></span></label></div>
-        <div class="setting-row"><div class="s-info"><div class="s-label">Eye Strain / Night Alert</div><div class="s-sub">Gentle reminders to rest eyes</div></div><label class="switch"><input type="checkbox" id="eyeStrainSw" onchange="toggleEyeStrain(this.checked)"><span class="slider"></span></label></div>
-        <div class="setting-row"><div class="s-info"><div class="s-label">Notifications</div><div class="s-sub">Smart daily study prompts</div></div><label class="switch"><input type="checkbox" id="notifSw" onchange="toggleNotifs(this.checked)"><span class="slider"></span></label></div>
-        <div class="setting-row" style="border-bottom:none;"><div class="s-info"><div class="s-label">Target Exam / Stream</div><div class="s-sub" id="courseDisplay">Class 12th Board</div></div><button class="btn-sm" onclick="changeCourse()">Edit</button></div>
+        <div class="setting-row" style="border-bottom:none;">
+          <div class="s-info">
+            <div class="s-label"><i class="fa-solid fa-file-invoice" style="color: #60a5fa; margin-right: 6px;"></i> Weekly Academic Report</div>
+            <div class="s-sub">Generate 7-day study performance summary & printable report</div>
+          </div>
+          <button class="btn-sm" onclick="openReportModal()" style="background: linear-gradient(135deg, #3b82f6, #60a5fa); color:#fff;"><i class="fa-solid fa-chart-simple"></i> View Report</button>
+        </div>
+      </div>
+
+      <!-- 🔐 ACCOUNT & SECURITY -->
+      <div class="sec-head"><div class="sec-title"><i class="fa-solid fa-shield-halved" style="color: #f87171;"></i> Account & Security</div></div>
+      <div class="glass settings-card" style="margin-bottom:20px;">
+        <div class="setting-row">
+          <div class="s-info">
+            <div class="s-label"><i class="fa-solid fa-lock" style="color: #f87171; margin-right: 6px;"></i> Change Password</div>
+            <div class="s-sub">Update login password & security</div>
+          </div>
+          <button class="btn-sm" onclick="openModal('editPass')" style="background: rgba(248,113,113,0.18); border: 1px solid #f87171; color: #f87171;"><i class="fa-solid fa-key"></i> Change</button>
+        </div>
+        <div class="setting-row">
+          <div class="s-info">
+            <div class="s-label"><i class="fa-solid fa-user-pen" style="color: #fbbf24; margin-right: 6px;"></i> Edit Display Name</div>
+            <div class="s-sub">Change name shown on Student ID & reports</div>
+          </div>
+          <button class="btn-sm" onclick="openModal('editName')"><i class="fa-solid fa-pen"></i> Edit</button>
+        </div>
+        <div class="setting-row" style="border-bottom:none;">
+          <div class="s-info">
+            <div class="s-label"><i class="fa-solid fa-graduation-cap" style="color: #a855f7; margin-right: 6px;"></i> Target Exam / Stream</div>
+            <div class="s-sub" id="courseDisplay">Class 12th Board</div>
+          </div>
+          <button class="btn-sm" onclick="changeCourse()"><i class="fa-solid fa-pen"></i> Edit</button>
+        </div>
+      </div>
+
+      <!-- ⚙️ SYSTEM PREFERENCES -->
+      <div class="sec-head"><div class="sec-title"><i class="fa-solid fa-sliders" style="color: var(--p1);"></i> Preferences</div></div>
+      <div class="glass settings-card" style="margin-bottom:20px;">
+        <div class="setting-row"><div class="s-info"><div class="s-label">Sound Effects (SFX)</div><div class="s-sub">Play audio on actions & task completion</div></div><label class="switch"><input type="checkbox" id="sfxSw" onchange="toggleSfx(this.checked)"><span class="slider"></span></label></div>
+        <div class="setting-row"><div class="s-info"><div class="s-label">Eye Strain / Night Alert</div><div class="s-sub">Gentle reminders to rest eyes every 45m</div></div><label class="switch"><input type="checkbox" id="eyeStrainSw" onchange="toggleEyeStrain(this.checked)"><span class="slider"></span></label></div>
+        <div class="setting-row" style="border-bottom:none;"><div class="s-info"><div class="s-label">Notifications</div><div class="s-sub">Smart daily study & backlog prompts</div></div><label class="switch"><input type="checkbox" id="notifSw" onchange="toggleNotifs(this.checked)"><span class="slider"></span></label></div>
       </div>
 
       <div class="sec-head"><div class="sec-title"><i class="fa-solid fa-database" style="color: var(--p1);"></i> Backup & Sync</div></div>

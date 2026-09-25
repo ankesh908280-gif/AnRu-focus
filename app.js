@@ -1382,6 +1382,73 @@ function renderWeeklyStudyChart(){
   }).join('');
 }
 
+
+/* =========================================================
+   💡 SMART AI SYLLABUS & STUDY ROUTINE ADVISOR ENGINE
+   ========================================================= */
+let _aiAdvIdx = 0;
+setInterval(updateAiAdvisor, 15000);
+function updateAiAdvisor() {
+  const el = document.getElementById('aiSuggesterText');
+  const ui = document.getElementById('aiSuggesterUI');
+  if (!el) return;
+  if (ui) ui.style.display = 'flex';
+
+  const totalTasks = S.tasks ? S.tasks.length : 0;
+  const completedTasks = S.tasks ? S.tasks.filter(t => t.isDone).length : 0;
+  const pendingTasks = totalTasks - completedTasks;
+  const backlogs = S.tasks ? S.tasks.filter(t => !t.isDone && t.isBacklog) : [];
+  const streak = calcStreak();
+  const course = S.session?.course || "Class 12th Board";
+
+  // Pending count by subject
+  const pendingBySubj = {};
+  if (S.tasks) {
+    S.tasks.filter(t => !t.isDone && t.subj).forEach(t => {
+      pendingBySubj[t.subj] = (pendingBySubj[t.subj] || 0) + 1;
+    });
+  }
+  let topBacklogSubj = '';
+  let maxPending = 0;
+  for (let s in pendingBySubj) {
+    if (pendingBySubj[s] > maxPending) {
+      maxPending = pendingBySubj[s];
+      topBacklogSubj = s;
+    }
+  }
+
+  const tips = [];
+
+  if (backlogs.length > 0 && topBacklogSubj) {
+    tips.push(`🔥 <b style="color:#f87171">${backlogs.length} class backlogs active!</b> Today focus 45m on <b>${topBacklogSubj}</b> (${maxPending} pending) to catch up.`);
+  } else if (backlogs.length > 0) {
+    tips.push(`🔥 <b style="color:#f87171">${backlogs.length} class backlogs active!</b> Clear 1 backlog lecture daily to stay on track.`);
+  }
+
+  if (pendingTasks > 0) {
+    tips.push(`🎯 <b>Daily Target:</b> ${pendingTasks} tasks pending in syllabus. Finish 2 high-priority tasks today!`);
+  } else if (totalTasks > 0) {
+    tips.push(`🎉 <b>All caught up!</b> Outstanding performance. Use <b>Notes Vault</b> for revision.`);
+  }
+
+  if (streak > 0) {
+    tips.push(`⚡ <b style="color:#fbbf24">${streak}-Day Streak Active!</b> Daily study routine increases board exam retention by 40%.`);
+  }
+
+  tips.push(`📚 <b style="color:#a855f7">Target ${course}:</b> Revise handwritten notes right after lectures & practice formulas.`);
+  tips.push(`🧠 <b>Active Recall Tip:</b> Test your concepts using <b>Quiz Battle</b> in Hub before sleeping.`);
+  tips.push(`⏱️ <b>Deep Work Routine:</b> Use 25m Focus Session + 5m Short Break to prevent study fatigue.`);
+
+  const currentTip = tips[_aiAdvIdx % tips.length];
+  el.innerHTML = currentTip;
+}
+
+function nextAiAdvice() {
+  _aiAdvIdx++;
+  updateAiAdvisor();
+  if (typeof playSfx === 'function') playSfx('click');
+}
+
 function renderDashboard(){
   const todayStr = getTodayStr();
   const revAlert = document.getElementById('revisionAlertUI');
@@ -1396,11 +1463,7 @@ function renderDashboard(){
   const targetText = document.getElementById('targetTextUI'); const targetBar = document.getElementById('targetBarUI');
   if(targetText) targetText.textContent = `${todayCompleted}/${target} Done`; if(targetBar) targetBar.style.width = `${Math.min(100, (todayCompleted/target)*100)}%`;
 
-  const aiUi = document.getElementById('aiSuggesterUI');
-  if(aiUi) {
-     const liveToday = S.tasks.filter(t => t.date === todayStr && !t.isBacklog && !t.isDone).length; const pendingBacklogs = S.tasks.filter(t => t.isBacklog && !t.isDone).length;
-     if(liveToday <= 1 && pendingBacklogs > 0) { aiUi.style.display = 'flex'; } else { aiUi.style.display = 'none'; }
-  }
+  updateAiAdvisor();
 
   const standardTasks = S.tasks.filter(t => !t.isBacklog); 
   const total = S.tasks.length; const done = S.tasks.filter(t => t.isDone).length; const pending = total - done; 
@@ -1696,7 +1759,24 @@ function openModal(type){
 function closeModal(){document.getElementById('modalOverlay').classList.remove('open');}
 function saveModal(type){
   if(type==='name'){ const val=document.getElementById('mInp').value.trim(); if(!val){ playSfx('error'); return showToast('Validation Error!','error'); } S.session.name=val; localStorage.setItem('mceo_sess',JSON.stringify(S.session)); saveData(); updateNavUser(); closeModal(); playSfx('success'); showToast('<i class="fa-solid fa-check"></i> Name updated!','success'); }
-  else if(type==='pass'){ const oldP=document.getElementById('mOld').value; const newP=document.getElementById('mNew').value; if(S.session.pass!==oldP){ playSfx('error'); return showToast('Old key invalid!','error'); } if(newP.length<4){ playSfx('error'); return showToast('Min 4 chars!','error'); } S.session.pass=newP; localStorage.setItem('mceo_sess',JSON.stringify(S.session)); saveData(); closeModal(); playSfx('success'); showToast('<i class="fa-solid fa-lock"></i> Password locked!','success'); }
+  else if(type==='pass'){ 
+    const oldP = document.getElementById('mOld').value; 
+    const newP = document.getElementById('mNew').value; 
+    if(S.session?.pass && S.session.pass !== oldP){ 
+      playSfx('error'); 
+      return showToast('❌ Current password incorrect!','error'); 
+    } 
+    if(!newP || newP.length < 4){ 
+      playSfx('error'); 
+      return showToast('❌ New password must be at least 4 characters!','error'); 
+    } 
+    S.session.pass = newP; 
+    localStorage.setItem('mceo_sess', JSON.stringify(S.session)); 
+    saveData(); 
+    closeModal(); 
+    playSfx('success'); 
+    showToast('<i class="fa-solid fa-lock"></i> Password updated successfully!','success'); 
+  }
   else if(type==='course'){ const val=document.getElementById('mInp').value.trim(); S.session.course=val; localStorage.setItem('mceo_sess',JSON.stringify(S.session)); saveData(); updateNavUser(); closeModal(); playSfx('success'); showToast('<i class="fa-solid fa-graduation-cap"></i> Course metrics saved!','success'); }
 }
 function confirmClearData(){ S.tasks=[]; S.subjects=[{name:'Physics',emoji:'fa-microscope'},{name:'Maths',emoji:'fa-calculator'},{name:'Computer Science',emoji:'fa-laptop-code'}]; S.subjects.forEach(s => s.flashcards = []); S.timer.logs=[]; S.xp=0; S.theme='default'; S.unlocks={matrix:false, cyber:false, ocean:false, sunset:false, gold:false, badge_ninja:false, badge_scholar:false, badge_legend:false}; S.freezeDate=null; S.lastDrainDate=null; S.lastMissionDate=null; S.eyeStrain=false; S.activeBuff=null; applyTheme('default'); saveData(); closeModal(); renderAll(); updateShopUI(); playSfx('delete'); showToast('<i class="fa-solid fa-trash-can"></i> Architecture wiped clean!'); }
