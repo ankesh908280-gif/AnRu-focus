@@ -59,14 +59,19 @@
     @keyframes floatLock { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-5px); } }
     @keyframes pulseBadge { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.1) rotate(3deg); } }
     @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+  
+    /* Header & Touch Fixes */
+    .chat-header-info { display: flex; align-items: center; gap: 14px; }
+    .dv-close { width: 44px !important; height: 44px !important; font-size: 18px !important; }
   </style>
+  <link rel="stylesheet" href="anru-modal.css">
 </head>
 <body>
 
   <!-- Header -->
   <div class="chat-header">
     <div class="chat-header-info">
-      <button class="btn-icon" onclick="window.location.href='index.html'">
+      <button class="btn-icon" onclick="window.location.href='index.html#hub'">
         <i class="fa-solid fa-arrow-left"></i>
       </button>
       <div>
@@ -122,6 +127,7 @@
   
   <!-- IMPORTANT: Make sure app.js loads first so we can sync XP -->
   <script src="app.js"></script>
+  <script src="anru-modal.js"></script>
   <script src="notes-vault.js"></script>
 
 </body>

@@ -58,15 +58,23 @@ function updateDisplay(exactLeft = leftSecs) {
     let m = Math.floor(exactLeft / 60);
     let s = Math.floor(exactLeft % 60);
     
-    if (cMode === 'stopwatch') {
-        m = Math.floor(exactLeft / 60);
-        s = Math.floor(exactLeft % 60);
+    if (exactLeft >= 3600) {
+        let h = Math.floor(exactLeft / 3600);
+        let remM = Math.floor((exactLeft % 3600) / 60);
+        elTime.textContent = `${h}:${remM.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
+        elTime.classList.add('compact-font');
+    } else {
+        elTime.textContent = `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
+        elTime.classList.remove('compact-font');
     }
     
-    elTime.textContent = `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
-    
-    let pct = durationSecs > 0 ? exactLeft / durationSecs : 0;
-    if (cMode === 'stopwatch') pct = 1; 
+    let pct = 0;
+    if (cMode === 'stopwatch') {
+        // Revolving 60-second animated cycle during stopwatch
+        pct = (exactLeft % 60) / 60;
+    } else {
+        pct = durationSecs > 0 ? exactLeft / durationSecs : 0;
+    }
     
     let offset = RING_CIRCUMFERENCE * (1 - pct);
     elRing.style.strokeDashoffset = offset;
@@ -94,7 +102,7 @@ function timerLoop() {
             elPlayBtn.innerHTML = '<i class="fa-solid fa-play"></i> Start Focus';
             elPlayBtn.classList.remove('paused');
             if (elBrain) elBrain.classList.remove('pulse-anim');
-            if (elSaveBtn) elSaveBtn.style.display = 'none';
+            if (elSaveBtn) elSaveBtn.classList.remove('visible');
             
             if (window.AnruNotifier) AnruNotifier.clearTimerNotification();
             finishSession();
@@ -138,7 +146,7 @@ function toggleTimer() {
         }
         isRun = true;
         
-        if (elSaveBtn) elSaveBtn.style.display = 'flex'; // Show Save Button
+        if (elSaveBtn) elSaveBtn.classList.add('visible'); // Show Save Button
         
         const now = Date.now();
         if (cMode === 'stopwatch') {
@@ -178,14 +186,14 @@ function manualFinish() {
     elPlayBtn.innerHTML = '<i class="fa-solid fa-play"></i> Start Focus';
     elPlayBtn.classList.remove('paused');
     if (elBrain) elBrain.classList.remove('pulse-anim');
-    if (elSaveBtn) elSaveBtn.style.display = 'none';
+    if (elSaveBtn) elSaveBtn.classList.remove('visible');
     
     finishSession(); 
 }
 
 // ================= MODES & PRESETS =================
 
-function hideSaveBtn() { if (elSaveBtn) elSaveBtn.style.display = 'none'; }
+function hideSaveBtn() { if (elSaveBtn) elSaveBtn.classList.remove('visible'); }
 
 function setMode(mode, el) {
     if (isRun) toggleTimer(); 
@@ -196,9 +204,23 @@ function setMode(mode, el) {
     el.classList.add('active');
     
     let m = 25;
-    if (mode === 'short') m = 5;
-    if (mode === 'long') m = 15;
-    if (mode === 'stopwatch') { m = 0; leftSecs = 0; durationSecs = 0; }
+    const labelEl = document.querySelector('.f-timer-label');
+    if (mode === 'short') {
+        m = 5;
+        if (labelEl) labelEl.textContent = 'Short Break';
+        elPlayBtn.innerHTML = '<i class="fa-solid fa-mug-hot"></i> Start Break';
+    } else if (mode === 'long') {
+        m = 15;
+        if (labelEl) labelEl.textContent = 'Long Break';
+        elPlayBtn.innerHTML = '<i class="fa-solid fa-moon"></i> Start Break';
+    } else if (mode === 'stopwatch') {
+        m = 0; leftSecs = 0; durationSecs = 0;
+        if (labelEl) labelEl.textContent = 'Count-Up';
+        elPlayBtn.innerHTML = '<i class="fa-solid fa-play"></i> Start Count-Up';
+    } else {
+        if (labelEl) labelEl.textContent = 'Focus Time';
+        elPlayBtn.innerHTML = '<i class="fa-solid fa-play"></i> Start Focus';
+    }
     
     if (mode !== 'stopwatch') {
         durationSecs = m * 60; 
@@ -228,22 +250,50 @@ function setPreset(m, el, type) {
 
 function customTimer(el) {
     if (isRun) toggleTimer();
-    let val = prompt("Enter focus minutes (e.g. 60):", "60");
-    let m = parseInt(val, 10);
-    if (!isNaN(m) && m > 0) {
-        cMode = 'custom';
-        hideSaveBtn();
-        document.querySelectorAll('.f-preset-card').forEach(b => b.classList.remove('active'));
-        el.classList.add('active');
-        
-        document.querySelectorAll('.f-tab').forEach(b => b.classList.remove('active'));
-        const focusTab = document.querySelector('.f-tab[data-mode="focus"]');
-        if (focusTab) focusTab.classList.add('active');
-        
-        durationSecs = m * 60; 
-        leftSecs = durationSecs;
-        updateDisplay();
+    if (window.AnruModal) {
+        AnruModal.prompt({
+            title: "Custom Focus Timer",
+            message: "Kitne minute focus karna chahte ho? (Quick select ya type karein):",
+            icon: "fa-sliders",
+            badgeClass: "purple",
+            placeholder: "e.g. 60",
+            defaultValue: "60",
+            inputType: "number",
+            chips: [15, 25, 45, 60, 90, 120],
+            confirmText: "Set Timer",
+            cancelText: "Cancel",
+            onConfirm: function(val) {
+                let m = parseInt(val, 10);
+                if (!isNaN(m) && m > 0) {
+                    applyCustomMinutes(m, el);
+                }
+            }
+        });
+    } else {
+        let val = prompt("Enter focus minutes (e.g. 60):", "60");
+        let m = parseInt(val, 10);
+        if (!isNaN(m) && m > 0) applyCustomMinutes(m, el);
     }
+}
+
+function applyCustomMinutes(m, el) {
+    cMode = 'custom';
+    hideSaveBtn();
+    document.querySelectorAll('.f-preset-card').forEach(b => b.classList.remove('active'));
+    if (el) el.classList.add('active');
+    
+    // Update Custom card subtitle
+    const customDesc = document.querySelector('.f-preset-card[onclick*="customTimer"] .f-preset-desc');
+    if (customDesc) customDesc.textContent = `${m}m`;
+
+    document.querySelectorAll('.f-tab').forEach(b => b.classList.remove('active'));
+    const focusTab = document.querySelector('.f-tab[data-mode="focus"]');
+    if (focusTab) focusTab.classList.add('active');
+    
+    durationSecs = m * 60;
+    leftSecs = durationSecs;
+    updateDisplay();
+    showFocusToast(`⏱️ Custom Timer Set: ${m}m!`);
 }
 
 // ================= DATA SYNC & FINISH =================
@@ -561,7 +611,7 @@ function resetFocusTimer() {
     elPlayBtn.innerHTML = '<i class="fa-solid fa-play"></i> Start Focus';
     elPlayBtn.classList.remove('paused');
     if (elBrain) elBrain.classList.remove('pulse-anim');
-    if (elSaveBtn) elSaveBtn.style.display = 'none';
+    if (elSaveBtn) elSaveBtn.classList.remove('visible');
 }
 
 // Background tab visibility recovery (Instant resync when returning to app)
@@ -584,3 +634,53 @@ document.addEventListener('visibilitychange', () => {
         rafId = requestAnimationFrame(timerLoop);
     }
 });
+
+
+// ================= VIEW ALL HISTORY MODAL =================
+window.openAllHistoryModal = function() {
+    let logs = JSON.parse(localStorage.getItem(logsKey) || '[]');
+    if (logs.length === 0) {
+        if (window.AnruModal) {
+            AnruModal.alert({ title: "Session History", message: "Abhi koi study session save nahi hua hai. Apna pehla focus session shuru karein!", icon: "fa-book-open" });
+        } else {
+            alert("No sessions yet!");
+        }
+        return;
+    }
+
+    let histContent = logs.map((l, i) => `
+        <div style="display:flex; justify-content:space-between; align-items:center; padding:10px 12px; background:rgba(255,255,255,0.04); border-radius:12px; margin-bottom:8px;">
+            <div style="text-align:left;">
+                <div style="font-weight:700; font-size:13px; color:#fff;">Session ${logs.length - i}: ${l.mode ? l.mode.toUpperCase() : 'FOCUS'}</div>
+                <div style="font-size:11px; color:#94a3b8;">${l.dateStr} • ${l.time || ''}</div>
+            </div>
+            <div style="font-weight:800; font-size:13px; color:#a855f7;">${l.duration}m</div>
+        </div>
+    `).join('');
+
+    if (window.AnruModal) {
+        AnruModal.alert({
+            title: `Session History (${logs.length})`,
+            message: "",
+            icon: "fa-clock-rotate-left",
+            badgeClass: "purple",
+            confirmText: "Close"
+        });
+        const msgEl = document.getElementById('anruModalMsg');
+        if (msgEl) {
+            msgEl.innerHTML = `<div style="max-height:260px; overflow-y:auto; padding-right:4px;">${histContent}</div>`;
+        }
+    }
+};
+
+window.openFocusSettingsModal = function() {
+    if (window.AnruModal) {
+        AnruModal.alert({
+            title: "Focus Settings",
+            message: "Target: 4 Hours Daily\nSound Effects: Enabled\nBackground Notifications: Active",
+            icon: "fa-gear",
+            badgeClass: "purple",
+            confirmText: "Done"
+        });
+    }
+};

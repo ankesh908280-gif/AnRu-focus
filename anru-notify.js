@@ -39,6 +39,8 @@
     function checkPermissionBanner() {
         if (!('Notification' in window)) return;
         if (Notification.permission === 'default') {
+            const dismissedUntil = parseInt(localStorage.getItem('anru_notify_dismissed_until') || '0', 10);
+            if (Date.now() < dismissedUntil) return;
             setTimeout(showPermissionPrompt, 3000);
         }
     }
@@ -88,6 +90,7 @@
 
         document.getElementById('anru-later-notify')?.addEventListener('click', () => {
             document.getElementById('anru-perm-prompt')?.remove();
+            localStorage.setItem('anru_notify_dismissed_until', (Date.now() + 3 * 24 * 60 * 60 * 1000).toString());
         });
     }
 

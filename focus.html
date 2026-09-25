@@ -8,6 +8,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <link rel="stylesheet" href="focus.css">
+  <link rel="stylesheet" href="anru-modal.css">
 </head>
 <body>
 
@@ -18,7 +19,7 @@
   <header class="f-header">
     <div class="f-header-content">
       <div class="f-header-left">
-        <a href="index.html" class="f-icon-btn f-back-btn"><i class="fa-solid fa-chevron-left"></i></a>
+        <a href="index.html#hub" class="f-icon-btn f-back-btn"><i class="fa-solid fa-chevron-left"></i></a>
         
         <div class="f-brand">
           <svg class="f-logo" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -174,9 +175,9 @@
     <div class="focus-right">
       
       <header class="f-right-header">
-        <a href="index.html" class="f-icon-btn f-back-btn-desktop"><i class="fa-solid fa-chevron-left"></i></a>
+        <a href="index.html#hub" class="f-icon-btn f-back-btn-desktop"><i class="fa-solid fa-chevron-left"></i></a>
         <h2><i class="fa-solid fa-brain"></i> Focus Session</h2>
-        <button class="f-icon-btn-transparent"><i class="fa-solid fa-gear"></i></button>
+        <button class="f-icon-btn-transparent" onclick="openFocusSettingsModal()"><i class="fa-solid fa-gear"></i></button>
       </header>
 
       <div class="f-glass-card f-today-focus">
@@ -257,7 +258,7 @@
       <div class="f-history-section">
         <div class="f-history-header">
           <h3>Session History</h3>
-          <button class="f-view-all">View All</button>
+          <button class="f-view-all" onclick="openAllHistoryModal()">View All</button>
         </div>
         <div class="f-history-list" id="ui-history-list">
           <!-- JS will inject history items here -->
@@ -276,6 +277,7 @@
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
   <script src="app.js"></script>
   <script src="anru-notify.js"></script>
+  <script src="anru-modal.js"></script>
   <script src="focus.js?v=3.0"></script>
 </body>
 </html>

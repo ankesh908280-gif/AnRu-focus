@@ -346,6 +346,28 @@ function saveData(){
 
 let buffInterval = null; 
 function bootApp(){
+  // Check hash route (e.g. #hub) or last active tab
+  const hash = window.location.hash;
+  if (hash === '#hub' || hash === '#page-hub') {
+    setTimeout(() => { if (typeof switchPage === 'function') switchPage('hub'); }, 50);
+  } else {
+    const lastTab = sessionStorage.getItem('anru_last_tab');
+    if (lastTab && lastTab !== 'dash') {
+      setTimeout(() => { if (typeof switchPage === 'function') switchPage(lastTab); }, 50);
+    }
+  }
+
+  // Keyboard open listener to hide bottom nav
+  if (window.visualViewport) {
+    window.visualViewport.addEventListener('resize', () => {
+      if (window.visualViewport.height < window.innerHeight - 140) {
+        document.body.classList.add('keyboard-open');
+      } else {
+        document.body.classList.remove('keyboard-open');
+      }
+    });
+  }
+
   const loginScr = document.getElementById('loginScreen');
   const appScr = document.getElementById('appScreen');
   if(loginScr) loginScr.classList.remove('active');
@@ -571,9 +593,31 @@ function guestLogin(){
 
 // 🔥 BUG FIX: Safely stop timer & UI cleanup without crashing
 function doLogout(){
-  if(!confirm('Logout karna chahte ho?'))return;
-  saveData(); S.session=null; localStorage.removeItem('mceo_sess'); 
-  stopTimer(); // Safe version running below
+  if (window.AnruModal) {
+    AnruModal.confirm({
+      title: "Logout Confirmation",
+      message: "Kya aap sach me AnRu Focus se logout karna chahte hain?",
+      icon: "fa-right-from-bracket",
+      badgeClass: "warn",
+      confirmText: "Logout",
+      cancelText: "Stay Logged In",
+      isDanger: true,
+      onConfirm: function() {
+        performLogout();
+      }
+    });
+  } else {
+    if(confirm('Logout karna chahte ho?')) performLogout();
+  }
+}
+
+function performLogout() {
+  saveData(); 
+  S.session=null; 
+  localStorage.removeItem('mceo_sess'); 
+  localStorage.removeItem('anru_user_session');
+  document.documentElement.classList.remove('user-authenticated');
+  stopTimer();
   playSfx('click');
   document.body.className = ''; 
   const appSc = document.getElementById('appScreen'); if(appSc) appSc.classList.remove('active'); 
@@ -747,6 +791,7 @@ function changeSecretMission() {
                   7. NAVIGATION & PROFILE 
 ████████████████████████████████████████████████████████████ */
 function switchPage(page,navEl){
+  sessionStorage.setItem('anru_last_tab', page);
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active')); document.getElementById('page-'+page).classList.add('active');
   document.querySelectorAll('.bnav-item').forEach(n=>n.classList.remove('active')); const tgt=navEl||document.getElementById('bn-'+page); if(tgt)tgt.classList.add('active');
   if(page==='dash')renderDashboard();

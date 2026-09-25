@@ -189,6 +189,39 @@ window.buyNote = async function(noteId) {
         return;
     }
 
+    const doUnlockAction = async () => {
+        // Unlock logic
+        userXp -= UNLOCK_COST;
+        unlockedNotes.push(noteId);
+        playCoin();
+        updateXpDisplay();
+        renderNotes(currentClass, currentSubject);
+        showToast("🎉 Chapter Unlocked Permanently!", "success");
+
+        if (window.db && userEmail && !window.auth.currentUser?.isAnonymous) {
+            try {
+                await notesDbRef.doc(userEmail).set({
+                    unlocked: unlockedNotes,
+                    updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+                }, { merge: true });
+                if(window.saveData) window.saveData();
+            } catch(e) { console.error("Cloud save failed", e); }
+        }
+    };
+
+    if (window.AnruModal) {
+        AnruModal.confirm({
+            title: "Unlock Chapter",
+            message: `Spend ${UNLOCK_COST} XP to permanently unlock this chapter?`,
+            icon: "fa-bolt",
+            badgeClass: "warn",
+            confirmText: `Unlock (${UNLOCK_COST} XP)`,
+            cancelText: "Cancel",
+            onConfirm: doUnlockAction
+        });
+        return;
+    }
+
     if(confirm(`Spend ${UNLOCK_COST} XP to permanently unlock this chapter?`)) {
         // 💰 Deduct XP via Unified Cloud Sync
         if (window.AnRuSync && typeof window.AnRuSync.deductXP === 'function') {

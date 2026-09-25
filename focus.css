@@ -277,3 +277,50 @@ body { background: var(--bg-color); color: var(--text-main); min-height: 100vh; 
   .f-ms-val { font-size: 18px; }
   .f-ms-icon { width: 35px; height: 35px; font-size: 14px;}
 }
+
+
+/* 🔥 BUTTON DOCK FIX: Prevents Start Focus button from jumping */
+.f-timer-inner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+}
+
+#main-save-btn {
+  position: absolute;
+  right: calc(50% - 130px);
+  width: 44px !important;
+  height: 44px !important;
+  border-radius: 50% !important;
+  opacity: 0;
+  pointer-events: none;
+  transform: scale(0.8);
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1) !important;
+}
+
+#main-save-btn.visible {
+  opacity: 1 !important;
+  pointer-events: auto !important;
+  transform: scale(1) !important;
+}
+
+/* Y-Axis 0m Baseline Alignment Fix */
+.f-chart-body {
+  height: 165px;
+  padding-bottom: 22px;
+}
+
+.f-chart-y-axis {
+  height: calc(100% - 22px) !important;
+  margin-bottom: 22px !important;
+  justify-content: space-between !important;
+}
+
+/* Auto-scale time display for sessions > 60m */
+.text-gradient.compact-font {
+  font-size: 56px !important;
+}

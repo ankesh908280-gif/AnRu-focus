@@ -10,6 +10,23 @@
   <link rel="stylesheet" href="style.css">
   <link rel="stylesheet" href="sidebar.css">
   <link rel="manifest" href="manifest.json">
+  <!-- Universal Apple Glassmorphism Modal System -->
+  <link rel="stylesheet" href="anru-modal.css">
+  
+  <!-- Zero-Flash Instant Auth Shield -->
+  <script>
+    try {
+      var sess = localStorage.getItem('mceo_sess') || localStorage.getItem('anru_user_session');
+      if (sess) {
+        document.documentElement.classList.add('user-authenticated');
+      }
+    } catch(e) {}
+  </script>
+  <style>
+    html.user-authenticated #loginScreen { display: none !important; }
+    html.user-authenticated #appScreen { display: block !important; }
+    body.keyboard-open .bottom-nav { transform: translateY(100%); pointer-events: none; }
+  </style>
 </head>
 <body>
 
@@ -737,5 +754,6 @@
   }
 </script>
 
+  <script src="anru-modal.js"></script>
 </body>
 </html>
