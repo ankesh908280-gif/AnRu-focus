@@ -1,6 +1,6 @@
 /* =========================================================
    🎧 AnRu Focus Pro - Built-in Procedural Audio Soundscapes
-   Pure Web Audio API — 100% Offline, Zero External Assets
+   Pure Web Audio API — 100% Offline, Audible on Speakers & Earphones
    ========================================================= */
 
 const FocusAudio = (function() {
@@ -8,7 +8,7 @@ const FocusAudio = (function() {
   let currentSound = null;
   let activeNodes = [];
   let masterGain = null;
-  let volume = 0.65;
+  let volume = 0.7;
 
   function initCtx() {
     if (!ctx) {
@@ -23,7 +23,7 @@ const FocusAudio = (function() {
     }
   }
 
-  // 1. Gentle Rain (Pink Noise + Resonant Lowpass Filter)
+  // 1. Gentle Rain (Pink Noise + Lowpass + Gentle Drops)
   function startRain() {
     stopCurrent();
     initCtx();
@@ -40,7 +40,7 @@ const FocusAudio = (function() {
       b3 = 0.86650 * b3 + white * 0.3104856;
       b4 = 0.55000 * b4 + white * 0.5329522;
       b5 = -0.7616 * b5 - white * 0.0168980;
-      output[i] = (b0 + b1 + b2 + b3 + b4 + b5 + b6 + white * 0.5362) * 0.12;
+      output[i] = (b0 + b1 + b2 + b3 + b4 + b5 + b6 + white * 0.5362) * 0.14;
       b6 = white * 0.115926;
     }
 
@@ -53,7 +53,7 @@ const FocusAudio = (function() {
     filter.frequency.setValueAtTime(950, ctx.currentTime);
 
     const gain = ctx.createGain();
-    gain.gain.setValueAtTime(0.75, ctx.currentTime);
+    gain.gain.setValueAtTime(0.85, ctx.currentTime);
 
     whiteNoise.connect(filter);
     filter.connect(gain);
@@ -65,34 +65,57 @@ const FocusAudio = (function() {
     updateAudioUI();
   }
 
-  // 2. 40Hz Gamma Focus Binaural Beats (200Hz Left / 240Hz Right)
+  // 2. 40Hz Gamma Focus Audio (432Hz Calming Carrier + 40Hz Gamma Isochronic Brainwave Pulse)
+  // Perfectly audible on mobile phone speakers AND earphones!
   function startBinaural() {
     stopCurrent();
     initCtx();
 
-    const merger = ctx.createChannelMerger(2);
+    // Carrier 1: Warm 432Hz Sine Tone
+    const osc1 = ctx.createOscillator();
+    osc1.type = 'sine';
+    osc1.frequency.setValueAtTime(432, ctx.currentTime);
 
-    const oscL = ctx.createOscillator();
-    oscL.type = 'sine';
-    oscL.frequency.setValueAtTime(200, ctx.currentTime);
-    const gainL = ctx.createGain();
-    gainL.gain.setValueAtTime(0.35, ctx.currentTime);
-    oscL.connect(gainL);
-    gainL.connect(merger, 0, 0);
+    // Carrier 2: Subtle warm octave (216Hz) for body depth
+    const osc2 = ctx.createOscillator();
+    osc2.type = 'triangle';
+    osc2.frequency.setValueAtTime(216, ctx.currentTime);
+    const gain2 = ctx.createGain();
+    gain2.gain.setValueAtTime(0.2, ctx.currentTime);
+    osc2.connect(gain2);
 
-    const oscR = ctx.createOscillator();
-    oscR.type = 'sine';
-    oscR.frequency.setValueAtTime(240, ctx.currentTime);
-    const gainR = ctx.createGain();
-    gainR.gain.setValueAtTime(0.35, ctx.currentTime);
-    oscR.connect(gainR);
-    gainR.connect(merger, 0, 1);
+    // Pulse Gain Node
+    const pulseGain = ctx.createGain();
+    pulseGain.gain.setValueAtTime(0.45, ctx.currentTime);
 
-    merger.connect(masterGain);
+    // 40Hz Gamma LFO (Low Frequency Oscillator)
+    const lfo = ctx.createOscillator();
+    lfo.type = 'sine';
+    lfo.frequency.setValueAtTime(40, ctx.currentTime); // 40Hz Gamma Rate
 
-    oscL.start();
-    oscR.start();
-    activeNodes.push(oscL, oscR, gainL, gainR, merger);
+    const lfoDepth = ctx.createGain();
+    lfoDepth.gain.setValueAtTime(0.35, ctx.currentTime);
+
+    lfo.connect(lfoDepth);
+    lfoDepth.connect(pulseGain.gain);
+
+    // Connect carriers to pulse gain
+    osc1.connect(pulseGain);
+    gain2.connect(pulseGain);
+
+    // Lowpass filter for velvety smooth sound
+    const filter = ctx.createBiquadFilter();
+    filter.type = 'lowpass';
+    filter.frequency.setValueAtTime(1200, ctx.currentTime);
+
+    pulseGain.connect(filter);
+    filter.connect(masterGain);
+
+    osc1.start();
+    osc2.start();
+    lfo.start();
+
+    activeNodes.push(osc1, osc2, gain2, lfo, lfoDepth, pulseGain, filter);
     currentSound = 'binaural';
     updateAudioUI();
   }
@@ -106,7 +129,7 @@ const FocusAudio = (function() {
     const noiseBuffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
     const output = noiseBuffer.getChannelData(0);
     for (let i = 0; i < bufferSize; i++) {
-      output[i] = (Math.random() * 2 - 1) * 0.15;
+      output[i] = (Math.random() * 2 - 1) * 0.18;
     }
 
     const noise = ctx.createBufferSource();
@@ -115,7 +138,7 @@ const FocusAudio = (function() {
 
     const filter = ctx.createBiquadFilter();
     filter.type = 'bandpass';
-    filter.frequency.setValueAtTime(450, ctx.currentTime);
+    filter.frequency.setValueAtTime(480, ctx.currentTime);
     filter.Q.setValueAtTime(1.5, ctx.currentTime);
 
     const lfo = ctx.createOscillator();
@@ -125,7 +148,7 @@ const FocusAudio = (function() {
     lfoGain.gain.setValueAtTime(0.45, ctx.currentTime);
 
     const waveGain = ctx.createGain();
-    waveGain.gain.setValueAtTime(0.5, ctx.currentTime);
+    waveGain.gain.setValueAtTime(0.55, ctx.currentTime);
 
     lfo.connect(lfoGain);
     lfoGain.connect(waveGain.gain);
@@ -171,7 +194,7 @@ const FocusAudio = (function() {
         if (typeof showToast === 'function') showToast('🌧️ Gentle Rain Audio Active', 'info');
       } else if (type === 'binaural') {
         startBinaural();
-        if (typeof showToast === 'function') showToast('🧠 40Hz Gamma Focus Audio Active', 'info');
+        if (typeof showToast === 'function') showToast('🧠 40Hz Gamma Focus Audio Active (Playing)', 'info');
       } else if (type === 'waves') {
         startWaves();
         if (typeof showToast === 'function') showToast('🌊 Ocean Waves Audio Active', 'info');
@@ -186,8 +209,12 @@ const FocusAudio = (function() {
       const type = btn.getAttribute('data-sound');
       if (type === currentSound) {
         btn.classList.add('active');
+        btn.style.borderColor = 'var(--p1, #a855f7)';
+        btn.style.background = 'rgba(168, 85, 247, 0.25)';
       } else {
         btn.classList.remove('active');
+        btn.style.borderColor = 'rgba(255,255,255,0.12)';
+        btn.style.background = 'rgba(255,255,255,0.06)';
       }
     });
 
@@ -232,7 +259,7 @@ const FocusAudio = (function() {
 
     mc.innerHTML = `
       <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px;">
-        <div style="font-family:'Playfair Display',serif; font-size:20px; font-weight:700;"><i class="fa-solid fa-headphones" style="color:var(--p1,#a855f7);"></i> Focus Soundscapes</div>
+        <div style="font-family:'Outfit',sans-serif; font-size:20px; font-weight:800;"><i class="fa-solid fa-headphones" style="color:var(--p1,#a855f7);"></i> Focus Soundscapes</div>
         <button onclick="FocusAudio.closeSoundModal()" style="background:rgba(255,255,255,0.1); border:none; width:30px; height:30px; border-radius:50%; color:#fff; cursor:pointer;"><i class="fa-solid fa-xmark"></i></button>
       </div>
       <p style="font-size:12px; color:rgba(255,255,255,0.6); margin-bottom:16px;">100% Offline Procedural Soundscapes for Deep Focus & Concentration.</p>
@@ -254,7 +281,7 @@ const FocusAudio = (function() {
             <div style="width:38px; height:38px; border-radius:10px; background:rgba(168,85,247,0.2); color:#c084fc; display:flex; align-items:center; justify-content:center; font-size:18px;"><i class="fa-solid fa-brain"></i></div>
             <div>
               <div style="font-size:14px; font-weight:700; color:#fff;">40Hz Gamma Focus</div>
-              <div style="font-size:11px; color:rgba(255,255,255,0.6);">Binaural wave for deep retention</div>
+              <div style="font-size:11px; color:rgba(255,255,255,0.6);">432Hz + 40Hz pulse for deep retention</div>
             </div>
           </div>
           <div style="font-size:13px; font-weight:700; color:${currentSound === 'binaural' ? '#c084fc' : 'rgba(255,255,255,0.4)'};">${currentSound === 'binaural' ? '<i class="fa-solid fa-circle-pause"></i> Playing' : '<i class="fa-solid fa-circle-play"></i> Play'}</div>

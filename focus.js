@@ -102,6 +102,10 @@ function timerLoop() {
             elPlayBtn.innerHTML = '<i class="fa-solid fa-play"></i> Start Focus';
             elPlayBtn.classList.remove('paused');
             if (elBrain) elBrain.classList.remove('pulse-anim');
+        if (elSaveBtn && (cMode === 'stopwatch' && leftSecs > 0)) {
+            elSaveBtn.style.display = 'inline-flex';
+            elSaveBtn.classList.add('visible');
+        }
             if (elSaveBtn) elSaveBtn.classList.remove('visible');
             
             if (window.AnruNotifier) AnruNotifier.clearTimerNotification();
@@ -146,7 +150,10 @@ function toggleTimer() {
         }
         isRun = true;
         
-        if (elSaveBtn) elSaveBtn.classList.add('visible'); // Show Save Button
+        if (elSaveBtn) {
+            elSaveBtn.style.display = 'inline-flex';
+            elSaveBtn.classList.add('visible');
+        }
         
         const now = Date.now();
         if (cMode === 'stopwatch') {
@@ -169,26 +176,46 @@ function toggleTimer() {
     }
 }
 
-// 🔥 Manual Finish Logic
+// 🔥 Manual Finish Logic (Count-Up and Focus Save)
 function manualFinish() {
     let studiedSecs = cMode === 'stopwatch' ? leftSecs : (durationSecs - leftSecs);
     
-    if (studiedSecs < 60) {
-        alert("Study for at least 1 minute to save this session!");
+    if (studiedSecs < 10) {
+        if (typeof showToast === 'function') showToast("⚠️ Kam se kam 10 second focus karo save karne ke liye!", "warn");
+        else alert("Kam se kam 10 second focus karo save karne ke liye!");
         return;
     }
     
-    if (!confirm("Are you sure you want to Save & Finish this session now?")) return;
-    
-    isRun = false;
-    cancelAnimationFrame(rafId);
-    
-    elPlayBtn.innerHTML = '<i class="fa-solid fa-play"></i> Start Focus';
-    elPlayBtn.classList.remove('paused');
-    if (elBrain) elBrain.classList.remove('pulse-anim');
-    if (elSaveBtn) elSaveBtn.classList.remove('visible');
-    
-    finishSession(); 
+    const finishAction = () => {
+        isRun = false;
+        cancelAnimationFrame(rafId);
+        if (bgTimerInterval) clearInterval(bgTimerInterval);
+        
+        elPlayBtn.innerHTML = (cMode === 'stopwatch') ? '<i class="fa-solid fa-play"></i> Start Count-Up' : '<i class="fa-solid fa-play"></i> Start Focus';
+        elPlayBtn.classList.remove('paused');
+        if (elBrain) elBrain.classList.remove('pulse-anim');
+        if (elSaveBtn) {
+            elSaveBtn.classList.remove('visible');
+            elSaveBtn.style.display = 'none';
+        }
+        
+        finishSession(); 
+    };
+
+    if (window.AnruModal) {
+        AnruModal.confirm({
+            title: "Save Study Session?",
+            message: `Kya aap ${formatTime(studiedSecs)} ka study session save karke finish karna chahte hain?`,
+            icon: "fa-floppy-disk",
+            badgeClass: "purple",
+            confirmText: "Yes, Save Session",
+            onConfirm: finishAction
+        });
+    } else {
+        if (confirm(`Save ${formatTime(studiedSecs)} focus session now?`)) {
+            finishAction();
+        }
+    }
 }
 
 // ================= MODES & PRESETS =================
@@ -301,11 +328,11 @@ function applyCustomMinutes(m, el) {
 function finishSession() {
     if (bgTimerInterval) clearInterval(bgTimerInterval);
     if (window.AnruNotifier) AnruNotifier.clearTimerNotification();
-    // Calculate EXACT minutes studied
-    let studiedSecs = cMode === 'stopwatch' ? leftSecs : (durationSecs - leftSecs);
-    let dMins = Math.floor(studiedSecs / 60);
     
-    if (dMins < 1) return; // Silent abort if under 1 minute
+    let studiedSecs = cMode === 'stopwatch' ? leftSecs : (durationSecs - leftSecs);
+    let dMins = Math.max(1, Math.round(studiedSecs / 60)); // Guarantee at least 1 min recorded
+    
+    if (studiedSecs < 10) return;
 
     let logs = JSON.parse(localStorage.getItem(logsKey) || '[]');
     let todayStr = getIndiaDate();

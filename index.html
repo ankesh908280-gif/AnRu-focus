@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
   <title>AnRu Focus</title>
   
-  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=Playfair+Display:wght@700;900&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&family=Outfit:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <link rel="stylesheet" href="style.css">
   <link rel="stylesheet" href="sidebar.css">
@@ -76,16 +76,20 @@
 <!-- ██████ MAIN APP SCREEN ██████ -->
 <div class="screen" id="appScreen">
 <div class="top-nav">
-  <div style="display:flex; align-items:center;">
+  <div style="display:flex; align-items:center; gap:8px;">
     <button class="menu-btn" onclick="openSidebar()"><i class="fa-solid fa-bars"></i></button>
     <div class="nav-brand"><i class="fa-solid fa-rocket" style="color: #fbbf24;"></i> AnRu Focus</div>
   </div>
 
-    <div class="nav-right">
-      <div class="nav-avatar" id="navAv" onclick="switchPage('profile')">?</div>
-      <button class="btn-logout" onclick="doLogout()"><i class="fa-solid fa-power-off"></i></button>
-    </div>
+  <div id="navStreakChip" onclick="switchPage('profile')" style="display:flex; align-items:center; gap:5px; background:rgba(251,191,36,0.15); border:1px solid rgba(251,191,36,0.35); padding:5px 12px; border-radius:18px; font-size:11px; font-weight:800; color:#fbbf24; cursor:pointer;" title="Current Streak">
+    <i class="fa-solid fa-bolt"></i> <span id="topStreakNum">1</span> Day
   </div>
+
+  <div class="nav-right">
+    <div class="nav-avatar" id="navAv" onclick="switchPage('profile')">?</div>
+    <button class="btn-logout" onclick="doLogout()"><i class="fa-solid fa-power-off"></i></button>
+  </div>
+</div>
 
   <div class="main-content">
     

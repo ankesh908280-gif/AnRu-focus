@@ -291,18 +291,24 @@ body { background: var(--bg-color); color: var(--text-main); min-height: 100vh; 
 }
 
 #main-save-btn {
-  position: absolute;
-  right: calc(50% - 130px);
-  width: 44px !important;
-  height: 44px !important;
-  border-radius: 50% !important;
-  opacity: 0;
-  pointer-events: none;
-  transform: scale(0.8);
-  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1) !important;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 10px 20px !important;
+  border-radius: 24px !important;
+  background: linear-gradient(135deg, #10b981, #059669) !important;
+  color: #fff !important;
+  font-size: 13px !important;
+  font-weight: 700 !important;
+  cursor: pointer !important;
+  border: 1px solid rgba(255, 255, 255, 0.25) !important;
+  box-shadow: 0 4px 15px rgba(16, 185, 129, 0.45) !important;
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1) !important;
 }
 
 #main-save-btn.visible {
+  display: inline-flex !important;
   opacity: 1 !important;
   pointer-events: auto !important;
   transform: scale(1) !important;

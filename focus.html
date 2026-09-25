@@ -116,8 +116,8 @@
                 <button class="f-timer-btn" id="main-play-btn" onclick="toggleTimer()">
                   <i class="fa-solid fa-play"></i> Start Focus
                 </button>
-                <button class="f-timer-btn" id="main-save-btn" onclick="manualFinish()" style="display: none; padding: 0; width: 44px; height: 44px; background: linear-gradient(135deg, #10b981, #059669); box-shadow: 0 5px 20px rgba(16, 185, 129, 0.4); justify-content: center;" title="Save & Finish Session">
-                  <i class="fa-solid fa-check-double" style="margin:0; font-size:16px;"></i>
+                <button class="f-timer-btn" id="main-save-btn" onclick="manualFinish()" style="display: none; padding: 10px 18px; border-radius: 24px; background: linear-gradient(135deg, #10b981, #059669); box-shadow: 0 5px 20px rgba(16, 185, 129, 0.4); color:#fff; font-size:13px; font-weight:700; align-items:center; gap:6px; cursor:pointer;" title="Save & Finish Session">
+                  <i class="fa-solid fa-floppy-disk"></i> Save & Finish
                 </button>
             </div>
 
@@ -126,6 +126,23 @@
           </div>
 
         </div>
+      </div>
+
+      
+      <!-- 🎧 INLINE AMBIENT FOCUS MINI-DOCK -->
+      <div class="f-ambient-dock" style="display:flex; justify-content:center; align-items:center; gap:8px; margin: 16px 0 12px; flex-wrap:wrap;">
+        <button class="sound-chip" data-sound="rain" onclick="FocusAudio.toggle('rain')" style="display:flex; align-items:center; gap:6px; padding:7px 14px; background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.12); border-radius:20px; color:#fff; font-size:11px; font-weight:700; cursor:pointer; transition:all 0.2s;">
+          <i class="fa-solid fa-cloud-rain" style="color:#60a5fa;"></i> Rain
+        </button>
+        <button class="sound-chip" data-sound="binaural" onclick="FocusAudio.toggle('binaural')" style="display:flex; align-items:center; gap:6px; padding:7px 14px; background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.12); border-radius:20px; color:#fff; font-size:11px; font-weight:700; cursor:pointer; transition:all 0.2s;">
+          <i class="fa-solid fa-brain" style="color:#c084fc;"></i> 40Hz Gamma
+        </button>
+        <button class="sound-chip" data-sound="waves" onclick="FocusAudio.toggle('waves')" style="display:flex; align-items:center; gap:6px; padding:7px 14px; background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.12); border-radius:20px; color:#fff; font-size:11px; font-weight:700; cursor:pointer; transition:all 0.2s;">
+          <i class="fa-solid fa-water" style="color:#2dd4bf;"></i> Waves
+        </button>
+        <button onclick="FocusAudio.openSoundModal()" style="display:flex; align-items:center; justify-content:center; width:30px; height:30px; background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.12); border-radius:50%; color:rgba(255,255,255,0.6); font-size:12px; cursor:pointer;" title="Sound settings">
+          <i class="fa-solid fa-sliders"></i>
+        </button>
       </div>
 
       <div class="f-presets-row">

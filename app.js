@@ -1518,7 +1518,9 @@ function calcStreak(){
   for(const d of doneDates){
     const dd=new Date(d); const diff=Math.round((cur-dd)/86400000);
     if(diff<=1) { streak++; cur=dd; } else if(diff === 2 && hasFreeze) { streak++; cur=dd; } else break;
-  } return streak;
+  } const topStreak = document.getElementById('topStreakNum');
+  if(topStreak) topStreak.textContent = streak;
+  return streak;
 }
 
 function renderProfile(){
