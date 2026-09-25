@@ -9,18 +9,17 @@
   backdrop-filter: blur(25px);
   -webkit-backdrop-filter: blur(25px);
   z-index: 100000;
-  display: flex;
+  display: none;
   align-items: center;
   justify-content: center;
   padding: 20px;
   opacity: 0;
-  pointer-events: none;
   transition: opacity 0.3s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .anru-modal-overlay.active {
+  display: flex;
   opacity: 1;
-  pointer-events: auto;
 }
 
 .anru-modal-card {

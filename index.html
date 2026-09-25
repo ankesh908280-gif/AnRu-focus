@@ -379,7 +379,6 @@
 
     </div>
 
-    <!-- === 3. TASKS TAB === -->
     <div class="page" id="page-tasks">
       <div class="add-card glass">
         <h3><i class="fa-solid fa-plus" style="color:var(--success)"></i> Add New Task</h3>
@@ -641,4 +640,196 @@
 
     </div>
 
+  </div>
+
+  <!-- PERFECT 5-TAB BOTTOM NAVIGATION -->
+  <div class="bottom-nav">
+    <button class="bnav-item active" id="bn-dash" onclick="switchPage('dash',this)"><span class="bni"><i class="fa-solid fa-house"></i></span>Dashboard</button>
+    <button class="bnav-item" id="bn-hub" onclick="switchPage('hub',this)"><span class="bni"><i class="fa-solid fa-layer-group"></i></span>Hub</button>
+    <button class="bnav-item" id="bn-tasks" onclick="switchPage('tasks',this)"><span class="bni"><i class="fa-solid fa-list-check"></i></span>Tasks<span class="bnav-badge" id="pendingBadge" style="display:none">0</span></button>
+    <button class="bnav-item" id="bn-subjects" onclick="switchPage('subjects',this)"><span class="bni"><i class="fa-solid fa-folder-open"></i></span>Subjects</button>
+    <button class="bnav-item" id="bn-profile" onclick="switchPage('profile',this)"><span class="bni"><i class="fa-solid fa-user-astronaut"></i></span>Profile</button>
+  </div>
+</div>
+
+<!-- ██████ FLOATING BUTTONS & MODALS ██████ -->
+<div id="floatingNoteBtn" onclick="openTimestampModal()" style="position:fixed; bottom:85px; right:20px; width:50px; height:50px; background:var(--grad); border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:20px; color:#fff; box-shadow:0 5px 15px rgba(0,0,0,0.4); cursor:pointer; z-index:400; transition:transform 0.2s;"><i class="fa-solid fa-pen-nib"></i></div>
+
+<div class="modal-overlay" id="modalOverlay">
+  <div class="modal-box glass2">
+    <button class="modal-close" onclick="closeModal()"><i class="fa-solid fa-xmark"></i></button>
+    <div id="modalContent"></div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="timestampModal">
+  <div class="modal-box glass2" style="max-width:320px;">
+    <button class="modal-close" onclick="document.getElementById('timestampModal').classList.remove('open')"><i class="fa-solid fa-xmark"></i></button>
+    <div class="modal-title" style="font-size:18px;"><i class="fa-solid fa-stopwatch" style="color: #fbbf24;"></i> Quick Timestamp Note</div>
+    <p style="font-size:12px; color:var(--textMuted); margin-bottom:12px;">Class ke beech me important point save karo!</p>
+    <div class="inp-wrap area"><textarea id="tsNoteInput" rows="3" placeholder="Ex: 45:20 - Important derivation..."></textarea></div>
+    <div class="inp-wrap"><select id="tsTaskSelect"><option value="">Select Active Task to attach...</option></select></div>
+    <button class="btn btn-grad" onclick="saveTimestampNote()">Save Note <i class="fa-solid fa-thumbtack"></i></button>
+  </div>
+</div>
+
+<div class="modal-overlay" id="reportModal">
+  <div class="modal-box glass2" style="max-width:400px; padding:16px;">
+    <button class="modal-close" onclick="document.getElementById('reportModal').classList.remove('open')"><i class="fa-solid fa-xmark"></i></button>
+    <div class="modal-title" style="font-size:18px; margin-bottom:10px;"><i class="fa-solid fa-chart-simple" style="color: #60a5fa;"></i> Weekly Report</div>
+    <div id="reportContent" style="background:#fff; color:#111; padding:20px; border-radius:12px; margin-bottom:16px; box-shadow:0 10px 25px rgba(0,0,0,0.3);">
+      <div style="text-align:center; font-family:'Playfair Display', serif; font-weight:900; font-size:22px; margin-bottom:10px; color:#222;">AnRu Focus</div>
+      <div style="text-align:center; font-size:12px; color:#666; margin-bottom:20px; border-bottom:1px solid #eee; padding-bottom:10px;">Weekly Academic Performance</div>
+      <div style="font-size:14px; font-weight:600; margin-bottom:8px;" id="reportDateRange">Date: -- to --</div>
+      <div style="font-size:13px; margin-bottom:6px;"><i class="fa-solid fa-user-graduate" style="color: #a855f7;"></i> Student: <span id="reportStudentName" style="font-weight:700;">--</span></div>
+      <div style="font-size:13px; margin-bottom:6px;"><i class="fa-solid fa-clock" style="color: #fbbf24;"></i> Total Focus: <span id="reportTotalTime" style="font-weight:700;">0h 0m</span></div>
+      <div style="font-size:13px; margin-bottom:6px;"><i class="fa-solid fa-check" style="color: #4ade80;"></i> Tasks Done: <span id="reportTasksDone" style="font-weight:700;">0</span></div>
+      <div style="font-size:13px; margin-bottom:20px;"><i class="fa-solid fa-box-archive" style="color: #f87171;"></i> Backlogs Cleared: <span id="reportBacklogsCleared" style="font-weight:700;">0</span></div>
+      <div style="text-align:center; font-size:11px; color:#888; font-style:italic; border-top:1px solid #eee; padding-top:10px;">"Consistency is the ultimate superpower."</div>
+    </div>
+    <button class="btn btn-grad" onclick="printReport()">Download / Print Report <i class="fa-solid fa-print"></i></button>
+  </div>
+</div>
+
+<div class="modal-overlay" id="forgotPassModal">
+  <div class="modal-box glass2" style="max-width:340px; text-align:center; padding:24px;">
+    <button class="modal-close" onclick="document.getElementById('forgotPassModal').classList.remove('open')"><i class="fa-solid fa-xmark"></i></button>
+    <div style="font-size:36px; margin-bottom:10px;"><i class="fa-solid fa-key" style="color:var(--warn)"></i></div>
+    <div class="modal-title" style="font-size:20px; margin-bottom:6px;">Reset Password</div>
+    <p style="font-size:12px; color:var(--textSub); margin-bottom:18px;" id="fpSubText">Enter your registered email address to verify your account.</p>
+    <div id="fpStep1">
+      <div class="inp-wrap" style="text-align:left; margin-bottom:16px;">
+        <span class="ico"><i class="fa-solid fa-envelope" style="color: #60a5fa;"></i></span><input type="email" id="fpEmail" placeholder="name@example.com" style="width:100%;">
+      </div>
+      <button class="btn btn-grad" style="width:100%; border-radius:12px; padding:12px;" onclick="fpVerifyEmail()">Verify Email <i class="fa-solid fa-paper-plane"></i></button>
+    </div>
+    <div id="fpStep2" style="display:none;">
+      <div class="inp-wrap" style="text-align:left; margin-bottom:16px;">
+        <span class="ico"><i class="fa-solid fa-lock" style="color: #f87171;"></i></span><input type="password" id="fpNewPass" placeholder="New Password (min 4 chars)" style="width:100%;">
+      </div>
+      <button class="btn btn-grad" style="width:100%; border-radius:12px; padding:12px;" onclick="fpSaveNewPassword()">Update Password <i class="fa-solid fa-wand-magic-sparkles"></i></button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<!-- ██████ SIDEBAR MODULE ██████ -->
+<div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>
+<div class="sidebar-menu" id="sidebarMenu">
+  <div class="sb-header">
+    <div class="sb-user-info">
+      <div class="sb-avatar" id="sbAv">?</div>
+      <div>
+        <div class="sb-name" id="sbName">Champion</div>
+        <div class="sb-rank" id="sbRank">Rank: Rookie <i class="fa-solid fa-star" style="color: #fbbf24;"></i></div>
+      </div>
+    </div>
+    <button class="sb-close" onclick="closeSidebar()"><i class="fa-solid fa-xmark"></i></button>
+  </div>
   
+  <div class="sb-content">
+    <div class="sb-label">Connect With Us</div>
+    <a href="#" id="linkInsta" target="_blank" class="sb-item"><i class="fa-brands fa-instagram ico" style="color:#E1306C; font-size:22px;"></i> Instagram</a>
+    <a href="#" id="linkTele" target="_blank" class="sb-item"><i class="fa-brands fa-telegram ico" style="color:#0088cc; font-size:22px;"></i> Telegram</a>
+    <a href="#" id="linkYt" target="_blank" class="sb-item"><i class="fa-brands fa-youtube ico" style="color:#FF0000; font-size:22px;"></i> YouTube</a>
+    <a href="#" id="linkPort" target="_blank" class="sb-item"><i class="fa-solid fa-microchip ico" style="color:#4ade80; font-size:20px;"></i> AI Portfolio</a>
+
+    <div class="sb-label">Support & Actions</div>
+    <div class="sb-item" onclick="shareApp()"><i class="fa-solid fa-share-nodes ico" style="color:#a855f7;"></i> Share with Friends</div>
+    <div class="sb-item" onclick="openFeedbackModal()"><i class="fa-solid fa-bug ico" style="color:#f87171;"></i> Report Bug / Feedback</div>
+    <div class="sb-item" onclick="rateApp()"><i class="fa-solid fa-star ico" style="color:#fbbf24;"></i> Rate 5 Stars</div>
+    <div class="sb-item" onclick="showPrivacy()"><i class="fa-solid fa-shield-halved ico" style="color:#60a5fa;"></i> Privacy Policy</div>
+  </div>
+
+  <div class="sb-footer">
+    <div class="sb-version" id="sbVersionBtn" onclick="handleSecretTap()">AnRu Focus v2.0</div>
+  </div>
+</div>
+
+<!-- Feedback & Bug Report Modal -->
+<div class="modal-overlay" id="feedbackModal">
+  <div class="modal-box glass2" style="max-width:320px; text-align:center; padding:24px;">
+    <button class="modal-close" onclick="document.getElementById('feedbackModal').classList.remove('open')"><i class="fa-solid fa-xmark"></i></button>
+    <div style="font-size:36px; margin-bottom:10px;"><i class="fa-solid fa-bug" style="color:#f87171"></i></div>
+    <div class="modal-title" style="font-size:20px; margin-bottom:6px;">Report Bug / Feedback</div>
+    <p style="font-size:12px; color:var(--textSub); margin-bottom:15px;">App me koi problem hai ya naya feature chahiye? Yahan likho.</p>
+    
+    <div class="inp-wrap area" style="text-align:left; border: none; padding: 0;">
+      <textarea id="fbMessage" rows="4" placeholder="Describe the issue or feature request..." style="width:100%; border-radius:12px; padding:12px; background:rgba(0,0,0,0.3); color:#fff; border:1px solid rgba(255,255,255,0.1); outline:none; resize:none; font-family:'Outfit', sans-serif; font-size:13px;"></textarea>
+    </div>
+    
+    <button class="btn btn-grad" style="width:100%; border-radius:12px; padding:12px; margin-top:10px;" onclick="submitFeedback()">Send to Developer <i class="fa-solid fa-paper-plane"></i></button>
+  </div>
+</div>
+
+<!-- Secret Admin Password Modal -->
+<div class="modal-overlay" id="adminPassModal">
+  <div class="modal-box glass2" style="max-width:300px; text-align:center;">
+    <button class="modal-close" onclick="document.getElementById('adminPassModal').classList.remove('open')"><i class="fa-solid fa-xmark"></i></button>
+    <div style="font-size:30px; margin-bottom:10px;"><i class="fa-solid fa-user-secret" style="color:var(--textSub)"></i></div>
+    <div class="modal-title">Developer Access</div>
+    <div class="inp-wrap" style="text-align:left;">
+      <span class="ico"><i class="fa-solid fa-key" style="color: var(--warn);"></i></span>
+      <input type="password" id="adminPassInput" placeholder="Enter Secret Code">
+    </div>
+    <button class="btn btn-grad" style="background:var(--danger)" onclick="verifyAdmin()">Unlock System</button>
+  </div>
+</div>
+
+<!-- Admin Dashboard Modal -->
+<div class="modal-overlay" id="adminDashModal">
+  <div class="modal-box glass2" style="max-width:400px; max-height:80vh;">
+    <button class="modal-close" onclick="document.getElementById('adminDashModal').classList.remove('open')"><i class="fa-solid fa-xmark"></i></button>
+    <div class="modal-title" style="color:var(--warn)"><i class="fa-solid fa-crown"></i> Admin Command Center</div>
+    <div class="sb-label" style="margin-top:0">User Feedbacks & Bugs</div>
+    <div id="adminFeedbackList" class="scroll-hide" style="max-height: 50vh; overflow-y: auto;">
+      <div style="text-align:center; color:#888; font-size:12px; margin-top:20px;">Fetching logs from cloud... <i class="fa-solid fa-cloud"></i></div>
+    </div>
+  </div>
+</div>
+
+<!-- ██████ SCRIPTS ██████ -->
+<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+
+<script src="app.js"></script>
+<script src="anru-ai.js"></script>
+<script src="sidebar.js"></script>
+  <script src="ai-plugin.js"></script>
+
+
+<!-- Quick Study Advanced Sound Script -->
+<script>
+    const qsClickSound = new Audio('https://assets.mixkit.co/sfx/preview/mixkit-sci-fi-click-900.mp3');
+    const qsHoverSound = new Audio('https://assets.mixkit.co/sfx/preview/mixkit-fast-small-sweep-transition-166.mp3');
+    qsClickSound.load(); qsHoverSound.load();
+    function playQsHover() {
+        qsHoverSound.volume = 0.2; qsHoverSound.currentTime = 0;
+        let playPromise = qsHoverSound.play();
+        if (playPromise !== undefined) { playPromise.catch(e => { }); }
+    }
+    function playQsClick(url) {
+        qsClickSound.volume = 1.0; qsClickSound.currentTime = 0;
+        let playPromise = qsClickSound.play();
+        if (playPromise !== undefined) { playPromise.catch(e => { console.log("Sound blocked by browser"); }); }
+        if (navigator.vibrate) { navigator.vibrate(40); }
+        setTimeout(() => { window.location.href = url; }, 300); 
+    }
+</script>
+
+<script>
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('sw.js').then(() => console.log('Service Worker Registered'));
+  }
+</script>
+
+
+<!-- AnRu Pro Modules -->
+<script src="anru-modal.js"></script>
+<script src="anru-notify.js"></script>
+
+</body>
+</html>
