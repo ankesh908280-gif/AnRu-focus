@@ -538,10 +538,18 @@ input::placeholder, textarea::placeholder { color: var(--textMuted); }
 ████████████████████████████████████████████████████████████ 
 */
 @media print {
-  body * { visibility: hidden; }
-  #reportContent, #reportContent * { visibility: visible; }
-  #reportContent { position: absolute; left: 0; top: 0; width: 100%; box-shadow: none; border: none; margin: 0; padding: 20px; }
-  .modal-overlay { background: transparent; position: absolute; align-items: flex-start; }
+  body * { visibility: hidden !important; }
+  #reportContent, #reportContent * { visibility: visible !important; }
+  #reportContent { 
+    position: absolute !important; left: 0 !important; top: 0 !important; width: 100% !important; 
+    background: #ffffff !important; color: #111111 !important; 
+    box-shadow: none !important; border: none !important; margin: 0 !important; padding: 20px !important; 
+  }
+  #reportContent div, #reportContent span, #reportContent p {
+    color: #111111 !important;
+    text-shadow: none !important;
+  }
+  .modal-overlay { background: transparent !important; position: absolute !important; align-items: flex-start !important; }
 }
 
 /* =========================================================
@@ -977,10 +985,19 @@ body, button, input, select, textarea {
   width: 38px !important;
   height: 38px !important;
   border-radius: 50% !important;
-  background: linear-gradient(135deg, var(--p1), var(--p2)) !important;
-  border: 2px solid rgba(255, 255, 255, 0.25) !important;
+  background: linear-gradient(135deg, var(--p1), var(--p2));
+  background-size: cover !important;
+  background-position: center !important;
+  background-repeat: no-repeat !important;
+  border: 2px solid rgba(255, 255, 255, 0.3) !important;
   box-shadow: 0 0 12px rgba(168, 85, 247, 0.5) !important;
   cursor: pointer !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  font-weight: 800 !important;
+  font-size: 14px !important;
+  overflow: hidden !important;
   transition: transform 0.2s !important;
 }
 .nav-avatar:active { transform: scale(0.92) !important; }

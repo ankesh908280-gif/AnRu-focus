@@ -877,15 +877,37 @@ function switchPage(page,navEl){
 }
 
 function updateNavUser(){
-  const u=S.session; if(!u)return;
-  const init=u.name ? u.name.charAt(0).toUpperCase() : 'U';
-  const nAv=document.getElementById('navAv'); const pAv=document.getElementById('profAv');
-  if(u.pfp){ 
-    if(nAv){ nAv.textContent=''; nAv.style.backgroundImage=`url(${u.pfp})`; }
-    if(pAv){ pAv.textContent=''; pAv.style.backgroundImage=`url(${u.pfp})`; }
+  const u = S.session; if(!u) return;
+  const init = u.name ? u.name.charAt(0).toUpperCase() : 'U';
+  const nAv = document.getElementById('navAv'); 
+  const pAv = document.getElementById('profAv');
+  
+  if (u.pfp) { 
+    if (nAv) { 
+      nAv.textContent = ''; 
+      nAv.style.setProperty('background-image', `url("${u.pfp}")`, 'important');
+      nAv.style.setProperty('background-size', 'cover', 'important');
+      nAv.style.setProperty('background-position', 'center', 'important');
+      nAv.style.setProperty('background-repeat', 'no-repeat', 'important');
+    }
+    if (pAv) { 
+      pAv.textContent = ''; 
+      pAv.style.setProperty('background-image', `url("${u.pfp}")`, 'important');
+      pAv.style.setProperty('background-size', 'cover', 'important');
+      pAv.style.setProperty('background-position', 'center', 'important');
+      pAv.style.setProperty('background-repeat', 'no-repeat', 'important');
+    }
   } else { 
-    if(nAv){ nAv.textContent=init; nAv.style.backgroundImage=''; }
-    if(pAv){ pAv.textContent=init; pAv.style.backgroundImage=''; }
+    if (nAv) { 
+      nAv.textContent = init; 
+      nAv.style.removeProperty('background-image');
+      nAv.style.background = 'linear-gradient(135deg, var(--p1), var(--p2))'; 
+    }
+    if (pAv) { 
+      pAv.textContent = init; 
+      pAv.style.removeProperty('background-image');
+      pAv.style.background = 'linear-gradient(135deg, var(--p1), var(--p2))'; 
+    }
   }
   const pName = document.getElementById('profName'); if(pName) pName.textContent=u.name;
   const pEmail = document.getElementById('profEmail'); if(pEmail) pEmail.textContent=u.email;
@@ -956,7 +978,23 @@ function toggleTask(id){
       let extraXP = getExtraBuffXP(); S.xp += (40 + extraXP); playSfx('task_complete'); 
       showToast(`<i class="fa-solid fa-check-double"></i> Mission complete (+${40 + extraXP} XP)!${extraXP>0?' <i class="fa-solid fa-bolt"></i> Buffed!':''}`,'success'); 
       if(t.subtasks){ t.subtasks.forEach(st=>st.done=true); } 
-      if(t.isTwoStep && !t.repScheduled) { setTimeout(() => { if(confirm("🏆 Task completed! Do you want to schedule automatic 7 & 30 Days Revisions for this topic?")) { scheduleRevision(t); } }, 500); }
+      if(t.isTwoStep && !t.repScheduled) { 
+        setTimeout(() => { 
+          if (window.AnruModal) {
+            AnruModal.confirm({
+              title: "Schedule Revisions?",
+              message: "🏆 Task completed! Is topic ke liye automatic 7 & 30 Days Revisions schedule karein?",
+              icon: "fa-calendar-check",
+              badgeClass: "purple",
+              confirmText: "Schedule Revisions",
+              cancelText: "Not Now",
+              onConfirm: () => scheduleRevision(t)
+            });
+          } else if (confirm("🏆 Task completed! Do you want to schedule automatic 7 & 30 Days Revisions for this topic?")) { 
+            scheduleRevision(t); 
+          } 
+        }, 500); 
+      }
     } else { S.xp = Math.max(0, S.xp - 40); playSfx('click'); }
     saveData(); renderAll();
   }
@@ -970,7 +1008,23 @@ function toggleSplitStep(id, step) {
   if(t.watched && t.notesMade) { 
       t.isDone = true; let extraXP = getExtraBuffXP(); S.xp += (20 + extraXP); playSfx('task_complete'); 
       showToast(`<i class="fa-solid fa-trophy"></i> Mastered: Lecture + Notes (+${20+extraXP} Bonus XP)!${extraXP>0?' <i class="fa-solid fa-bolt"></i> Buffed!':''}`, 'success'); 
-      if(!t.repScheduled) { setTimeout(() => { if(confirm("🏆 Mastered! Do you want to schedule automatic 7 & 30 Days Revisions for this topic?")) { scheduleRevision(t); } }, 500); }
+      if(!t.repScheduled) { 
+        setTimeout(() => { 
+          if (window.AnruModal) {
+            AnruModal.confirm({
+              title: "Topic Mastered!",
+              message: "🏆 Mastered! Is topic ke liye automatic 7 & 30 Days Revisions schedule karein?",
+              icon: "fa-trophy",
+              badgeClass: "purple",
+              confirmText: "Schedule Revisions",
+              cancelText: "Not Now",
+              onConfirm: () => scheduleRevision(t)
+            });
+          } else if (confirm("🏆 Mastered! Do you want to schedule automatic 7 & 30 Days Revisions for this topic?")) { 
+            scheduleRevision(t); 
+          } 
+        }, 500); 
+      }
   } else { t.isDone = false; }
   saveData(); renderAll();
 }
@@ -983,8 +1037,27 @@ function toggleBacklogVault(id) {
 }
 
 function deleteTask(id){
-  if(!confirm('🗑️ Are you sure you want to permanently delete this task?')) return;
-  playSfx('delete'); S.tasks=S.tasks.filter(x=>x.id!==id); saveData(); renderAll(); showToast('<i class="fa-solid fa-trash-can"></i> Task deleted!');
+  const doDel = () => {
+    playSfx('delete');
+    S.tasks = S.tasks.filter(x => x.id !== id);
+    saveData();
+    renderAll();
+    showToast('<i class="fa-solid fa-trash-can"></i> Task deleted!', 'success');
+  };
+
+  if (window.AnruModal) {
+    AnruModal.confirm({
+      title: "Delete Task?",
+      message: "Kya aap is task ko permanently delete karna chahte hain?",
+      icon: "fa-trash-can",
+      badgeClass: "red",
+      confirmText: "Delete",
+      cancelText: "Cancel",
+      onConfirm: doDel
+    });
+  } else {
+    if (confirm('Are you sure you want to permanently delete this task?')) doDel();
+  }
 }
 
 function openEditTask(id){
@@ -1289,7 +1362,30 @@ function addSubject(){
   S.subjects.push({name,emoji:S.emoji, flashcards:[]}); document.getElementById('sName').value='';
   saveData(); renderSubjects(); populateSubjDropdown(); playSfx('success'); showToast('<i class="fa-solid fa-book"></i> Subject added!','success');
 }
-function deleteSubject(i){ if(!confirm('Subject delete karo?'))return; playSfx('delete'); S.subjects.splice(i,1); saveData(); renderSubjects(); populateSubjDropdown(); }
+function deleteSubject(i){
+  const doDel = () => {
+    playSfx('delete');
+    S.subjects.splice(i, 1);
+    saveData();
+    renderSubjects();
+    populateSubjDropdown();
+    showToast('<i class="fa-solid fa-trash-can"></i> Subject deleted!', 'success');
+  };
+
+  if (window.AnruModal) {
+    AnruModal.confirm({
+      title: "Delete Subject?",
+      message: `Kya aap "${S.subjects[i]?.name || 'is subject'}" ko delete karna chahte hain?`,
+      icon: "fa-trash-can",
+      badgeClass: "red",
+      confirmText: "Delete",
+      cancelText: "Cancel",
+      onConfirm: doDel
+    });
+  } else {
+    if (confirm('Subject delete karo?')) doDel();
+  }
+}
 
 function openFlashcards(subName) {
   const subj = S.subjects.find(s=>s.name===subName); if(!subj) return;

@@ -330,3 +330,20 @@ body { background: var(--bg-color); color: var(--text-main); min-height: 100vh; 
 .text-gradient.compact-font {
   font-size: 56px !important;
 }
+
+
+/* Sizing fix for clock action buttons to stay comfortably inside the ring */
+.f-timer-btn {
+  padding: 10px 18px !important;
+  font-size: 13px !important;
+  max-width: 110px !important;
+  white-space: nowrap !important;
+  border-radius: 24px !important;
+}
+
+#main-save-btn {
+  padding: 9px 16px !important;
+  font-size: 13px !important;
+  max-width: 95px !important;
+  white-space: nowrap !important;
+}

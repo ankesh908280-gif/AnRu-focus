@@ -180,3 +180,23 @@
   color: #fff;
   box-shadow: 0 8px 25px rgba(239, 68, 68, 0.4);
 }
+
+
+/* Mobile Bottom Sheet Upgrade */
+@media (max-width: 600px) {
+  .anru-modal-overlay {
+    align-items: flex-end !important;
+    padding: 0 !important;
+  }
+  .anru-modal-card {
+    max-width: 100% !important;
+    border-radius: 28px 28px 0 0 !important;
+    border-bottom: none !important;
+    padding: 16px 22px 34px !important;
+    transform: translateY(100%) !important;
+    box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.7) !important;
+  }
+  .anru-modal-overlay.active .anru-modal-card {
+    transform: translateY(0) !important;
+  }
+}
