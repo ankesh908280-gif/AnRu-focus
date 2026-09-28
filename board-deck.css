@@ -1,0 +1,536 @@
+/* ==========================================================================
+   📚 AnRu Focus Pro - Board Pocket Deck (UP Board Master Vault) Styles
+   ========================================================================== */
+
+.deck-body {
+  margin: 0;
+  padding: 0 0 100px;
+  background: radial-gradient(circle at top right, #1e1145, #0d081f 45%, #05030a 100%);
+  color: #ffffff;
+  font-family: 'Plus Jakarta Sans', 'Outfit', sans-serif;
+  min-height: 100vh;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+/* 1. Header */
+.deck-header {
+  position: sticky;
+  top: 10px;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 16px;
+  margin: 10px 14px 14px;
+  background: rgba(16, 12, 34, 0.82);
+  backdrop-filter: blur(35px) saturate(200%);
+  -webkit-backdrop-filter: blur(35px) saturate(200%);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 26px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5), inset 0 1px 1px rgba(255, 255, 255, 0.2);
+}
+
+.deck-back-btn, .deck-star-filter-btn {
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.deck-back-btn:active, .deck-star-filter-btn:active {
+  transform: scale(0.92);
+}
+
+.deck-star-filter-btn.active {
+  background: rgba(251, 191, 36, 0.2);
+  border-color: #fbbf24;
+  color: #fbbf24;
+  box-shadow: 0 0 15px rgba(251, 191, 36, 0.4);
+}
+
+.deck-header-title {
+  text-align: center;
+  flex: 1;
+}
+
+.deck-header-title h2 {
+  margin: 0;
+  font-size: 17px;
+  font-weight: 800;
+  letter-spacing: -0.3px;
+  background: linear-gradient(135deg, #ffffff 40%, rgba(255,255,255,0.7));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.deck-header-title p {
+  margin: 2px 0 0;
+  font-size: 10px;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.5);
+  letter-spacing: 0.5px;
+}
+
+/* 2. Search Section */
+.deck-search-section {
+  padding: 0 16px;
+  margin-bottom: 14px;
+}
+
+.deck-search-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 18px;
+  padding: 0 14px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
+}
+
+.deck-search-icon {
+  font-size: 15px;
+  color: rgba(255, 255, 255, 0.4);
+  margin-right: 10px;
+}
+
+.deck-search-wrap input {
+  width: 100%;
+  background: transparent;
+  border: none;
+  padding: 13px 0;
+  color: #fff;
+  font-size: 14px;
+  font-family: inherit;
+  outline: none;
+}
+
+.deck-search-wrap input::placeholder {
+  color: rgba(255, 255, 255, 0.35);
+}
+
+.deck-search-clear {
+  background: transparent;
+  border: none;
+  color: rgba(255, 255, 255, 0.5);
+  cursor: pointer;
+  padding: 4px;
+  font-size: 14px;
+}
+
+/* 3. Class Switcher Dock */
+.deck-class-switcher-container {
+  padding: 0 16px;
+  margin-bottom: 14px;
+}
+
+.deck-class-dock {
+  display: flex;
+  gap: 6px;
+  background: rgba(16, 12, 34, 0.75);
+  padding: 4px;
+  border-radius: 20px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+}
+
+.class-pill {
+  flex: 1;
+  padding: 9px 8px;
+  border: none;
+  background: transparent;
+  color: rgba(255, 255, 255, 0.5);
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 700;
+  border-radius: 16px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.class-pill.active {
+  background: linear-gradient(135deg, var(--p1, #a855f7), var(--p2, #6366f1));
+  color: #ffffff;
+  box-shadow: 0 4px 15px rgba(168, 85, 247, 0.45);
+}
+
+/* 4. Subject Tabs Carousel */
+.deck-subj-carousel-container {
+  padding: 0 16px;
+  margin-bottom: 16px;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.deck-subj-carousel-container::-webkit-scrollbar { display: none; }
+
+.deck-subj-carousel {
+  display: flex;
+  gap: 8px;
+  width: max-content;
+}
+
+.subj-chip {
+  padding: 8px 16px;
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: rgba(255, 255, 255, 0.65);
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  white-space: nowrap;
+}
+
+.subj-chip.active {
+  background: rgba(168, 85, 247, 0.25);
+  border-color: #c084fc;
+  color: #fff;
+  box-shadow: 0 0 15px rgba(168, 85, 247, 0.4);
+}
+
+/* 5. Main Content Area */
+.deck-main-container {
+  padding: 0 16px;
+}
+
+.deck-stats-strip {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 11px;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.5);
+  margin-bottom: 12px;
+  padding: 0 4px;
+}
+
+#activeRecallTip {
+  color: #fbbf24;
+}
+
+/* Cards Grid */
+.deck-cards-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+/* Luxury Academic Index Card */
+.deck-card {
+  position: relative;
+  background: linear-gradient(135deg, rgba(26, 18, 56, 0.8), rgba(15, 10, 36, 0.85));
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 22px;
+  padding: 18px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4), inset 0 1px 1px rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(25px);
+  -webkit-backdrop-filter: blur(25px);
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.deck-card:hover {
+  transform: translateY(-2px);
+  border-color: rgba(168, 85, 247, 0.4);
+  box-shadow: 0 14px 35px rgba(0, 0, 0, 0.5);
+}
+
+/* Top Card Header */
+.card-top-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+
+.card-badge {
+  font-size: 9px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  padding: 4px 9px;
+  border-radius: 12px;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.badge-guaranteed { background: rgba(239, 68, 68, 0.2); border: 1px solid rgba(239, 68, 68, 0.5); color: #f87171; }
+.badge-core { background: rgba(168, 85, 247, 0.2); border: 1px solid rgba(168, 85, 247, 0.5); color: #c084fc; }
+.badge-highyield { background: rgba(251, 191, 36, 0.2); border: 1px solid rgba(251, 191, 36, 0.5); color: #fbbf24; }
+.badge-diagram { background: rgba(56, 189, 248, 0.2); border: 1px solid rgba(56, 189, 248, 0.5); color: #38bdf8; }
+
+.card-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.card-action-btn {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: rgba(255, 255, 255, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.card-action-btn:active {
+  transform: scale(0.9);
+}
+
+.card-action-btn.starred {
+  background: rgba(251, 191, 36, 0.25);
+  border-color: #fbbf24;
+  color: #fbbf24;
+}
+
+/* Card Content Typography */
+.card-title {
+  margin: 0 0 6px;
+  font-size: 16px;
+  font-weight: 800;
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.card-subtitle {
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.5);
+  margin-bottom: 12px;
+}
+
+/* Formula Box (With Active Recall Blur Toggle) */
+.formula-box {
+  background: rgba(0, 0, 0, 0.35);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 14px;
+  padding: 12px 14px;
+  margin: 8px 0;
+  position: relative;
+  transition: all 0.3s ease;
+}
+
+.formula-text {
+  font-family: 'Plus Jakarta Sans', monospace;
+  font-size: 15px;
+  font-weight: 700;
+  color: #fbbf24;
+  line-height: 1.4;
+  transition: filter 0.3s ease;
+}
+
+.formula-box.is-blurred .formula-text {
+  filter: blur(8px);
+  user-select: none;
+}
+
+.blur-overlay-hint {
+  display: none;
+  position: absolute;
+  inset: 0;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: 800;
+  color: #fff;
+  background: rgba(0,0,0,0.4);
+  border-radius: 14px;
+  cursor: pointer;
+}
+
+.formula-box.is-blurred .blur-overlay-hint {
+  display: flex;
+}
+
+.formula-explanation {
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.7);
+  line-height: 1.5;
+  margin-top: 6px;
+}
+
+/* Hindi Sahitya Table Card */
+.sahitya-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 8px 0 10px;
+  font-size: 12px;
+}
+
+.sahitya-table td {
+  padding: 6px 4px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.sahitya-label {
+  color: rgba(255, 255, 255, 0.5);
+  font-weight: 600;
+  width: 32%;
+}
+
+.sahitya-val {
+  color: #ffffff;
+  font-weight: 700;
+}
+
+.sahitya-val.highlight {
+  color: #c084fc;
+}
+
+.sahitya-quotes {
+  font-size: 11px;
+  font-style: italic;
+  color: rgba(251, 191, 36, 0.9);
+  background: rgba(251, 191, 36, 0.08);
+  border-left: 3px solid #fbbf24;
+  padding: 6px 10px;
+  border-radius: 0 8px 8px 0;
+  margin-top: 8px;
+}
+
+/* Diagram Preview Inside Card */
+.diagram-preview-card {
+  width: 100%;
+  height: 170px;
+  background: rgba(0, 0, 0, 0.4);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+  cursor: pointer;
+  margin: 10px 0;
+}
+
+.diagram-preview-card svg {
+  max-width: 90%;
+  max-height: 90%;
+  filter: drop-shadow(0 2px 8px rgba(0,0,0,0.5));
+}
+
+.diagram-zoom-badge {
+  position: absolute;
+  bottom: 8px;
+  right: 8px;
+  background: rgba(0, 0, 0, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: #38bdf8;
+  font-size: 10px;
+  font-weight: 700;
+  padding: 4px 8px;
+  border-radius: 8px;
+  backdrop-filter: blur(6px);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+/* 6. Fullscreen Diagram Lightbox Modal */
+.deck-lightbox-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  z-index: 100000;
+  background: rgba(5, 3, 15, 0.85);
+  backdrop-filter: blur(25px);
+  -webkit-backdrop-filter: blur(25px);
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+}
+
+.deck-lightbox-overlay.open {
+  display: flex;
+  animation: fadeIn 0.25s ease;
+}
+
+.deck-lightbox-card {
+  width: 100%;
+  max-width: 480px;
+  background: rgba(18, 12, 38, 0.95);
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: 24px;
+  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.7);
+  padding: 20px;
+  overflow: hidden;
+}
+
+.deck-lightbox-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 14px;
+}
+
+.deck-lightbox-header h3 {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 800;
+  color: #fff;
+}
+
+.deck-lightbox-close {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: none;
+  background: rgba(255, 255, 255, 0.1);
+  color: #fff;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.deck-lightbox-body {
+  width: 100%;
+  min-height: 240px;
+  background: #000;
+  border-radius: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px;
+  margin-bottom: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.deck-lightbox-body svg {
+  max-width: 100%;
+  max-height: 260px;
+}
+
+.deck-lightbox-footer p {
+  margin: 0;
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.7);
+  line-height: 1.5;
+}

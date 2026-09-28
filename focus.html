@@ -116,9 +116,7 @@
                 <button class="f-timer-btn" id="main-play-btn" onclick="toggleTimer()">
                   <i class="fa-solid fa-play"></i> Start Focus
                 </button>
-                <button class="f-timer-btn" id="main-save-btn" onclick="manualFinish()" style="display: none; padding: 9px 16px; border-radius: 24px; background: linear-gradient(135deg, #10b981, #059669); box-shadow: 0 4px 15px rgba(16, 185, 129, 0.4); color:#fff; font-size:13px; font-weight:700; align-items:center; gap:6px; cursor:pointer;" title="Save Session">
-                  <i class="fa-solid fa-floppy-disk"></i> Save
-                </button>
+                <button class="f-timer-btn" id="main-save-btn" onclick="manualFinish()" style="display: none; padding: 9px 16px; border-radius: 24px; background: linear-gradient(135deg, #10b981, #059669); box-shadow: 0 4px 15px rgba(16, 185, 129, 0.4); color:#fff; font-size:13px; font-weight:700; align-items:center; gap:6px; cursor:pointer;" title="Save Session"><i class="fa-solid fa-floppy-disk"></i> Save</button>
             </div>
 
 
@@ -131,6 +129,7 @@
       
       <!-- 🎧 INLINE AMBIENT FOCUS MINI-DOCK -->
       <div class="f-ambient-dock" style="display:flex; justify-content:center; align-items:center; gap:8px; margin: 16px 0 12px; flex-wrap:wrap;">
+        <button class="sound-chip" onclick="FlashRecall.openModal()" style="display:flex; align-items:center; gap:6px; padding:7px 14px; background:rgba(168,85,247,0.18); border:1px solid rgba(168,85,247,0.35); border-radius:20px; color:#c084fc; font-size:11px; font-weight:700; cursor:pointer;"><i class="fa-solid fa-brain"></i> Warmup (60s)</button>
         <button class="sound-chip" data-sound="rain" onclick="FocusAudio.toggle('rain')" style="display:flex; align-items:center; gap:6px; padding:7px 14px; background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.12); border-radius:20px; color:#fff; font-size:11px; font-weight:700; cursor:pointer; transition:all 0.2s;">
           <i class="fa-solid fa-cloud-rain" style="color:#60a5fa;"></i> Rain
         </button>
@@ -295,6 +294,7 @@
   <script src="app.js"></script>
   <script src="anru-notify.js"></script>
   <script src="anru-modal.js"></script>
+  <script src="flash-recall.js"></script>
   <script src="focus-audio.js"></script>
   <script src="bottom-sheet-gestures.js"></script>
   <script src="focus.js?v=3.0"></script>

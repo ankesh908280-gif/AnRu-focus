@@ -932,8 +932,15 @@ function handlePfpUpload(e) {
       const canvas=document.createElement('canvas'); const max=400; let w=img.width, h=img.height;
       if(w>h){ if(w>max){ h*=max/w; w=max;} } else { if(h>max){ w*=max/h; h=max;} }
       canvas.width=w; canvas.height=h; const ctx=canvas.getContext('2d'); ctx.drawImage(img,0,0,w,h);
-      const compressedUrl = canvas.toDataURL('image/jpeg',0.85); S.session.pfp = compressedUrl;
-      saveData(); updateNavUser(); showToast('<i class="fa-solid fa-camera"></i> Profile image synced to Cloud!','success');
+      const compressedUrl = canvas.toDataURL('image/jpeg',0.85); 
+      if (!S.session) S.session = {};
+      S.session.pfp = compressedUrl;
+      localStorage.setItem('mceo_sess', JSON.stringify(S.session));
+      localStorage.setItem('anru_user_session', JSON.stringify(S.session));
+      saveData(); 
+      updateNavUser(); 
+      if (typeof playSfx === 'function') playSfx('success');
+      showToast('<i class="fa-solid fa-camera"></i> Profile photo updated & saved permanently!','success');
     }; img.src=ev.target.result;
   }; reader.readAsDataURL(file);
 }

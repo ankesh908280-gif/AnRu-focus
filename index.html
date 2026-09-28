@@ -265,6 +265,21 @@
       </div>
 
       <div class="qs-pro-cards" style="margin-bottom:24px;">
+                <!-- 🏆 FLAGSHIP: BOARD POCKET DECK -->
+        <div class="qs-card-3d glass-panel" onclick="window.location.href='board-deck.html'" onpointerdown="playQsHover()" onmouseenter="playQsHover()" style="border: 1px solid rgba(251,191,36,0.4); background: linear-gradient(135deg, rgba(251,191,36,0.14), rgba(168,85,247,0.16)); box-shadow: 0 0 25px rgba(251,191,36,0.15);">
+          <div class="qs-card-content">
+            <div class="qs-icon-wrapper" style="background: linear-gradient(135deg, #fbbf24, #f59e0b); box-shadow: 0 0 20px rgba(251,191,36,0.5);"><i class="fa-solid fa-graduation-cap qs-floating-icon" style="color:#000;"></i></div>
+            <div class="qs-text-content">
+              <div style="display:flex; align-items:center; gap:6px;">
+                <h4 class="qs-card-title" style="color:#fff;">Board Pocket Deck</h4>
+                <span style="font-size:9px; background:#fbbf24; color:#000; font-weight:900; padding:2px 6px; border-radius:6px;">10 • 11 • 12</span>
+              </div>
+              <p class="qs-card-desc">UP Board Formulas, Sahitya & Diagrams</p>
+            </div>
+            <div class="qs-arrow-btn"><i class="fa-solid fa-arrow-right-long" style="color:#fbbf24;"></i></div>
+          </div>
+        </div>
+
         <!-- Notes Vault -->
         <div class="qs-card-3d glass-panel" onclick="window.location.href='notes-vault.html'" onpointerdown="playQsHover()" onmouseenter="playQsHover()">
           <div class="qs-card-content">
@@ -404,6 +419,31 @@
             <div class="qs-arrow-btn"><i class="fa-solid fa-arrow-right-long"></i></div>
           </div>
         </div>
+
+        <!-- 🧠 60-Second Daily Flash Recall -->
+        <div class="qs-card-3d glass-panel" onclick="FlashRecall.openModal()" onpointerdown="playQsHover()" onmouseenter="playQsHover()">
+          <div class="qs-card-content">
+            <div class="qs-icon-wrapper" style="background: linear-gradient(135deg, #a855f7, #6366f1); box-shadow: 0 0 20px rgba(168,85,247,0.5);"><i class="fa-solid fa-brain qs-floating-icon" style="color:#fff;"></i></div>
+            <div class="qs-text-content">
+              <h4 class="qs-card-title">Flash Recall (60s)</h4>
+              <p class="qs-card-desc">Daily Formula & Concept Warmup</p>
+            </div>
+            <div class="qs-arrow-btn"><i class="fa-solid fa-arrow-right-long"></i></div>
+          </div>
+        </div>
+
+        <!-- 🌙 Evening Study Diary -->
+        <div class="qs-card-3d glass-panel" onclick="EveningDiary.openDiaryModal()" onpointerdown="playQsHover()" onmouseenter="playQsHover()">
+          <div class="qs-card-content">
+            <div class="qs-icon-wrapper" style="background: linear-gradient(135deg, #6366f1, #c084fc); box-shadow: 0 0 20px rgba(99,102,241,0.5);"><i class="fa-solid fa-moon qs-floating-icon" style="color:#fff;"></i></div>
+            <div class="qs-text-content">
+              <h4 class="qs-card-title">Evening Reflection</h4>
+              <p class="qs-card-desc">2-Min Daily Log & Tomorrow Top-2</p>
+            </div>
+            <div class="qs-arrow-btn"><i class="fa-solid fa-arrow-right-long"></i></div>
+          </div>
+        </div>
+
       </div>
 
       <!-- 👥 SHELF 3: STUDENT CONNECT & COMMUNITY -->
@@ -963,6 +1003,8 @@
 <script src="focus-audio.js"></script>
 <script src="backlog-boss.js"></script>
 <script src="focus-wheel.js"></script>
+<script src="flash-recall.js"></script>
+<script src="evening-diary.js"></script>
 <script src="anru-modal.js"></script>
 <script src="bottom-sheet-gestures.js"></script>
 <script src="anru-notify.js"></script>

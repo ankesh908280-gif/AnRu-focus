@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+  <title>Board Pocket Deck - UP Board Master Vault</title>
+  
+  <!-- Modern Clean Typography -->
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&family=Outfit:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="board-deck.css">
+</head>
+<body class="deck-body">
+
+  <!-- 🌟 FLOATING HEADER -->
+  <header class="deck-header">
+    <button class="deck-back-btn" onclick="window.location.href='index.html#hub'" title="Back to Hub">
+      <i class="fa-solid fa-arrow-left"></i>
+    </button>
+    <div class="deck-header-title">
+      <h2>Board Pocket Deck</h2>
+      <p>UP Board Class 10 • 11 • 12 Master Vault</p>
+    </div>
+    <button class="deck-star-filter-btn" id="starFilterBtn" onclick="toggleStarFilter()" title="Filter Starred">
+      <i class="fa-solid fa-star"></i>
+    </button>
+  </header>
+
+  <!-- 🔍 LIVE SEARCH & FILTER BAR -->
+  <div class="deck-search-section">
+    <div class="deck-search-wrap">
+      <i class="fa-solid fa-magnifying-glass deck-search-icon"></i>
+      <input type="text" id="deckSearchInput" placeholder="Search formula, poet (सूरदास), theorem..." oninput="handleSearch(this.value)">
+      <button class="deck-search-clear" id="searchClearBtn" onclick="clearSearch()" style="display:none;">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+    </div>
+  </div>
+
+  <!-- 🎓 DYNAMIC ISLAND CLASS SWITCHER -->
+  <div class="deck-class-switcher-container">
+    <div class="deck-class-dock">
+      <button class="class-pill" data-class="10" onclick="switchClass('10', this)">
+        <i class="fa-solid fa-school"></i> 10th
+      </button>
+      <button class="class-pill active" data-class="11" onclick="switchClass('11', this)">
+        <i class="fa-solid fa-bolt"></i> 11th (Current)
+      </button>
+      <button class="class-pill" data-class="12" onclick="switchClass('12', this)">
+        <i class="fa-solid fa-graduation-cap"></i> 12th Target
+      </button>
+    </div>
+  </div>
+
+  <!-- 📚 SUBJECT TABS CAROUSEL -->
+  <div class="deck-subj-carousel-container">
+    <div class="deck-subj-carousel" id="subjTabsContainer">
+      <!-- Injected dynamically based on selected class -->
+    </div>
+  </div>
+
+  <!-- 📑 MAIN CONTENT CARDS CONTAINER -->
+  <main class="deck-main-container">
+    <div class="deck-stats-strip" id="deckStatsStrip">
+      <span id="deckCountLabel">Showing 0 Cards</span>
+      <span id="activeRecallTip"><i class="fa-solid fa-eye"></i> Tap Eye to Blur & Self-Test</span>
+    </div>
+
+    <div class="deck-cards-grid" id="deckCardsGrid">
+      <!-- Flashcards, Formulae, Diagrams & Sahitya Cards Injected Here -->
+    </div>
+  </main>
+
+  <!-- 🖼️ FULLSCREEN DIAGRAM LIGHTBOX MODAL -->
+  <div class="deck-lightbox-overlay" id="deckLightbox" onclick="closeLightbox(event)">
+    <div class="deck-lightbox-card" onclick="event.stopPropagation()">
+      <div class="deck-lightbox-header">
+        <h3 id="lightboxTitle">Diagram Title</h3>
+        <button class="deck-lightbox-close" onclick="closeLightbox()"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <div class="deck-lightbox-body" id="lightboxBody">
+        <!-- Diagram SVG or Image rendered here -->
+      </div>
+      <div class="deck-lightbox-footer">
+        <p id="lightboxDesc">Detailed key points and examination tips for this diagram.</p>
+      </div>
+    </div>
+  </div>
+
+  <script src="board-deck.js"></script>
+</body>
+</html>
