@@ -1,9 +1,0 @@
-{
-  "name": "AnRu Focus Pro",
-  "short_name": "AnRu Focus",
-  "start_url": "index.html",
-  "display": "standalone",
-  "background_color": "#0d0914",
-  "theme_color": "#0d0914",
-  "description": "Gamified Focus & Study Routine Manager with Live Cloud Sync"
-}
