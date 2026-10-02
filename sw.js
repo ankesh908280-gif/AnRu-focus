@@ -1,19 +1,16 @@
 /* =========================================================
    AnRu Focus - Service Worker (PWA Offline & Push Engine)
-   Version: 3.2.0
+   Version: 3.3.0
    ========================================================= */
 
-const CACHE_NAME = 'anru-focus-v3.2';
+const CACHE_NAME = 'anru-focus-v3.3';
 const ASSETS_TO_CACHE = [
     './',
     './index.html',
     './style.css',
     './sidebar.css',
     './app.js',
-    './manifest.json',
-    './6868.png',
-    './icon-192.png',
-    './icon-512.png'
+    './manifest.json'
 ];
 
 self.addEventListener('install', (event) => {
@@ -111,8 +108,8 @@ self.addEventListener('message', (event) => {
             tag: tag || 'anru-focus-timer',
             renotify: false,
             silent: silent !== undefined ? silent : true,
-            icon: '6868.png',
-            badge: '6868.png',
+            icon: 'icon.png',
+            badge: 'icon.png',
             actions: actions || [],
             data: { url: 'focus.html' }
         });

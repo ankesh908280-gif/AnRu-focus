@@ -10,8 +10,8 @@
   <link rel="stylesheet" href="style.css">
   <link rel="stylesheet" href="sidebar.css">
     <link rel="manifest" href="manifest.json">
-  <link rel="icon" type="image/png" href="6868.png">
-  <link rel="apple-touch-icon" href="6868.png">
+  <link rel="icon" type="image/png" href="icon.png">
+  <link rel="apple-touch-icon" href="icon.png">
   <meta name="theme-color" content="#0d0914">
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-capable" content="yes">
@@ -1024,7 +1024,7 @@
 
 <!-- 📲 Smart PWA Install Banner (Triggers Android Chrome System Install Prompt) -->
 <div id="anru-install-banner" style="display:none; position:fixed; bottom:75px; left:50%; transform:translateX(-50%); width:92%; max-width:400px; background:linear-gradient(135deg, rgba(26,16,63,0.97), rgba(15,8,36,0.98)); border:1px solid rgba(168,85,247,0.45); border-radius:18px; padding:12px 16px; z-index:99999; box-shadow:0 12px 35px rgba(0,0,0,0.85); backdrop-filter:blur(15px); align-items:center; gap:12px;">
-  <img src="6868.png" style="width:40px; height:40px; border-radius:10px; object-fit:cover; flex-shrink:0;">
+  <img src="icon.png" onerror="this.src='https://img.icons8.com/fluency/96/brain.png'" style="width:40px; height:40px; border-radius:10px; object-fit:cover; flex-shrink:0;">
   <div style="flex:1;">
     <div style="font-size:13px; font-weight:800; color:#fff;">Install AnRu Focus</div>
     <div style="font-size:11px; color:#cbd5e1;">Add to Home Screen with App Icon</div>
@@ -1041,7 +1041,7 @@
     window.addEventListener('load', () => {
       navigator.serviceWorker.register('sw.js')
         .then(reg => console.log('[PWA] Service Worker registered:', reg.scope))
-        .catch(err => console.warn('[PWA] Service Worker reg error:', err));
+        .catch(err => console.warn('[PWA] Service Worker reg failed:', err));
     });
   }
 
