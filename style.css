@@ -1663,3 +1663,52 @@ body, button, input, select, textarea {
 .auth-btn-guest:active {
   transform: scale(0.98);
 }
+
+
+
+/* =========================================================
+   🖥️ SCREEN CONTROLLER & VISIBILITY ENFORCEMENT
+   ========================================================= */
+.screen {
+  display: none !important;
+  min-height: 100vh;
+  position: relative;
+  z-index: 1;
+}
+
+.screen.active {
+  display: flex !important;
+  flex-direction: column;
+}
+
+#loginScreen {
+  min-height: 100vh;
+  position: relative;
+  overflow-x: hidden;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  background: #0d0914;
+}
+
+html:not(.user-authenticated) #loginScreen.active {
+  display: flex !important;
+}
+
+html.user-authenticated #loginScreen {
+  display: none !important;
+}
+
+html.user-authenticated #appScreen {
+  display: flex !important;
+}
+
+html:not(.user-authenticated) #appScreen {
+  display: none !important;
+}
+
+/* Hide floating action buttons while on login screen */
+html:not(.user-authenticated) .ai-fab,
+html:not(.user-authenticated) #floatingNoteBtn {
+  display: none !important;
+}

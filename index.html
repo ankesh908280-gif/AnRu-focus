@@ -25,12 +25,19 @@
   <!-- Universal Apple Glassmorphism Modal System -->
   <link rel="stylesheet" href="anru-modal.css">
   
-  <!-- Zero-Flash Instant Auth Shield -->
+    <!-- Zero-Flash Instant Auth Shield -->
   <script>
     try {
-      var sess = localStorage.getItem('mceo_sess') || localStorage.getItem('anru_user_session');
-      if (sess) {
-        document.documentElement.classList.add('user-authenticated');
+      var sessStr = localStorage.getItem('mceo_sess') || localStorage.getItem('anru_user_session');
+      if (sessStr) {
+        var sessObj = JSON.parse(sessStr);
+        if (sessObj && (sessObj.email || sessObj.isGuest)) {
+          document.documentElement.classList.add('user-authenticated');
+        } else {
+          document.documentElement.classList.remove('user-authenticated');
+        }
+      } else {
+        document.documentElement.classList.remove('user-authenticated');
       }
     } catch(e) {}
   </script>

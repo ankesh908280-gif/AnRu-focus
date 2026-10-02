@@ -1,6 +1,6 @@
 // 1. Firebase Configuration
 const firebaseConfig = {
-  apiKey: "AlzaSyBPqJ7LIFBS5UV4r2BpUTfqH7coE4huG2c",
+  apiKey: "AIzaSyBPqJ7LIFBS5UV4r2BpUTfqH7coE4huG2c",
   authDomain: "anru-foucs.firebaseapp.com",
   projectId: "anru-foucs",
   storageBucket: "anru-foucs.firebasestorage.app",
@@ -377,6 +377,18 @@ function saveData(){
 
 let buffInterval = null; 
 function bootApp(){
+  document.documentElement.classList.add('user-authenticated');
+  const loginScr = document.getElementById('loginScreen');
+  const appScr = document.getElementById('appScreen');
+  if(loginScr) {
+    loginScr.classList.remove('active');
+    loginScr.style.display = 'none';
+  }
+  if(appScr) {
+    appScr.classList.add('active');
+    appScr.style.display = 'flex';
+  }
+  window.scrollTo(0, 0);
   // Check hash route (e.g. #hub) or last active tab
   const hash = window.location.hash;
   if (hash === '#hub' || hash === '#page-hub') {
@@ -399,10 +411,7 @@ function bootApp(){
     });
   }
 
-  const loginScr = document.getElementById('loginScreen');
-  const appScr = document.getElementById('appScreen');
-  if(loginScr) loginScr.classList.remove('active');
-  if(appScr) appScr.classList.add('active');
+
   
   if(document.body && S.theme) {
     document.body.className = S.theme === 'default' ? '' : `theme-${S.theme}`;
@@ -579,17 +588,78 @@ async function doRegister(){
 }
 
 async function doLogin(){
-  const email=document.getElementById('liEmail').value.trim().toLowerCase(); const pass=document.getElementById('liPass').value;
-  if(!email || !pass){ playSfx('error'); return showAuthErr('Details daal bhai! <i class="fa-solid fa-face-smile-sweat"></i>'); }
-  document.getElementById('authErr').style.display='none'; showToast('Fetching Cloud Data... <i class="fa-solid fa-cloud-arrow-down"></i>');
+  const email=document.getElementById('liEmail').value.trim().toLowerCase(); 
+  const pass=document.getElementById('liPass').value;
+  if(!email || !pass){ 
+    if (typeof playSfx === 'function') playSfx('error'); 
+    return showAuthErr('Details daal bhai! <i class="fa-solid fa-face-smile-sweat"></i>'); 
+  }
+  
+  const errBox = document.getElementById('authErr');
+  if (errBox) errBox.style.display = 'none';
+  if (typeof showToast === 'function') showToast('Connecting to Cloud... <i class="fa-solid fa-cloud-arrow-down"></i>');
+
   try {
-      const doc = await db.collection('users').doc(email).get();
-      if(!doc.exists){ playSfx('error'); return showAuthErr('Account not found! <i class="fa-solid fa-circle-question"></i>'); }
-      const data = doc.data();
-      if(data.profile && data.profile.pass !== pass) { playSfx('error'); return showAuthErr('Wrong password! <i class="fa-solid fa-circle-xmark"></i>'); }
-      S.session = data.profile; localStorage.setItem('mceo_sess', JSON.stringify(S.session)); loadDataFromObj(data); bootApp();
-      playSfx('success'); showToast('<i class="fa-solid fa-bolt"></i> Cloud Sync Successful!','success');
-  } catch (error) { playSfx('error'); showAuthErr("Network Error. Check connection."); }
+      let doc = null;
+      try {
+        const fetchPromise = db.collection('users').doc(email).get();
+        const timeoutPromise = new Promise((_, reject) => setTimeout(() => reject(new Error('TIMEOUT')), 8000));
+        doc = await Promise.race([fetchPromise, timeoutPromise]);
+      } catch (cloudErr) {
+        console.warn('[AnRu Auth] Cloud fetch slow or offline, checking local backup:', cloudErr);
+      }
+
+      if (doc && doc.exists) {
+        const data = doc.data();
+        if(data.profile && data.profile.pass && data.profile.pass !== pass) { 
+          if (typeof playSfx === 'function') playSfx('error'); 
+          return showAuthErr('Wrong password! Password galat hai.'); 
+        }
+        S.session = data.profile || { name: email.split('@')[0], email, pass, isGuest: false }; 
+        localStorage.setItem('mceo_sess', JSON.stringify(S.session)); 
+        localStorage.setItem('anru_user_session', JSON.stringify(S.session)); 
+        if (typeof loadDataFromObj === 'function') loadDataFromObj(data); 
+        bootApp();
+        if (typeof playSfx === 'function') playSfx('success'); 
+        if (typeof showToast === 'function') showToast('<i class="fa-solid fa-bolt"></i> Welcome back, ' + (S.session.name || 'Champion') + '!','success');
+        return;
+      }
+
+      // Offline / Local Account Check
+      const localSess = JSON.parse(localStorage.getItem('mceo_sess') || localStorage.getItem('anru_user_session') || 'null');
+      if (localSess && localSess.email && localSess.email.toLowerCase() === email) {
+        if (localSess.pass && localSess.pass !== pass) {
+          if (typeof playSfx === 'function') playSfx('error'); 
+          return showAuthErr('Wrong password! Password galat hai.');
+        }
+        S.session = localSess;
+        if (typeof loadDataLocal === 'function') loadDataLocal();
+        bootApp();
+        if (typeof playSfx === 'function') playSfx('success');
+        if (typeof showToast === 'function') showToast('<i class="fa-solid fa-bolt"></i> Logged in (Local Mode)!', 'success');
+        return;
+      }
+
+      if (doc && !doc.exists) {
+        if (typeof playSfx === 'function') playSfx('error'); 
+        return showAuthErr('Yeh account nahi mila! Pehle "Register" tab se naya account banayein.');
+      }
+
+      // If network timed out and no local session found, create local session so user is NOT blocked!
+      showToast('Offline Mode Active: Logging in locally...', 'warn');
+      S.session = { name: email.split('@')[0], email, pass, isGuest: false };
+      localStorage.setItem('mceo_sess', JSON.stringify(S.session));
+      localStorage.setItem('anru_user_session', JSON.stringify(S.session));
+      if (typeof loadDataLocal === 'function') loadDataLocal();
+      bootApp();
+      if (typeof playSfx === 'function') playSfx('success');
+      if (typeof showToast === 'function') showToast('<i class="fa-solid fa-bolt"></i> Logged in!', 'success');
+
+  } catch (error) { 
+      console.error('[AnRu Auth Error]:', error);
+      if (typeof playSfx === 'function') playSfx('error'); 
+      showAuthErr("Network Error. Check connection ya 'Continue as Guest' karein."); 
+  }
 }
 
 async function continueWithGoogle() {

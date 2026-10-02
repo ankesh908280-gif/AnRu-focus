@@ -5,7 +5,7 @@
 
 // --- 🔥 FIREBASE CONNECTION (CLASH-PROOF FIX) ---
 var tbFbConfig = (typeof window.firebaseConfig !== 'undefined') ? window.firebaseConfig : {
-    apiKey: "AlzaSyBPqJ7LIFBS5UV4r2BpUTfqH7coE4huG2c",
+    apiKey: "AIzaSyBPqJ7LIFBS5UV4r2BpUTfqH7coE4huG2c",
     authDomain: "anru-foucs.firebaseapp.com",
     projectId: "anru-foucs",
     storageBucket: "anru-foucs.firebasestorage.app",

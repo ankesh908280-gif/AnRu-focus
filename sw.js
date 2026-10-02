@@ -41,7 +41,21 @@ self.addEventListener('activate', (event) => {
 // PWA Offline Capability - Network first, fallback to cache
 self.addEventListener('fetch', (event) => {
     if (event.request.method !== 'GET') return;
-    if (!event.request.url.startsWith('http')) return;
+    
+    const url = event.request.url;
+    // CRITICAL: DO NOT intercept Firebase, Firestore, Google APIs or external auth streams!
+    if (url.includes('googleapis.com') ||
+        url.includes('firebaseio.com') ||
+        url.includes('identitytoolkit') ||
+        url.includes('gstatic.com') ||
+        url.includes('google.com')) {
+        return; // Direct browser network handling without SW interference
+    }
+
+    // Only cache same-origin assets or specific CDN scripts
+    if (!url.startsWith(self.location.origin) && !url.includes('cdnjs.cloudflare.com')) {
+        return;
+    }
 
     event.respondWith(
         fetch(event.request)
