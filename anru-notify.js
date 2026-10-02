@@ -7,7 +7,7 @@
     'use strict';
 
     const NOTIFY_CONFIG = {
-        swPath: 'sw.js?v=3.0',
+        swPath: 'sw.js',
         minIntervalHours: 2.5, // Throttling: at least 2.5 hours between smart reminders
         storageKeyLast: 'anru_last_smart_notify_ts',
         storageKeyHistory: 'anru_notify_history',

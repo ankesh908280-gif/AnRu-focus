@@ -1,0 +1,38 @@
+{
+  "name": "AnRu Focus Pro",
+  "short_name": "AnRu Focus",
+  "id": "./",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#0d0914",
+  "theme_color": "#0d0914",
+  "description": "Gamified Focus & Study Routine Manager with Live Cloud Sync",
+  "icons": [
+    {
+      "src": "6868.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "6868.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
