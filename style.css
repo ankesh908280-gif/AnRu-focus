@@ -1173,3 +1173,493 @@ body, button, input, select, textarea {
   from { opacity: 0; }
   to { opacity: 1; }
 }
+
+
+/* ==========================================================================
+   ✨ AnRu Focus Pro - Next-Gen Modern Animated Auth Screen
+   ========================================================================== */
+
+#loginScreen {
+  min-height: 100vh;
+  position: relative;
+  overflow-x: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #0d0914;
+}
+
+/* Ambient Floating Glowing Orbs */
+.auth-ambient-orbs {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+  z-index: 0;
+}
+
+.ambient-orb {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(80px);
+  opacity: 0.4;
+  animation: floatOrb 14s ease-in-out infinite alternate;
+}
+
+.orb-cyan {
+  width: 280px;
+  height: 280px;
+  top: -40px;
+  left: -40px;
+  background: radial-gradient(circle, #06b6d4 0%, transparent 70%);
+}
+
+.orb-purple {
+  width: 360px;
+  height: 360px;
+  top: 30%;
+  right: -80px;
+  background: radial-gradient(circle, #a855f7 0%, transparent 70%);
+  animation-duration: 18s;
+  animation-delay: -4s;
+}
+
+.orb-pink {
+  width: 300px;
+  height: 300px;
+  bottom: -60px;
+  left: 10%;
+  background: radial-gradient(circle, #ec4899 0%, transparent 70%);
+  animation-duration: 16s;
+  animation-delay: -7s;
+}
+
+@keyframes floatOrb {
+  0% { transform: translate(0, 0) scale(1); }
+  50% { transform: translate(25px, 35px) scale(1.08); }
+  100% { transform: translate(-20px, 15px) scale(0.95); }
+}
+
+/* Auth Container */
+.auth-container {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  max-width: 420px;
+  margin: auto;
+  padding: 24px 18px;
+}
+
+/* Auth Hero */
+.auth-hero {
+  text-align: center;
+  margin-bottom: 24px;
+  animation: heroSlideUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+@keyframes heroSlideUp {
+  from { opacity: 0; transform: translateY(-25px) scale(0.94); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.auth-brand-badge {
+  width: 82px;
+  height: 82px;
+  margin: 0 auto 14px;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.auth-icon-halo {
+  position: absolute;
+  inset: -6px;
+  border-radius: 28px;
+  background: linear-gradient(135deg, #06b6d4, #a855f7, #ec4899, #f59e0b);
+  filter: blur(14px);
+  opacity: 0.75;
+  animation: pulseHalo 4s ease-in-out infinite alternate;
+}
+
+@keyframes pulseHalo {
+  0% { opacity: 0.55; transform: scale(0.95); }
+  100% { opacity: 0.95; transform: scale(1.05); }
+}
+
+.auth-icon-img {
+  width: 82px;
+  height: 82px;
+  border-radius: 22px;
+  object-fit: cover;
+  position: relative;
+  z-index: 1;
+  box-shadow: 0 12px 35px rgba(0,0,0,0.65);
+  border: 1.5px solid rgba(255, 255, 255, 0.3);
+  animation: floatBadge 4s ease-in-out infinite;
+}
+
+@keyframes floatBadge {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-5px); }
+}
+
+.auth-title {
+  font-family: 'Outfit', sans-serif;
+  font-size: 32px;
+  font-weight: 900;
+  color: #ffffff;
+  letter-spacing: -0.5px;
+  margin: 0;
+  line-height: 1.1;
+}
+
+.auth-title-gradient {
+  background: linear-gradient(135deg, #38bdf8 0%, #c084fc 50%, #f472b6 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.auth-tagline-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 8px;
+  padding: 5px 14px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 20px;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.8px;
+  color: #cbd5e1;
+  backdrop-filter: blur(10px);
+}
+
+.pulse-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #4ade80;
+  box-shadow: 0 0 8px #4ade80;
+  animation: pulseGlow 1.8s infinite;
+}
+
+@keyframes pulseGlow {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.4; transform: scale(0.85); }
+}
+
+/* Glassmorphism Luxury Card */
+.auth-card.glass-luxury {
+  background: rgba(20, 14, 40, 0.76);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.75), 
+              inset 0 1px 1px rgba(255, 255, 255, 0.22),
+              0 0 30px rgba(168, 85, 247, 0.12);
+  backdrop-filter: blur(35px) saturate(190%);
+  -webkit-backdrop-filter: blur(35px) saturate(190%);
+  border-radius: 28px;
+  padding: 26px 22px;
+  animation: cardIn 0.7s cubic-bezier(0.16, 1, 0.3, 1) 0.15s both;
+}
+
+/* Animated Pill Tab Switcher */
+.auth-tab-switch {
+  display: flex;
+  position: relative;
+  background: rgba(0, 0, 0, 0.45);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 16px;
+  padding: 4px;
+  margin-bottom: 22px;
+}
+
+.auth-tab-slider {
+  position: absolute;
+  top: 4px;
+  bottom: 4px;
+  left: 4px;
+  width: calc(50% - 4px);
+  border-radius: 12px;
+  background: linear-gradient(135deg, #a855f7, #ec4899);
+  box-shadow: 0 4px 15px rgba(168, 85, 247, 0.45);
+  transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+  pointer-events: none;
+}
+
+.auth-tab-slider.reg-active {
+  transform: translateX(100%);
+}
+
+.auth-tab {
+  flex: 1;
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 10px 14px;
+  border: none;
+  background: transparent;
+  color: rgba(255, 255, 255, 0.55);
+  font-family: 'Outfit', sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  border-radius: 12px;
+  transition: color 0.3s;
+}
+
+.auth-tab.active {
+  color: #ffffff;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
+}
+
+/* Modern Input Groups with Focus Effects */
+.auth-input-group {
+  position: relative;
+  display: flex;
+  align-items: center;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 16px;
+  margin-bottom: 14px;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  overflow: hidden;
+}
+
+.auth-input-group:focus-within {
+  border-color: #a855f7;
+  background: rgba(255, 255, 255, 0.07);
+  box-shadow: 0 0 20px rgba(168, 85, 247, 0.35), inset 0 1px 1px rgba(255, 255, 255, 0.15);
+  transform: translateY(-1px);
+}
+
+.auth-input-icon {
+  width: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 15px;
+  flex-shrink: 0;
+}
+
+.auth-input-group input {
+  flex: 1;
+  background: transparent;
+  border: none;
+  padding: 14px 14px 14px 0;
+  color: #ffffff;
+  font-size: 14px;
+  font-family: 'Outfit', sans-serif;
+  outline: none;
+}
+
+.auth-input-group input::placeholder {
+  color: rgba(255, 255, 255, 0.35);
+}
+
+.pwd-toggle-btn {
+  background: transparent;
+  border: none;
+  color: rgba(255, 255, 255, 0.45);
+  padding: 0 14px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: color 0.2s, transform 0.15s;
+}
+
+.pwd-toggle-btn:hover {
+  color: #ffffff;
+}
+
+.pwd-toggle-btn:active {
+  transform: scale(0.9);
+}
+
+/* Password Strength Meter */
+.pwd-strength-container {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: -6px;
+  margin-bottom: 14px;
+  padding: 0 4px;
+}
+
+.pwd-strength-track {
+  flex: 1;
+  height: 4px;
+  border-radius: 2px;
+  background: rgba(255, 255, 255, 0.1);
+  overflow: hidden;
+}
+
+.pwd-strength-fill {
+  height: 100%;
+  width: 0%;
+  border-radius: 2px;
+  transition: width 0.35s ease, background-color 0.35s ease;
+}
+
+.pwd-strength-label {
+  font-size: 11px;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.5);
+}
+
+/* Forgot Password Link */
+.auth-forgot-row {
+  text-align: right;
+  margin-top: -4px;
+  margin-bottom: 14px;
+}
+
+.auth-forgot-link {
+  color: #c084fc;
+  font-size: 12px;
+  font-weight: 700;
+  text-decoration: none;
+  transition: color 0.2s, text-shadow 0.2s;
+}
+
+.auth-forgot-link:hover {
+  color: #ffffff;
+  text-shadow: 0 0 10px rgba(192, 132, 252, 0.8);
+}
+
+/* Primary Shimmer Button */
+.auth-btn-primary {
+  position: relative;
+  overflow: hidden;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 14px 20px;
+  border: none;
+  border-radius: 16px;
+  background: linear-gradient(135deg, #a855f7 0%, #ec4899 50%, #f59e0b 100%);
+  color: #ffffff;
+  font-family: 'Outfit', sans-serif;
+  font-size: 15px;
+  font-weight: 800;
+  cursor: pointer;
+  box-shadow: 0 10px 25px rgba(168, 85, 247, 0.45);
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.auth-btn-primary:active {
+  transform: scale(0.98);
+}
+
+.auth-btn-shine {
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 60%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.35), transparent);
+  transform: skewX(-20deg);
+  animation: btnShine 3.5s infinite;
+  pointer-events: none;
+}
+
+@keyframes btnShine {
+  0%, 65% { left: -100%; }
+  100% { left: 200%; }
+}
+
+/* Divider */
+.auth-divider {
+  display: flex;
+  align-items: center;
+  text-align: center;
+  color: rgba(255, 255, 255, 0.4);
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  margin: 18px 0;
+}
+
+.auth-divider::before,
+.auth-divider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.auth-divider span {
+  padding: 0 12px;
+}
+
+/* Google Sign-In Button */
+.auth-btn-google {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 12px 18px;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 16px;
+  color: #ffffff;
+  font-family: 'Outfit', sans-serif;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  margin-bottom: 10px;
+  backdrop-filter: blur(10px);
+  transition: all 0.25s;
+}
+
+.auth-btn-google:hover {
+  background: rgba(255, 255, 255, 0.12);
+  border-color: rgba(255, 255, 255, 0.25);
+  transform: translateY(-1px);
+}
+
+.auth-btn-google:active {
+  transform: scale(0.98);
+}
+
+.google-svg {
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+}
+
+/* Guest Button */
+.auth-btn-guest {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 12px 18px;
+  background: transparent;
+  border: 1px dashed rgba(168, 85, 247, 0.4);
+  border-radius: 16px;
+  color: rgba(255, 255, 255, 0.75);
+  font-family: 'Outfit', sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.25s;
+}
+
+.auth-btn-guest:hover {
+  background: rgba(168, 85, 247, 0.12);
+  border-color: #a855f7;
+  color: #ffffff;
+}
+
+.auth-btn-guest:active {
+  transform: scale(0.98);
+}

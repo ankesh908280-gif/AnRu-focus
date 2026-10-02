@@ -505,9 +505,61 @@ window.deductXP = function(amt) { return window.AnRuSync.deductXP(amt); };
                   4. CLOUD AUTHENTICATION 
 ████████████████████████████████████████████████████████████ */
 function switchAuthTab(t){
-  document.getElementById('tabLogin').classList.toggle('active',t==='login'); document.getElementById('tabReg').classList.toggle('active',t==='reg');
-  document.getElementById('panelLogin').classList.toggle('active',t==='login'); document.getElementById('panelReg').classList.toggle('active',t==='reg');
-  document.getElementById('authErr').style.display='none';
+  document.getElementById('tabLogin')?.classList.toggle('active', t==='login');
+  document.getElementById('tabReg')?.classList.toggle('active', t==='reg');
+  document.getElementById('panelLogin')?.classList.toggle('active', t==='login');
+  document.getElementById('panelReg')?.classList.toggle('active', t==='reg');
+  const errBox = document.getElementById('authErr');
+  if (errBox) errBox.style.display = 'none';
+  const slider = document.getElementById('authTabSlider');
+  if (slider) slider.classList.toggle('reg-active', t==='reg');
+  if (typeof playSfx === 'function') playSfx('click');
+}
+
+function togglePasswordVisibility(inputId, btn) {
+  const input = document.getElementById(inputId);
+  if (!input) return;
+  const isPass = input.type === 'password';
+  input.type = isPass ? 'text' : 'password';
+  const icon = btn.querySelector('i');
+  if (icon) {
+    icon.className = isPass ? 'fa-solid fa-eye-slash' : 'fa-solid fa-eye';
+  }
+  if (typeof playSfx === 'function') playSfx('click');
+}
+
+function checkPasswordStrength(val) {
+  const wrap = document.getElementById('pwdStrengthWrap');
+  const fill = document.getElementById('pwdStrengthFill');
+  const text = document.getElementById('pwdStrengthText');
+  if (!wrap || !fill || !text) return;
+
+  if (!val) {
+    wrap.style.display = 'none';
+    return;
+  }
+  wrap.style.display = 'flex';
+
+  let score = 0;
+  if (val.length >= 4) score += 30;
+  if (val.length >= 8) score += 25;
+  if (/[0-9]/.test(val)) score += 25;
+  if (/[^A-Za-z0-9]/.test(val)) score += 20;
+
+  fill.style.width = Math.min(100, score) + '%';
+  if (score < 40) {
+    fill.style.backgroundColor = '#ef4444';
+    text.textContent = 'Too Short (Min 4)';
+    text.style.color = '#ef4444';
+  } else if (score < 75) {
+    fill.style.backgroundColor = '#f59e0b';
+    text.textContent = 'Good Password 👍';
+    text.style.color = '#f59e0b';
+  } else {
+    fill.style.backgroundColor = '#10b981';
+    text.textContent = 'Strong 🚀';
+    text.style.color = '#10b981';
+  }
 }
 function showAuthErr(m){const e=document.getElementById('authErr'); e.innerHTML=m; e.style.display='block';}
 

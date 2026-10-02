@@ -42,44 +42,124 @@
 </head>
 <body>
 
-<!-- ██████ LOGIN SCREEN ██████ -->
+<!-- ██████ LOGIN SCREEN (NEXT-GEN MODERN ANIMATED AUTH) ██████ -->
 <div class="screen active" id="loginScreen">
+  <!-- Dynamic Ambient Glowing Orbs Background -->
+  <div class="auth-ambient-orbs">
+    <div class="ambient-orb orb-cyan"></div>
+    <div class="ambient-orb orb-purple"></div>
+    <div class="ambient-orb orb-pink"></div>
+  </div>
+
   <div class="auth-container">
+    <!-- 🌟 Hero Branding Header -->
     <div class="auth-hero">
-      <div class="logo-ring"><div class="logo-inner"><i class="fa-solid fa-rocket" style="color: #fff;"></i></div></div>
-      <h1>AnRu Focus</h1>
-      <p>Crush Your Backlog. Design Your Future.</p>
-    </div>
-    <div class="auth-card glass2">
-      <div class="tab-switcher">
-        <button class="tab-btn active" id="tabLogin" onclick="switchAuthTab('login')">Login</button>
-        <button class="tab-btn" id="tabReg" onclick="switchAuthTab('reg')">Register</button>
+      <div class="auth-brand-badge">
+        <div class="auth-icon-halo"></div>
+        <img src="icon.png" onerror="this.src='https://img.icons8.com/fluency/96/brain.png'" class="auth-icon-img" alt="AnRu Focus">
       </div>
+      <h1 class="auth-title">AnRu <span class="auth-title-gradient">Focus</span></h1>
+      <div class="auth-tagline-chip">
+        <span class="pulse-dot"></span>
+        <span>FOCUS • LEARN • IMPROVE • SUCCEED</span>
+      </div>
+    </div>
+
+    <!-- 💎 Luxury Glassmorphic Auth Card -->
+    <div class="auth-card glass-luxury">
+      <!-- Animated Pill Tab Switcher -->
+      <div class="auth-tab-switch">
+        <div class="auth-tab-slider" id="authTabSlider"></div>
+        <button class="auth-tab active" id="tabLogin" onclick="switchAuthTab('login')">
+          <i class="fa-solid fa-lock-open"></i> Login
+        </button>
+        <button class="auth-tab" id="tabReg" onclick="switchAuthTab('reg')">
+          <i class="fa-solid fa-user-plus"></i> Register
+        </button>
+      </div>
+
+      <!-- Error Notification Box -->
       <div class="err-box" id="authErr"></div>
-      
+
+      <!-- 🔐 LOGIN PANEL -->
       <div class="form-panel active" id="panelLogin">
-        <div class="inp-wrap"><span class="ico"><i class="fa-solid fa-envelope" style="color: #60a5fa;"></i></span><input type="email" id="liEmail" placeholder="Email address" autocomplete="email"></div>
-        <div class="inp-wrap"><span class="ico"><i class="fa-solid fa-lock" style="color: #f87171;"></i></span><input type="password" id="liPass" placeholder="Password" autocomplete="current-password"></div>
-        
-        <div style="text-align: right; margin-top: -6px; margin-bottom: 12px;">
-          <a href="#" onclick="doForgotPassword(); return false;" style="color: var(--p1, #a855f7); font-size: 13px; text-decoration: none; font-weight: 600;">Forgot Password?</a>
+        <div class="auth-input-group">
+          <span class="auth-input-icon"><i class="fa-solid fa-envelope" style="color: #38bdf8;"></i></span>
+          <input type="email" id="liEmail" placeholder="Email address" autocomplete="email">
         </div>
 
-        <button class="btn btn-grad" onclick="doLogin()">Login to Focus <i class="fa-solid fa-arrow-right-to-bracket" style="margin-left: 5px;"></i></button>
-        <button class="btn btn-grad" style="background: #db4437; color: white; width: 100%; padding: 12px; border: none; border-radius: 8px; font-size: 16px; margin-bottom: 10px; cursor: pointer;margin-top: 8px" onclick="continueWithGoogle()">
-          <i class="fa-brands fa-google" style="margin-right: 5px;"></i> Continue with Google
+        <div class="auth-input-group">
+          <span class="auth-input-icon"><i class="fa-solid fa-lock" style="color: #f472b6;"></i></span>
+          <input type="password" id="liPass" placeholder="Password" autocomplete="current-password">
+          <button type="button" class="pwd-toggle-btn" onclick="togglePasswordVisibility('liPass', this)" tabindex="-1" title="Show/Hide Password">
+            <i class="fa-solid fa-eye"></i>
+          </button>
+        </div>
+
+        <div class="auth-forgot-row">
+          <a href="#" onclick="doForgotPassword(); return false;" class="auth-forgot-link">Forgot Password?</a>
+        </div>
+
+        <button class="auth-btn-primary" onclick="doLogin()">
+          <span class="auth-btn-shine"></span>
+          <span class="auth-btn-text">Sign In to Focus</span>
+          <i class="fa-solid fa-arrow-right-to-bracket auth-btn-icon"></i>
         </button>
 
-        <div class="divider">or</div>
-        <button class="btn btn-glass" onclick="guestLogin()"><i class="fa-solid fa-user-astronaut" style="color: #a855f7; margin-right: 5px;"></i> Continue as Guest</button>
+        <div class="auth-divider"><span>or continue with</span></div>
+
+        <button class="auth-btn-google" onclick="continueWithGoogle()">
+          <svg class="google-svg" viewBox="0 0 24 24">
+            <path fill="#4285F4" d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.82-2.4 3.68v3.05h3.88c2.27-2.09 3.66-5.17 3.66-9.17z"/>
+            <path fill="#34A853" d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.88-3.05c-1.08.72-2.45 1.16-4.05 1.16-3.12 0-5.77-2.1-6.72-4.93H1.25v3.15C3.26 21.36 7.34 24 12 24z"/>
+            <path fill="#FBBC05" d="M5.28 14.27c-.25-.72-.38-1.49-.38-2.27s.13-1.55.38-2.27V6.58H1.25C.45 8.18 0 9.99 0 12s.45 3.82 1.25 5.42l4.03-3.15z"/>
+            <path fill="#EA4335" d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.34 0 3.26 2.64 1.25 6.58l4.03 3.15c.95-2.83 3.6-4.98 6.72-4.98z"/>
+          </svg>
+          <span>Continue with Google</span>
+        </button>
+
+        <button class="auth-btn-guest" onclick="guestLogin()">
+          <i class="fa-solid fa-user-astronaut"></i>
+          <span>Continue as Guest</span>
+        </button>
       </div>
-      
+
+      <!-- ✨ REGISTER PANEL -->
       <div class="form-panel" id="panelReg">
-        <div class="inp-wrap"><span class="ico"><i class="fa-solid fa-user" style="color: #a855f7;"></i></span><input type="text" id="reName" placeholder="Your full name"></div>
-        <div class="inp-wrap"><span class="ico"><i class="fa-solid fa-envelope" style="color: #60a5fa;"></i></span><input type="email" id="reEmail" placeholder="Email address"></div>
-        <div class="inp-wrap"><span class="ico"><i class="fa-solid fa-graduation-cap" style="color: #fbbf24;"></i></span><input type="text" id="reCourse" placeholder="Course / College (optional)"></div>
-        <div class="inp-wrap"><span class="ico"><i class="fa-solid fa-lock" style="color: #f87171;"></i></span><input type="password" id="rePass" placeholder="Create password (min 4 chars)"></div>
-        <button class="btn btn-grad" onclick="doRegister()">Create Account <i class="fa-solid fa-wand-magic-sparkles" style="margin-left: 5px;"></i></button>
+        <div class="auth-input-group">
+          <span class="auth-input-icon"><i class="fa-solid fa-user" style="color: #c084fc;"></i></span>
+          <input type="text" id="reName" placeholder="Your full name" autocomplete="name">
+        </div>
+
+        <div class="auth-input-group">
+          <span class="auth-input-icon"><i class="fa-solid fa-envelope" style="color: #38bdf8;"></i></span>
+          <input type="email" id="reEmail" placeholder="Email address" autocomplete="email">
+        </div>
+
+        <div class="auth-input-group">
+          <span class="auth-input-icon"><i class="fa-solid fa-graduation-cap" style="color: #fbbf24;"></i></span>
+          <input type="text" id="reCourse" placeholder="Class / Exam (e.g. 11th UP Board)">
+        </div>
+
+        <div class="auth-input-group">
+          <span class="auth-input-icon"><i class="fa-solid fa-lock" style="color: #f472b6;"></i></span>
+          <input type="password" id="rePass" placeholder="Create password (min 4 chars)" oninput="checkPasswordStrength(this.value)">
+          <button type="button" class="pwd-toggle-btn" onclick="togglePasswordVisibility('rePass', this)" tabindex="-1" title="Show/Hide Password">
+            <i class="fa-solid fa-eye"></i>
+          </button>
+        </div>
+
+        <!-- Live Password Strength Meter -->
+        <div class="pwd-strength-container" id="pwdStrengthWrap" style="display:none;">
+          <div class="pwd-strength-track"><div class="pwd-strength-fill" id="pwdStrengthFill"></div></div>
+          <span class="pwd-strength-label" id="pwdStrengthText">Weak</span>
+        </div>
+
+        <button class="auth-btn-primary" onclick="doRegister()">
+          <span class="auth-btn-shine"></span>
+          <span class="auth-btn-text">Create Account</span>
+          <i class="fa-solid fa-wand-magic-sparkles auth-btn-icon"></i>
+        </button>
       </div>
     </div>
   </div>
